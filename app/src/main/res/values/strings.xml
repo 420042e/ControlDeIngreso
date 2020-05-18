@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Control de Ingreso</string>
+    <string name="title_activity_visitantes">Visitantes</string>
+</resources>
