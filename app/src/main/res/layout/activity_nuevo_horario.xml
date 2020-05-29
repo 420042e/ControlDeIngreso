@@ -127,12 +127,11 @@
                 android:timePickerMode="spinner" />
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/button"
+                android:id="@+id/btnNH"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="16dp"
                 android:gravity="center"
-                android:onClick="guardarHorario"
 
                 android:text="Guardar Horario"
                 android:textAllCaps="true"

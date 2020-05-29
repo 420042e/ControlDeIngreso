@@ -10,8 +10,8 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 public class NetworkClient {
-    //private static final String BASE_URL = "http://172.16.0.22:8080/ingresoVisitantes/visitante/";
-    private static final String BASE_URL = "http://172.16.0.22:8080/ingresoVisitantes/";
+    //private static final String BASE_URL = "http://172.16.0.22:8080/ingresoVisitantes/";
+    private static final String BASE_URL = "http://190.129.90.115:8083/ingresoVisitantes/";
     private static Retrofit retrofit;
 
     public static Retrofit getRetrofitClient(Context context) {

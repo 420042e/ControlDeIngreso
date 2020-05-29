@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Spinner;
@@ -72,6 +73,8 @@ public class NuevoHorarioActivity extends AppCompatActivity implements Validator
     private CheckBox dia4;
     private CheckBox dia5;
 
+    private Button btnNH;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -96,6 +99,8 @@ public class NuevoHorarioActivity extends AppCompatActivity implements Validator
         entrada = findViewById(R.id.entrada);
         salida = findViewById(R.id.salida);
 
+        btnNH = findViewById(R.id.btnNH);
+
         /*ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);*/
 
@@ -110,85 +115,14 @@ public class NuevoHorarioActivity extends AppCompatActivity implements Validator
         salida = (TimePicker)findViewById(R.id.salida);
         salida.setIs24HourView(true);
 
-        /*recintoS = findViewById(R.id.recinto);
-        tipoVisitanteS = findViewById(R.id.tipoVisitante);
-
-        iniciarSpinnerRecinto();
-        iniciarSpinnerTipoVisitante();
-
-        fetchRecintos();
-        fetchTipoVisitantes();*/
-    }
-
-    /*public void iniciarSpinnerRecinto() {
-        recintos = new ArrayList<>();
-        Recinto recinto = new Recinto();
-        recinto.setRecCod("cod");
-        recinto.setRecNombre("Selecciona un recinto");
-        recinto.setRecNombrea("obs");
-        recinto.setRecEstado("obs");
-        recinto.setRecTipo("obs");
-        Aduana aduana = new Aduana();
-        aduana.setAduCod("");
-        aduana.setAduNombre("");
-        aduana.setAduPais("");
-        aduana.setAduEstado("");
-        recinto.setAduana(aduana);
-        recintos.add(recinto);
-        adapterRecinto = new ArrayAdapter<Recinto>(this, android.R.layout.simple_spinner_dropdown_item, recintos);
-        adapterRecinto.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        recintoS.setAdapter(adapterRecinto);
-        recintoS.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        btnNH.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                Recinto recinto = (Recinto) parent.getSelectedItem();
-                displayRecintoData(recinto);
-            }
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
+            public void onClick(View v) {
+                validator.validate();
+                //Log.d("msg", "hola");
             }
         });
     }
-
-    public void iniciarSpinnerTipoVisitante() {
-        tipoVisitantes = new ArrayList<>();
-        TipoVisitante tipoVisitante = new TipoVisitante();
-        tipoVisitante.setTviCod("cod");
-        tipoVisitante.setTviNombre("Selecciona tipo de visitante");
-        tipoVisitante.setTviDescripcion("obs");
-        tipoVisitante.setHorEstado("estado");
-        tipoVisitantes.add(tipoVisitante);
-        adapterTipoVisitante = new ArrayAdapter<TipoVisitante>(this, android.R.layout.simple_spinner_dropdown_item, tipoVisitantes);
-        adapterTipoVisitante.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        tipoVisitanteS.setAdapter(adapterTipoVisitante);
-        tipoVisitanteS.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                TipoVisitante tipoVisitante = (TipoVisitante) parent.getSelectedItem();
-                displayTipoVisitanteData(tipoVisitante);
-            }
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-            }
-        });
-    }
-
-    private void displayRecintoData(Recinto recinto) {
-        String cod = recinto.getRecCod();
-        String nombre = recinto.getRecNombre();
-        String obs = recinto.getRecTipo();
-        String userData = "Cod: " + cod + "\nNombre: " + nombre + "\nObs: " + obs;
-        //Toast.makeText(this, userData, Toast.LENGTH_LONG).show();
-    }
-
-    private void displayTipoVisitanteData(TipoVisitante tipoVisitante) {
-        String cod = tipoVisitante.getTviCod();
-        String nombre = tipoVisitante.getTviNombre();
-        String descripcion = tipoVisitante.getTviDescripcion();
-        String estado = tipoVisitante.getHorEstado();
-        String userData = "Cod: " + cod + "\nNombre: " + nombre + "\nObs: " + descripcion + "\nEstado: " + estado;
-        //Toast.makeText(this, userData, Toast.LENGTH_LONG).show();
-    }*/
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
@@ -200,69 +134,6 @@ public class NuevoHorarioActivity extends AppCompatActivity implements Validator
         return super.onOptionsItemSelected(item);
     }
 
-    /*private void fetchRecintos() {
-        Retrofit retrofit = NetworkClient.getRetrofitClient(this);
-        RecintosAPIs recintosAPIs = retrofit.create(RecintosAPIs.class);
-        Call<List<Recinto>> call = recintosAPIs.listaRecintos();
-        call.enqueue(new Callback<List<Recinto>>() {
-            @Override
-            public void onResponse(Call <List<Recinto>> call, Response<List<Recinto>> response) {
-                //recintos = response.body();
-                int pos = -1;
-                for(int i = 0 ; i < response.body().size() ; i++)
-                {
-                    recintos.add(response.body().get(i));
-                    if(response.body().get(i).getRecCod().equals(recintoRecibido.getRecCod()))
-                    {
-                        pos = i+1;
-                    }
-                }
-                recintoS.setSelection(pos, true);
-            }
-            @Override
-            public void onFailure(Call call, Throwable t) {
-
-            }
-        });
-    }
-
-    private void fetchTipoVisitantes() {
-        Retrofit retrofit = NetworkClient.getRetrofitClient(this);
-        TipoVisitanteAPIs tipoVisitantesAPIs = retrofit.create(TipoVisitanteAPIs.class);
-        Call<List<TipoVisitante>> call = tipoVisitantesAPIs.listaTipoVisitante();
-        call.enqueue(new Callback<List<TipoVisitante>>() {
-            @Override
-            public void onResponse(Call <List<TipoVisitante>> call, Response<List<TipoVisitante>> response) {
-                //tipoVisitantes = response.body();
-                int pos = -1;
-                for(int i = 0 ; i < response.body().size() ; i++)
-                {
-                    tipoVisitantes.add(response.body().get(i));
-                    if(response.body().get(i).getTviCod().equals(tipoVisitanteRecibido.getTviCod()))
-                    {
-                        pos = i+1;
-                    }
-                }
-                tipoVisitanteS.setSelection(pos, true);
-
-                tipoVisitanteS.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                    @Override
-                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                        TipoVisitante tipoVisitante = (TipoVisitante) parent.getSelectedItem();
-                        displayTipoVisitanteData(tipoVisitante);
-                    }
-                    @Override
-                    public void onNothingSelected(AdapterView<?> parent) {
-                    }
-                });
-            }
-            @Override
-            public void onFailure(Call call, Throwable t) {
-
-            }
-        });
-    }*/
-
     private void registrarHorario() {
         Retrofit retrofit = NetworkClient.getRetrofitClient(this);
         RegistrarHorarioAPIs registrarHorarioAPIs = retrofit.create(RegistrarHorarioAPIs.class);
@@ -273,6 +144,7 @@ public class NuevoHorarioActivity extends AppCompatActivity implements Validator
                 Horario horarioRecibido = response.body();
                 //Log.d("msg",""+horarioRecibido.getHorNombre());
                 Toast.makeText(getApplicationContext(), "El nuevo horario fué registrado", Toast.LENGTH_SHORT).show();
+                horario.setHorEstado("0");
                 Intent intent = new Intent();
                 intent.putExtra("horarioResult", horario);
                 setResult(RESULT_OK, intent);
@@ -284,10 +156,6 @@ public class NuevoHorarioActivity extends AppCompatActivity implements Validator
 
             }
         });
-    }
-
-    public void guardarHorario(View view) {
-        validator.validate();
     }
 
     @Override
@@ -324,11 +192,9 @@ public class NuevoHorarioActivity extends AppCompatActivity implements Validator
             //Log.d("msgdias",""+dias);
 
             diasTV.setError(null);
-            //Horario horario = new Horario();
             horario = new Horario();
             horario.setHorNombre(horNombre.getText().toString());
             horario.setHorDescripcion(horDescripcion.getText().toString());
-            //horario.setHorDias("MONDAY,TUESDAY,WEDNESDAY,THURSDAY,FRIDAY");
             horario.setHorDias(dias);
             horario.setHorHoraEntrada(Integer.toString(entrada.getCurrentHour()));
             horario.setHorMinEntrada(Integer.toString(entrada.getCurrentMinute()));
@@ -341,12 +207,6 @@ public class NuevoHorarioActivity extends AppCompatActivity implements Validator
 
 
         }
-
-
-        /*Gson gson = new Gson();
-        String descripcion = gson.toJson(horario);
-
-        Log.d("msg",""+descripcion);*/
 
     }
 
