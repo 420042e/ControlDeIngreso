@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="#FFFFFF"
+    android:id="@+id/contenedor"
+    android:focusableInTouchMode="true"
+    android:orientation="vertical">
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fitsSystemWindows="true"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@drawable/fondo_toolbar"
+            app:popupTheme="@style/Theme.AppCompat.Light"/>
+
+    </com.google.android.material.appbar.AppBarLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <TextView
+            android:id="@+id/textView7"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Tipo de visitante" />
+
+        <Spinner
+            android:id="@+id/tipoVisitante"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scrollbarSize="5dp"
+            android:scrollbarThumbVertical="@android:color/darker_gray"
+            android:scrollbars="vertical" />
+
+        <TextView
+            android:id="@+id/emptyView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/no_data_available"
+            android:visibility="gone" />
+
+    </LinearLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
+

@@ -1,6 +1,6 @@
 package com.stbnlycan.models;
 
-public class AreaR {
+public class AreaRecinto {
     private String areaCod;
     private String areaNombre;
     private String areaDescripcion;
@@ -47,7 +47,7 @@ public class AreaR {
         this.recinto = recinto;
     }
 
-    public AreaR() {
+    public AreaRecinto() {
     }
 
     @Override

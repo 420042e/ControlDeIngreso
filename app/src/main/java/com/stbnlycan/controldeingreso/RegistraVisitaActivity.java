@@ -1,24 +1,34 @@
 package com.stbnlycan.controldeingreso;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonArrayRequest;
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.Volley;
-import com.stbnlycan.models.AreaR;
+import com.google.gson.Gson;
+import com.mobsandgeeks.saripaar.ValidationError;
+import com.mobsandgeeks.saripaar.Validator;
+import com.mobsandgeeks.saripaar.annotation.NotEmpty;
+import com.mobsandgeeks.saripaar.annotation.Select;
+import com.stbnlycan.interfaces.AreaRecintoAPIs;
+import com.stbnlycan.interfaces.RegistrarIngresoAPIs;
+import com.stbnlycan.interfaces.RegistrarSalidaAPIs;
+import com.stbnlycan.models.Aduana;
+import com.stbnlycan.models.AreaRecinto;
+import com.stbnlycan.models.Empresa;
+import com.stbnlycan.models.Recinto;
 import com.stbnlycan.models.TipoVisitante;
+import com.stbnlycan.models.Visita;
 import com.stbnlycan.models.Visitante;
 
 import org.json.JSONArray;
@@ -26,42 +36,64 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.List;
 
-public class RegistraVisitaActivity extends AppCompatActivity {
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Retrofit;
 
-    ArrayList<AreaR> areaR;
-    ArrayAdapter<AreaR> adapterAreaR;
+public class RegistraVisitaActivity extends AppCompatActivity implements Validator.ValidationListener {
+
+    private ArrayList<AreaRecinto> areaRecinto;
+    private ArrayAdapter<AreaRecinto> adapterAreaR;
+    private Visitante visitanteRecibido;
+
+    @Select
+    private Spinner areaRecintoS;
+
+    @NotEmpty
+    private EditText observacion;
+    private Validator validator;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registrar_visita);
 
-        setTitle("Confirmar Visita");
+        setTitle("Registrar Ingreso");
+        areaRecintoS = findViewById(R.id.area_recinto);
+        observacion = findViewById(R.id.observacion);
+
+        validator = new Validator(this);
+        validator.setValidationListener(this);
+
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);
+
+        visitanteRecibido = (Visitante) getIntent().getSerializableExtra("Visitante");
 
         iniciarSpinnerArea();
-        getDataAreaR(getIntent().getStringExtra("recCod"));
+        fetchAreaRecintos(getIntent().getStringExtra("recCod"));
     }
 
     public void iniciarSpinnerArea() {
-        Spinner spinner = findViewById(R.id.area_recinto);
-        areaR = new ArrayList<>();
+        areaRecinto = new ArrayList<>();
 
-        AreaR area = new AreaR();
+        AreaRecinto area = new AreaRecinto();
         area.setAreaCod("cod");
         area.setAreaNombre("Selecciona area del recinto");
         area.setAreaDescripcion("descripcion");
         area.setAreaEstado("estado");
 
-        areaR.add(area);
-        adapterAreaR = new ArrayAdapter<AreaR>(this, android.R.layout.simple_spinner_dropdown_item, areaR);
+        areaRecinto.add(area);
+        adapterAreaR = new ArrayAdapter<AreaRecinto>(this, android.R.layout.simple_spinner_dropdown_item, areaRecinto);
         adapterAreaR.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(adapterAreaR);
-        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        areaRecintoS.setAdapter(adapterAreaR);
+        areaRecintoS.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                AreaR areaR = (AreaR) parent.getSelectedItem();
-                displayAreaRData(areaR);
+                AreaRecinto areaRecinto = (AreaRecinto) parent.getSelectedItem();
+                displayAreaRData(areaRecinto);
             }
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
@@ -69,123 +101,110 @@ public class RegistraVisitaActivity extends AppCompatActivity {
         });
     }
 
-    private void getDataAreaR(String recCod) {
-        String url = "http://172.16.0.22:8080/ingresoVisitantes/areaRecinto/listaPorRecinto?recCod="+recCod;
-        JsonArrayRequest jsonArrayRequest  = new JsonArrayRequest
-                (Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
+    private void fetchAreaRecintos(String recCod) {
+        Retrofit retrofit = NetworkClient.getRetrofitClient(this);
+        AreaRecintoAPIs areaRecintoAPIs = retrofit.create(AreaRecintoAPIs.class);
+        Call<List<AreaRecinto>> call = areaRecintoAPIs.listaPorRecinto(recCod);
+        call.enqueue(new Callback<List<AreaRecinto>>() {
+            @Override
+            public void onResponse(Call <List<AreaRecinto>> call, retrofit2.Response<List<AreaRecinto>> response) {
+                for(int i = 0 ; i < response.body().size() ; i++)
+                {
+                    areaRecinto.add(response.body().get(i));
+                }
+            }
+            @Override
+            public void onFailure(Call <List<AreaRecinto>> call, Throwable t) {
 
-                    @Override
-                    public void onResponse(JSONArray response) {
-                        //Toast.makeText(getApplicationContext(), "hola "+response.toString(), Toast.LENGTH_LONG).show();
-
-                        for (int i = 0; i < response.length(); i++) {
-                            try {
-                                JSONObject jsonObject = response.getJSONObject(i);
-
-                                AreaR area = new AreaR();
-                                area.setAreaCod(jsonObject.getString("areaCod"));
-                                area.setAreaNombre(jsonObject.getString("areaNombre"));
-                                area.setAreaDescripcion(jsonObject.getString("areaDescripcion"));
-                                area.setAreaEstado(jsonObject.getString("areaEstado"));
-
-                                areaR.add(area);
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                        //adapterEmpresa.notifyDataSetChanged();
-                    }
-                }, new Response.ErrorListener() {
-
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        // TODO: Handle error
-                        Toast.makeText(getApplicationContext(), "error "+error, Toast.LENGTH_SHORT).show();
-                    }
-                });
-        RequestQueue requestQueue = Volley.newRequestQueue(this);
-        requestQueue.add(jsonArrayRequest);
+            }
+        });
     }
 
-    private void displayAreaRData(AreaR areaR) {
-        String cod = areaR.getAreaCod();
-        String nombre = areaR.getAreaNombre();
-        String descripcion = areaR.getAreaDescripcion();
-        String estado = areaR.getAreaEstado();
+    private void displayAreaRData(AreaRecinto areaRecinto) {
+        String cod = areaRecinto.getAreaCod();
+        String nombre = areaRecinto.getAreaNombre();
+        String descripcion = areaRecinto.getAreaDescripcion();
+        String estado = areaRecinto.getAreaEstado();
         String userData = "Cod: " + cod + "\nNombre: " + nombre + "\nObs: " + descripcion + "\nEstado: " + estado;
         //Toast.makeText(this, userData, Toast.LENGTH_LONG).show();
     }
 
     public void registrarVisita(View view) {
-        JSONObject registroIngreso = new JSONObject();
-        try {
-            JSONObject visitante = new JSONObject();
-            visitante.put("vteCi", "6580366");
-            visitante.put("vteCorreo", "live626@gmail.com");
-            visitante.put("vteImagen", "logoAlbo_07-05-2020_13_39_23_784.png");
-            visitante.put("vteNombre", "Daniel");
-            visitante.put("vteApellidos", "Romero Velasco");
-            visitante.put("vteTelefono", "68384383");
-            visitante.put("vteDireccion", "Calle 17");
-            visitante.put("vteEstado", "ACT");
-            visitante.put("vteLlave", "7f66c2927bab25eaa6e6c450eae5d267d87ecadba0f44e92fbd0fdd941779ca4503bc58468b4de9cb80f8c7872a99e141c991edda701e139428b539e92b2e1d3");
-            visitante.put("vteFecha", "2020-05-07T11:42:49.636");
-            JSONObject tipoVisitante = new JSONObject();
-            tipoVisitante.put("tviCod", 2);
-            tipoVisitante.put("tviNombre", "TRAMITADOR");
-            tipoVisitante.put("tviDescripcion", "TRAMITADORES");
-            tipoVisitante.put("horEstado", "ACT");
-            JSONObject empresa = new JSONObject();
-            empresa.put("empCod", 1);
-            empresa.put("empNombre", "CHASQUI");
-            empresa.put("empObs", "EMPRESA DE TRANSPORTE CHASQUI");
-            visitante.put("tipoVisitante", tipoVisitante);
-            visitante.put("empresa", empresa);
-            JSONObject areaRecinto = new JSONObject();
-            areaRecinto.put("areaCod", 2);
-            areaRecinto.put("areaNombre", "ALMACEN 2");
-            areaRecinto.put("areaDescripcion", "ALMACEN 2 DONDE SE GUARDA X COSAS");
-            areaRecinto.put("areaEstado", "ACT");
-            JSONObject recinto = new JSONObject();
-            recinto.put("recCod", "YAC01");
-            recinto.put("recNombre", "PAJOSO - YACUIBA");
-            recinto.put("recNombrea", "FRONTERA YACUIBA");
-            recinto.put("recEstado", "ACT");
-            recinto.put("recTipo", "FRONTERA");
-            JSONObject aduana = new JSONObject();
-            aduana.put("aduCod", 621);
-            aduana.put("aduNombre", "FRONTERA YACUIBA");
-            aduana.put("aduPais", "BOLIVIA");
-            aduana.put("aduEstado", "ACT");
-            recinto.put("aduana", aduana);
-            areaRecinto.put("recinto", recinto);
-            registroIngreso.put("visObs", "La persona ingresa con un maletin negro de cuero");
-            registroIngreso.put("visitante", visitante);
-            registroIngreso.put("areaRecinto", areaRecinto);
+        /*Visita visita = new Visita();
+        AreaRecinto areaRecinto = (AreaRecinto) areaRecintoS.getSelectedItem();
+        visita.setVisObs(observacion.getText().toString());
+        visita.setVisitante(visitanteRecibido);
+        visita.setAreaRecinto(areaRecinto);
+        registrarIngreso(visita);*/
 
-        } catch (JSONException e) {
-            e.printStackTrace();
+        validator.validate();
+    }
+
+    @Override
+    public void onValidationSucceeded() {
+        Visita visita = new Visita();
+        AreaRecinto areaRecinto = (AreaRecinto) areaRecintoS.getSelectedItem();
+        visita.setVisObs(observacion.getText().toString());
+        visita.setVisitante(visitanteRecibido);
+        visita.setAreaRecinto(areaRecinto);
+        registrarIngreso(visita);
+    }
+
+    @Override
+    public void onValidationFailed(List<ValidationError> errors) {
+        for (ValidationError error : errors) {
+            View view = error.getView();
+            String message = error.getCollatedErrorMessage(this);
+            // Display error messages
+            if (view instanceof EditText) {
+                //((EditText) view).setError(message);
+                ((EditText) view).setError("Este campo es requerido");
+            }else if (view instanceof Spinner) {
+                //((TextView) ((Spinner) view).getSelectedView()).setError(message);
+                ((TextView) ((Spinner) view).getSelectedView()).setError("Este campo es requerido");
+            }else {
+                Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+            }
         }
-        Log.d("ob",""+registroIngreso.toString());
+    }
 
-        String url = "http://172.16.0.22:8080/ingresoVisitantes/visita/registrarIngreso";
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
-                Request.Method.POST, url, registroIngreso,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        Log.d("msg", response.toString());
-                    }
-                }, new Response.ErrorListener() {
-
+    private void registrarIngreso(Visita visita) {
+        Retrofit retrofit = NetworkClient.getRetrofitClient(this);
+        RegistrarIngresoAPIs registrarIngresoAPIs = retrofit.create(RegistrarIngresoAPIs.class);
+        Call<Visita> call = registrarIngresoAPIs.registrarIngreso(visita);
+        call.enqueue(new Callback<Visita>() {
             @Override
-            public void onErrorResponse(VolleyError error) {
-                // TODO: Handle error
-                Toast.makeText(getApplicationContext(), "error " + error, Toast.LENGTH_SHORT).show();
+            public void onResponse(Call <Visita> call, retrofit2.Response<Visita> response) {
+                Visita visitaRecibida = response.body();
+                if(visitaRecibida.getVisCod() != null)
+                {
+                    Toast.makeText(getApplicationContext(), "La visita fué registrada", Toast.LENGTH_SHORT).show();
+                    finish();
+                }
+                else
+                {
+                    Toast.makeText(getApplicationContext(), "El Visitante tiene Salidas Pendientes", Toast.LENGTH_SHORT).show();
+                    finish();
+                }
+                //Log.d("msg",""+horarioRecibido.getHorNombre());
+                /*Toast.makeText(getApplicationContext(), "La salida fué registrada", Toast.LENGTH_SHORT).show();
+                finish();*/
+            }
+            @Override
+            public void onFailure(Call <Visita> call, Throwable t) {
+                Log.d("msg",""+t.toString());
             }
         });
-        RequestQueue requestQueue = Volley.newRequestQueue(this);
-        requestQueue.add(jsonObjectRequest);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                return false;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
 }

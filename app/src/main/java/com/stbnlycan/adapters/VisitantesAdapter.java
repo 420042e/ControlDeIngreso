@@ -49,7 +49,7 @@ public class VisitantesAdapter extends RecyclerView.Adapter<VisitantesAdapter.AR
         }
 
         //holder.artimg.setImageResource(R.drawable.evento_agetic2);
-        holder.areaRecinto = eventosList.get(position);
+        holder.visitante = eventosList.get(position);
     }
 
     @Override
@@ -102,7 +102,7 @@ public class VisitantesAdapter extends RecyclerView.Adapter<VisitantesAdapter.AR
         private TextView artNaam;
         private TextView lugar;
         private TextView estado;
-        Visitante areaRecinto;
+        Visitante visitante;
 
         public ARV(@NonNull View itemView) {
             super(itemView);
@@ -130,7 +130,7 @@ public class VisitantesAdapter extends RecyclerView.Adapter<VisitantesAdapter.AR
             transaction.add(R.id.fragment_details, fragment, "BLANK_FRAGMENT").commit();
 
             onNoteListener.onNoteClick(getAdapterPosition());*/
-            mListener.onEventoClick(areaRecinto);
+            mListener.onEventoClick(visitante, getAdapterPosition());
 
         }
 
@@ -142,6 +142,6 @@ public class VisitantesAdapter extends RecyclerView.Adapter<VisitantesAdapter.AR
 
     public interface OnVisitanteClickListener
     {
-        void onEventoClick(Visitante areaRecinto);
+        void onEventoClick(Visitante visitante, int position);
     }
 }

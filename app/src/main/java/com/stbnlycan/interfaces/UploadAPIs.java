@@ -10,6 +10,6 @@ import retrofit2.http.Part;
 
 public interface UploadAPIs {
     @Multipart
-    @POST("registrar")
+    @POST("visitante/registrar")
     Call<ResponseBody> uploadImage(@Part MultipartBody.Part file, @Part("vte") RequestBody requestBody);
 }

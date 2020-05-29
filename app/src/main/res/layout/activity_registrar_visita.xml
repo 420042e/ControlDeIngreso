@@ -30,12 +30,27 @@
         android:layout_height="wrap_content"
         android:ems="10"
         android:gravity="start|top"
-        android:inputType="textMultiLine" />
+        android:inputType="textMultiLine"
+        android:lines="4"
+        android:maxLines="4" />
 
-    <Button
-        android:id="@+id/button3"
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:gravity="center"
         android:onClick="registrarVisita"
-        android:text="Registrar visita" />
+
+        android:text="Registrar visita"
+        android:textAllCaps="true"
+        app:backgroundTint="#2196F3"
+        app:icon="@drawable/ic_save_black_24dp"
+        app:iconGravity="textStart"
+        app:iconPadding="20dp"
+        app:iconTint="#FFFFFF"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
 </LinearLayout>

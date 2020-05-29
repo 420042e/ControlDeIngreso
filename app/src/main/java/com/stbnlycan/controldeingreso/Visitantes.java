@@ -1,34 +1,28 @@
 package com.stbnlycan.controldeingreso;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
+import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.ArrayAdapter;
+import android.view.View;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonArrayRequest;
-import com.android.volley.toolbox.Volley;
-import com.stbnlycan.adapters.RecintosAdapter;
-import com.stbnlycan.adapters.VisitanteListAdapter;
 import com.stbnlycan.adapters.VisitantesAdapter;
-import com.stbnlycan.models.AreaR;
+import com.stbnlycan.interfaces.ListaVisitantesAPIs;
 import com.stbnlycan.models.Empresa;
-import com.stbnlycan.models.Recinto;
 import com.stbnlycan.models.TipoVisitante;
 import com.stbnlycan.models.Visitante;
 
@@ -36,15 +30,21 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Retrofit;
 
 public class Visitantes extends AppCompatActivity implements VisitantesAdapter.OnVisitanteClickListener {
 
-    ArrayList<Visitante> visitantes;
-    ListView listaVisitantes;
-    //VisitanteListAdapter adapter;
-    VisitantesAdapter visitantesAdapter;
+    private ArrayList<Visitante> visitantes;
+    private VisitantesAdapter visitantesAdapter;
+    private Toolbar toolbar;
+    private final static int REQUEST_CODE_NV = 1;
+    private final static int REQUEST_CODE_EV = 2;
+    private RecyclerView recyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,8 +53,12 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
 
         setTitle("Visitantes");
 
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);
+        /*ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);*/
+        toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         //listaVisitantes = findViewById(R.id.visitantes);
 
@@ -65,15 +69,16 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
         listaVisitantes.setAdapter(adapter);*/
 
 
-        /*RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
+        recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
         visitantesAdapter = new VisitantesAdapter(visitantes);
         visitantesAdapter.setOnVisitanteClickListener(Visitantes.this);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new GridLayoutManager(this, 1));
-        recyclerView.setAdapter(visitantesAdapter);*/
+        recyclerView.setAdapter(visitantesAdapter);
 
 
-        getDataVisitante();
+        //getDataVisitante();
+        fetchVisitantes();
     }
 
     @Override
@@ -82,75 +87,65 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
             case android.R.id.home:
                 finish();
                 return false;
+            case R.id.action_nuevo_visitante:
+                //Log.d("msg", "nuevo visitante");
+                Intent intent = new Intent(Visitantes.this, NuevoVisitanteActivity.class);
+                intent.putExtra("recCod", getIntent().getStringExtra("recCod"));
+                //startActivity(intent);
+                startActivityForResult(intent, REQUEST_CODE_NV);
+                //prueba();
+                return false;
         }
         return super.onOptionsItemSelected(item);
     }
 
-    private void getDataVisitante() {
-        String url = "http://172.16.0.22:8080/ingresoVisitantes/visitante/lista";
-        JsonArrayRequest jsonArrayRequest  = new JsonArrayRequest
-                (Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == Activity.RESULT_OK) {
+            if (requestCode == REQUEST_CODE_NV) {
+                Bundle b = data.getExtras();
+                if (data != null) {
+                    Visitante visitanteResult = (Visitante) b.getSerializable("visitanteResult");
+                    visitantes.add(0, visitanteResult);
+                    visitantesAdapter.notifyItemInserted(0);
+                    recyclerView.scrollToPosition(0);
+                }
+            }
+            else if (requestCode == REQUEST_CODE_EV) {
+                Bundle b = data.getExtras();
+                if (data != null) {
+                    Visitante visitanteResult = (Visitante) b.getSerializable("visitanteResult");
+                    Log.d("msg3", ""+b.getInt("position", -1));
+                    int position = b.getInt("position", -1);
+                    visitantes.add(position, visitanteResult);
+                    visitantesAdapter.notifyItemInserted(position);
+                    recyclerView.scrollToPosition(position);
+                }
+            }
+        }
+    }
 
-                    @Override
-                    public void onResponse(JSONArray response) {
-                        //Toast.makeText(getApplicationContext(), "hola "+response.toString(), Toast.LENGTH_LONG).show();
+    private void fetchVisitantes() {
+        Retrofit retrofit = NetworkClient.getRetrofitClient(this);
+        ListaVisitantesAPIs listaVisitantesAPIs = retrofit.create(ListaVisitantesAPIs.class);
+        Call<List<Visitante>> call = listaVisitantesAPIs.listaVisitantes();
+        call.enqueue(new Callback<List<Visitante>>() {
+            @Override
+            public void onResponse(Call <List<Visitante>> call, retrofit2.Response<List<Visitante>> response) {
+                //recintos = response.body();
 
-                        for (int i = 0; i < response.length(); i++) {
-                            try {
-                                JSONObject jsonObject = response.getJSONObject(i);
+                for(int i = 0 ; i < response.body().size() ; i++)
+                {
+                    visitantes.add(response.body().get(i));
+                }
+                visitantesAdapter.notifyDataSetChanged();
+            }
+            @Override
+            public void onFailure(Call <List<Visitante>> call, Throwable t) {
 
-                                Visitante visitante = new Visitante();
-                                visitante.setVteCi(jsonObject.getString("vteCi"));
-                                visitante.setVteCorreo(jsonObject.getString("vteCorreo"));
-                                visitante.setVteNombre(jsonObject.getString("vteNombre"));
-                                visitante.setVteApellidos(jsonObject.getString("vteApellidos"));
-                                visitante.setVteTelefono(jsonObject.getString("vteTelefono"));
-                                visitante.setVteDireccion(jsonObject.getString("vteDireccion"));
-                                visitante.setVteEstado(jsonObject.getString("vteEstado"));
-                                visitante.setVteLlave(jsonObject.getString("vteLlave"));
-                                visitante.setVteFecha(jsonObject.getString("vteFecha"));
-                                visitante.setVteFecha(jsonObject.getString("vteFecha"));
-
-                                JSONObject jsonObjectTV = new JSONObject(jsonObject.getString("tipoVisitante"));
-                                TipoVisitante tipoVisitante = new TipoVisitante();
-                                tipoVisitante.setTviCod(jsonObjectTV.getString("tviCod"));
-                                tipoVisitante.setTviNombre(jsonObjectTV.getString("tviNombre"));
-                                tipoVisitante.setTviDescripcion(jsonObjectTV.getString("tviDescripcion"));
-                                tipoVisitante.setHorEstado(jsonObjectTV.getString("horEstado"));
-
-                                JSONObject jsonObjectE = new JSONObject(jsonObject.getString("empresa"));
-                                Empresa empresa = new Empresa();
-                                empresa.setEmpCod(jsonObjectE.getString("empCod"));
-                                empresa.setEmpNombre(jsonObjectE.getString("empNombre"));
-                                empresa.setEmpObs(jsonObjectE.getString("empObs"));
-
-                                visitante.setTipoVisitante(tipoVisitante);
-                                visitante.setEmpresa(empresa);
-
-                                visitantes.add(visitante);
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
-                        visitantesAdapter = new VisitantesAdapter(visitantes);
-                        visitantesAdapter.setOnVisitanteClickListener(Visitantes.this);
-                        recyclerView.setHasFixedSize(true);
-                        recyclerView.setLayoutManager(new GridLayoutManager(getApplicationContext(), 1));
-                        recyclerView.setAdapter(visitantesAdapter);
-
-                        //visitantesAdapter.notifyDataSetChanged();
-                    }
-                }, new Response.ErrorListener() {
-
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        // TODO: Handle error
-                        Toast.makeText(getApplicationContext(), "error "+error, Toast.LENGTH_SHORT).show();
-                    }
-                });
-        RequestQueue requestQueue = Volley.newRequestQueue(this);
-        requestQueue.add(jsonArrayRequest);
+            }
+        });
     }
 
     @Override
@@ -166,7 +161,7 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.example_menu, menu);
+        inflater.inflate(R.menu.menu2, menu);
         MenuItem searchItem = menu.findItem(R.id.action_search);
         SearchView searchView = (SearchView) searchItem.getActionView();
         searchView.setMaxWidth(Integer.MAX_VALUE);
@@ -186,9 +181,12 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
     }
 
     @Override
-    public void onEventoClick(Visitante visitante) {
+    public void onEventoClick(Visitante visitante, int position) {
+        Log.d("msg1",""+position);
         Intent intent = new Intent(Visitantes.this, EditarVisitanteActivity.class);
         intent.putExtra("Visitante", visitante);
-        startActivity(intent);
+        intent.putExtra("position", position);
+        //startActivity(intent);
+        startActivityForResult(intent, REQUEST_CODE_EV);
     }
 }

@@ -1,19 +1,58 @@
 package com.stbnlycan.models;
 
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+
 import java.io.Serializable;
 
 public class Visitante implements Serializable {
+
+    @SerializedName("vteCi")
+    @Expose
     private  String vteCi;
+
+    @SerializedName("vteCorreo")
+    @Expose
     private String vteCorreo;
+
+    @SerializedName("vteImagen")
+    @Expose
     private String vteImagen;
+
+    @SerializedName("vteNombre")
+    @Expose
     private String vteNombre;
+
+    @SerializedName("vteApellidos")
+    @Expose
     private String vteApellidos;
+
+    @SerializedName("vteTelefono")
+    @Expose
     private String vteTelefono;
+
+    @SerializedName("vteDireccion")
+    @Expose
     private String vteDireccion;
+
+    @SerializedName("vteEstado")
+    @Expose
     private String vteEstado;
+
+    @SerializedName("vteLlave")
+    @Expose
     private String vteLlave;
+
+    @SerializedName("vteFecha")
+    @Expose
     private String vteFecha;
+
+    @SerializedName("tipoVisitante")
+    @Expose
     private TipoVisitante tipoVisitante;
+
+    @SerializedName("empresa")
+    @Expose
     private Empresa empresa;
 
     public String getVteCi() {

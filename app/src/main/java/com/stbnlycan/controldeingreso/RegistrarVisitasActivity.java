@@ -3,6 +3,7 @@ package com.stbnlycan.controldeingreso;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -14,20 +15,16 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonArrayRequest;
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.Volley;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 import com.stbnlycan.adapters.RecintoAdapter;
 import com.stbnlycan.fragments.BusquedaCiDialogFragment;
+import com.stbnlycan.interfaces.BuscarXQRAPIs;
+import com.stbnlycan.interfaces.RegistrarSalidaAPIs;
 import com.stbnlycan.models.Accion;
 import com.stbnlycan.models.Empresa;
 import com.stbnlycan.models.TipoVisitante;
+import com.stbnlycan.models.Visita;
 import com.stbnlycan.models.Visitante;
 
 import org.json.JSONArray;
@@ -37,7 +34,14 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Retrofit;
+
 public class RegistrarVisitasActivity extends AppCompatActivity implements RecintoAdapter.OnEventoListener, BusquedaCiDialogFragment.OnBusquedaCiListener{
+
+    private String recCod;
+    private Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,8 +50,12 @@ public class RegistrarVisitasActivity extends AppCompatActivity implements Recin
 
         setTitle("Registrar Visita");
 
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);
+        recCod = getIntent().getStringExtra("recCod");
+
+        /*ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);*/
+        toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
         List<Accion> cards = new ArrayList<>();
         cards.add(new Accion(0, "Escanear QR", R.drawable.icono_scan_qr));
@@ -128,8 +136,6 @@ public class RegistrarVisitasActivity extends AppCompatActivity implements Recin
             else
             {
                 //Toast.makeText(this,  "ID Participante "+result.getContents().toString(), Toast.LENGTH_LONG).show();
-                //dialogLoading.show();
-                //ciExiste(session_key, sid, result.getContents().toString());
                 buscarXQR(result.getContents().toString());
             }
         }
@@ -139,76 +145,47 @@ public class RegistrarVisitasActivity extends AppCompatActivity implements Recin
         }
     }
 
-    public void buscarXQR(String llave) {
-        String url = "http://172.16.0.22:8080/ingresoVisitantes/visitante/buscarXQR?llave="+llave;
-        JsonObjectRequest jsonObjectRequest  = new JsonObjectRequest
-                (Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
+    private void buscarXQR(String llave) {
+        Retrofit retrofit = NetworkClient.getRetrofitClient(this);
+        BuscarXQRAPIs buscarXQRAPIs = retrofit.create(BuscarXQRAPIs.class);
+        Call<Visitante> call = buscarXQRAPIs.buscarXQR(llave);
+        call.enqueue(new Callback<Visitante>() {
+            @Override
+            public void onResponse(Call <Visitante> call, retrofit2.Response<Visitante> response) {
+                Visitante visitanteRecibido = response.body();
+                if(visitanteRecibido.getVteCi() != null)
+                {
+                    Toast.makeText(getApplicationContext(), "Se encontró el visitante", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(RegistrarVisitasActivity.this, RegistraVisitaActivity.class);
+                    intent.putExtra("Visitante", visitanteRecibido);
+                    intent.putExtra("recCod", recCod);
+                    startActivity(intent);
+                }
+                else
+                {
+                    Toast.makeText(getApplicationContext(), "No se encontró el visitante", Toast.LENGTH_SHORT).show();
+                }
+                /*Toast.makeText(getApplicationContext(), "Se encontró el visitante", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(RegistrarVisitasActivity.this, RegistraVisitaActivity.class);
+                intent.putExtra("Visitante", visitanteRecibido);
+                intent.putExtra("recCod", recCod);
+                startActivity(intent);*/
+            }
+            @Override
+            public void onFailure(Call <Visitante> call, Throwable t) {
 
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        //Toast.makeText(getApplicationContext(), "hola "+response.toString(), Toast.LENGTH_LONG).show();
-                        try {
-                            JSONObject jsonObject = new JSONObject(response.toString());
-                            Visitante visitante = new Visitante();
-                            visitante.setVteCi(jsonObject.getString("vteCi"));
-                            visitante.setVteCorreo(jsonObject.getString("vteCorreo"));
-                            visitante.setVteImagen(jsonObject.getString("vteImagen"));
-                            visitante.setVteNombre(jsonObject.getString("vteNombre"));
-                            visitante.setVteApellidos(jsonObject.getString("vteApellidos"));
-                            visitante.setVteTelefono(jsonObject.getString("vteTelefono"));
-                            visitante.setVteDireccion(jsonObject.getString("vteDireccion"));
-                            visitante.setVteEstado(jsonObject.getString("vteEstado"));
-                            visitante.setVteLlave(jsonObject.getString("vteLlave"));
-                            visitante.setVteFecha(jsonObject.getString("vteFecha"));
-                            JSONObject jsonObjectTV = new JSONObject(jsonObject.getString("tipoVisitante"));
-                            TipoVisitante tipoVisitante = new TipoVisitante();
-                            tipoVisitante.setTviCod(jsonObjectTV.getString("tviCod"));
-                            tipoVisitante.setTviNombre(jsonObjectTV.getString("tviNombre"));
-                            tipoVisitante.setTviDescripcion(jsonObjectTV.getString("tviDescripcion"));
-                            tipoVisitante.setHorEstado(jsonObjectTV.getString("horEstado"));
-                            visitante.setTipoVisitante(tipoVisitante);
-                            JSONObject jsonObjectE = new JSONObject(jsonObject.getString("empresa"));
-                            Empresa empresa = new Empresa();
-                            empresa.setEmpCod(jsonObjectE.getString("empCod"));
-                            empresa.setEmpNombre(jsonObjectE.getString("empNombre"));
-                            empresa.setEmpObs(jsonObjectE.getString("empObs"));
-                            visitante.setEmpresa(empresa);
-
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }, new Response.ErrorListener() {
-
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        // TODO: Handle error
-                        Toast.makeText(getApplicationContext(), "error "+error, Toast.LENGTH_SHORT).show();
-                    }
-                });
-        RequestQueue requestQueue = Volley.newRequestQueue(this);
-        requestQueue.add(jsonObjectRequest);
+            }
+        });
     }
 
     @Override
     public void onBusquedaCiListener(String ci) {
         Log.d("result", ""+ci);
-        Toast.makeText(getApplicationContext(),  "ID Participante "+ci, Toast.LENGTH_LONG).show();
-
-        //Si existe, iniciamos activity de detalles del asistente
+        Toast.makeText(getApplicationContext(),  "CI Visitante "+ci, Toast.LENGTH_LONG).show();
+        //Prueba
         if(ci.equals("1"))
         {
-            Intent intent = new Intent(RegistrarVisitasActivity.this, RegistraVisitaActivity.class);
-            intent.putExtra("recCod", getIntent().getStringExtra("recCod"));
-            startActivity(intent);
-            //finish();
-            //showRegistrarDialog();
-        }
-        else if(ci.equals("2"))
-        {
-            Intent intent = new Intent(RegistrarVisitasActivity.this, NuevoVisitanteActivity.class);
-            startActivity(intent);
-            //finish();
+            buscarXQR("7f66c2927bab25eaa6e6c450eae5d267d87ecadba0f44e92fbd0fdd941779ca4503bc58468b4de9cb80f8c7872a99e141c991edda701e139428b539e92b2e1d3");
         }
     }
 

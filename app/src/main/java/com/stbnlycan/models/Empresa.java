@@ -1,10 +1,22 @@
 package com.stbnlycan.models;
 
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+
 import java.io.Serializable;
 
 public class Empresa implements Serializable {
+
+    @SerializedName("empCod")
+    @Expose
     private String empCod;
+
+    @SerializedName("empNombre")
+    @Expose
     private String empNombre;
+
+    @SerializedName("empObs")
+    @Expose
     private String empObs;
 
     public String getEmpCod() {

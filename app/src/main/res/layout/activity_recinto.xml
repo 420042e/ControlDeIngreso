@@ -1,10 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.recyclerview.widget.RecyclerView
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/recyclerView"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:scrollbarSize="5dp"
-    android:scrollbarThumbVertical="@android:color/darker_gray"
-    android:scrollbars="vertical" />
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="#FFFFFF"
+    android:id="@+id/contenedor"
+    android:focusableInTouchMode="true"
+    android:orientation="vertical">
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fitsSystemWindows="true"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@drawable/fondo_toolbar"
+            app:popupTheme="@style/Theme.AppCompat.Light"/>
+
+    </com.google.android.material.appbar.AppBarLayout>
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scrollbarSize="5dp"
+        android:scrollbarThumbVertical="@android:color/darker_gray"
+        android:scrollbars="vertical"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -1,11 +1,33 @@
 package com.stbnlycan.models;
 
-public class Recinto {
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+
+import java.io.Serializable;
+
+public class Recinto implements Serializable {
+    @SerializedName("recCod")
+    @Expose
     private String recCod;
+
+    @SerializedName("recNombre")
+    @Expose
     private String recNombre;
+
+    @SerializedName("recNombrea")
+    @Expose
     private String recNombrea;
+
+    @SerializedName("recEstado")
+    @Expose
     private String recEstado;
+
+    @SerializedName("recTipo")
+    @Expose
     private String recTipo;
+
+    @SerializedName("aduana")
+    @Expose
     private Aduana aduana;
 
     public String getRecCod() {
@@ -67,5 +89,10 @@ public class Recinto {
         this.recEstado = recEstado;
         this.recTipo = recTipo;
         this.aduana = aduana;
+    }
+
+    @Override
+    public String toString() {
+        return recNombre;
     }
 }

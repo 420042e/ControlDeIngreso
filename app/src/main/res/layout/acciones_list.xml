@@ -4,7 +4,11 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     app:cardElevation="6dp"
-    app:cardPreventCornerOverlap="false">
+    app:cardPreventCornerOverlap="false"
+    app:cardBackgroundColor="@color/cardview_light_background"
+    app:cardCornerRadius="@dimen/cardview_default_radius"
+    app:cardUseCompatPadding="true"
+    app:elevation="0dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"

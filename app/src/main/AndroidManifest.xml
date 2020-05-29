@@ -3,9 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.stbnlycan.controldeingreso">
 
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
@@ -16,7 +15,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".RegistraVisitaActivity"></activity>
+        <activity android:name=".RegistrarSalidasActivity"></activity>
+        <activity android:name=".NuevoHorarioActivity" />
+        <activity android:name=".Horarios" />
+        <activity android:name=".RegistraVisitaActivity" />
         <activity android:name=".RegistrarVisitasActivity" />
         <activity android:name=".EditarVisitanteActivity" />
         <activity

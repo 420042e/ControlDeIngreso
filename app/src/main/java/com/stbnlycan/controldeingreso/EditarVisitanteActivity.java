@@ -1,8 +1,17 @@
 package com.stbnlycan.controldeingreso;
 
+import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.os.FileUtils;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.MenuItem;
@@ -12,23 +21,30 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonArrayRequest;
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.Volley;
+import com.google.gson.Gson;
+import com.mobsandgeeks.saripaar.ValidationError;
+import com.mobsandgeeks.saripaar.Validator;
+import com.mobsandgeeks.saripaar.annotation.NotEmpty;
+import com.mobsandgeeks.saripaar.annotation.Select;
 import com.squareup.picasso.Picasso;
-import com.stbnlycan.adapters.EmpresaAdapter;
-import com.stbnlycan.models.AreaR;
+import com.stbnlycan.fragments.LoadingFragment;
+import com.stbnlycan.interfaces.EmpresaAPIs;
+import com.stbnlycan.interfaces.EnviarCorreoIAPIs;
+import com.stbnlycan.interfaces.TipoVisitanteAPIs;
+import com.stbnlycan.interfaces.UploadAPIs;
+import com.stbnlycan.interfaces.VisitanteAPIs;
 import com.stbnlycan.models.Empresa;
 import com.stbnlycan.models.Recinto;
 import com.stbnlycan.models.TipoVisitante;
@@ -38,39 +54,64 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EditarVisitanteActivity extends AppCompatActivity {
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
 
-    private ImageView mimageView;
+public class EditarVisitanteActivity extends AppCompatActivity implements Validator.ValidationListener{
+
+    private ImageView visitanteIV;
     private static final int REQUEST_IMAGE_CAPTURE = 101;
     private List<Recinto> areas;
-    ArrayList<Empresa> empresas;
-    ArrayList<TipoVisitante> tiposVisitante;
+    private ArrayList<Empresa> empresas;
+    private ArrayList<TipoVisitante> tiposVisitante;
 
-    ArrayAdapter<Empresa> adapterEmpresa;
-    ArrayAdapter<TipoVisitante> adapterTipoVisitante;
+    private ArrayAdapter<Empresa> adapterEmpresa;
+    private ArrayAdapter<TipoVisitante> adapterTipoVisitante;
+    private Visitante visitante;
 
-    private ImageView fotoIV;
+    @NotEmpty
     private EditText ciET;
+    @NotEmpty
     private EditText nombreET;
+    @NotEmpty
     private EditText apellidosET;
+    @NotEmpty
     private EditText telcelET;
+    @NotEmpty
     private EditText emailET;
+    @NotEmpty
     private EditText direccionET;
+    @Select
     private Spinner empresaS;
+    @Select
     private Spinner tipoVisitanteS;
 
+    private Validator validator;
     private Visitante visitanteRecibido;
+    private int position;
+    private Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_editar_visitante);
 
-        setTitle("Editar visitante");
-        fotoIV = findViewById(R.id.fotoVisitante);
+        validator = new Validator(this);
+        validator.setValidationListener(this);
+
+        setTitle("Nuevo visitante");
+        visitanteIV = findViewById(R.id.visitanteIV);
         ciET = findViewById(R.id.ci);
         nombreET = findViewById(R.id.nombre);
         apellidosET = findViewById(R.id.apellidos);
@@ -80,29 +121,37 @@ public class EditarVisitanteActivity extends AppCompatActivity {
         empresaS = findViewById(R.id.empresa);
         tipoVisitanteS = findViewById(R.id.tipo_visitante);
 
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);
+        /*ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);*/
+
+        toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         iniciarSpinnerEmpresa();
         iniciarSpinnerTipoVisitante();
 
         visitanteRecibido = (Visitante) getIntent().getSerializableExtra("Visitante");
-        //Log.d("msgV", ""+visitanteRecibido.getVteNombre());
+        position = getIntent().getIntExtra("position", -1);
+        Log.d("msg2", ""+position);
 
-        getDataEmpresa();
-        getDataTipoVisitante();
 
-        Picasso.get().load("http://dineroclub.net/wp-content/uploads/2019/11/DEVELOPER3-696x465.jpg").centerCrop().resize(150, 150).into(fotoIV);
+        fetchDataEmpresa();
+        fetchDataTipoVisitante();
+        //getDataEmpresa();
+        //getDataTipoVisitante();
+
+        Picasso.get().load("http://172.16.0.22:8080/ingresoVisitantes/visitante/mostrarFoto?foto=" + visitanteRecibido.getVteImagen()).centerCrop().resize(150, 150).into(visitanteIV);
+
         ciET.setText(visitanteRecibido.getVteCi());
         nombreET.setText(visitanteRecibido.getVteNombre());
         apellidosET.setText(visitanteRecibido.getVteApellidos());
         telcelET.setText(visitanteRecibido.getVteTelefono());
         emailET.setText(visitanteRecibido.getVteCorreo());
         direccionET.setText(visitanteRecibido.getVteDireccion());
-
-        //tipoVisitanteS.setSelection(1);
-
-        //Log.d("msgSel",""+empresaS.getAdapter().getCount());
+        /*empresaS.setSelection(0);
+        tipoVisitanteS.setSelection(0);*/
     }
 
     public void iniciarSpinnerEmpresa() {
@@ -169,11 +218,12 @@ public class EditarVisitanteActivity extends AppCompatActivity {
 
     public void takePicture(View view)
     {
-        Intent imageTakeIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        /*Intent imageTakeIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if(imageTakeIntent.resolveActivity(getPackageManager())!=null)
         {
             startActivityForResult(imageTakeIntent, REQUEST_IMAGE_CAPTURE);
-        }
+        }*/
+        Picasso.get().load("http://dineroclub.net/wp-content/uploads/2019/11/DEVELOPER3-696x465.jpg").centerCrop().resize(150, 150).into(visitanteIV);
     }
 
     @Override
@@ -182,10 +232,35 @@ public class EditarVisitanteActivity extends AppCompatActivity {
         {
             Bundle extras = data.getExtras();
             Bitmap imageBitmap = (Bitmap)extras.get("data");
-            mimageView.setImageBitmap(imageBitmap);
-        }
+            visitanteIV.setImageBitmap(imageBitmap);
 
+            // CALL THIS METHOD TO GET THE URI FROM THE BITMAP
+            Uri tempUri = getImageUri(getApplicationContext(), imageBitmap);
+
+            // CALL THIS METHOD TO GET THE ACTUAL PATH
+            File finalFile = new File(getRealPathFromURI(tempUri));
+        }
         super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    public Uri getImageUri(Context inContext, Bitmap inImage) {
+        Bitmap OutImage = Bitmap.createScaledBitmap(inImage, 1000, 1000,true);
+        String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), OutImage, "Title", null);
+        return Uri.parse(path);
+    }
+
+    public String getRealPathFromURI(Uri uri) {
+        String path = "";
+        if (getContentResolver() != null) {
+            Cursor cursor = getContentResolver().query(uri, null, null, null, null);
+            if (cursor != null) {
+                cursor.moveToFirst();
+                int idx = cursor.getColumnIndex(MediaStore.Images.ImageColumns.DATA);
+                path = cursor.getString(idx);
+                cursor.close();
+            }
+        }
+        return path;
     }
 
     @Override
@@ -198,158 +273,167 @@ public class EditarVisitanteActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void getDataEmpresa() {
-        String url = "http://172.16.0.22:8080/ingresoVisitantes/empresa/lista";
-        JsonArrayRequest jsonArrayRequest  = new JsonArrayRequest
-                (Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
-
-                    @Override
-                    public void onResponse(JSONArray response) {
-                        //Toast.makeText(getApplicationContext(), "hola "+response.toString(), Toast.LENGTH_LONG).show();
-
-                        int index = -1;
-                        for (int i = 0; i < response.length(); i++) {
-                            try {
-                                JSONObject jsonObject = response.getJSONObject(i);
-
-                                Empresa empresa = new Empresa();
-                                empresa.setEmpCod(jsonObject.getString("empCod"));
-                                empresa.setEmpNombre(jsonObject.getString("empNombre"));
-                                empresa.setEmpObs(jsonObject.getString("empObs"));
-                                empresas.add(empresa);
-
-                                if(jsonObject.getString("empCod").equals(visitanteRecibido.getEmpresa().getEmpCod()))
-                                {
-                                    index = i + 1;
-                                }
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                        //adapterEmpresa.notifyDataSetChanged();
-                        empresaS.setSelection(index);
+    private void fetchDataEmpresa() {
+        Retrofit retrofit = NetworkClient.getRetrofitClient(this);
+        EmpresaAPIs empresaAPIs = retrofit.create(EmpresaAPIs.class);
+        Call<List<Empresa>> call = empresaAPIs.listaEmpresas();
+        call.enqueue(new Callback<List<Empresa>>() {
+            @Override
+            public void onResponse(Call <List<Empresa>> call, retrofit2.Response<List<Empresa>> response) {
+                //recintos = response.body();
+                int pos = -1;
+                for(int i = 0 ; i < response.body().size() ; i++)
+                {
+                    empresas.add(response.body().get(i));
+                    if(response.body().get(i).getEmpCod().equals(visitanteRecibido.getEmpresa().getEmpCod()))
+                    {
+                        pos = i+1;
                     }
-                }, new Response.ErrorListener() {
+                }
+                //adapter.notifyDataSetChanged();
+                empresaS.setSelection(pos, true);
 
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        // TODO: Handle error
-                        Toast.makeText(getApplicationContext(), "error "+error, Toast.LENGTH_SHORT).show();
-                    }
-                });
-        RequestQueue requestQueue = Volley.newRequestQueue(this);
-        requestQueue.add(jsonArrayRequest);
+            }
+            @Override
+            public void onFailure(Call <List<Empresa>> call, Throwable t) {
+
+            }
+        });
     }
 
-    private void getDataTipoVisitante() {
-        String url = "http://172.16.0.22:8080/ingresoVisitantes/tipoVisitante/lista";
-        JsonArrayRequest jsonArrayRequest  = new JsonArrayRequest
-                (Request.Method.GET, url, null, new Response.Listener<JSONArray>() {
-
-                    @Override
-                    public void onResponse(JSONArray response) {
-                        //Toast.makeText(getApplicationContext(), "hola "+response.toString(), Toast.LENGTH_LONG).show();
-
-                        int index = -1;
-                        for (int i = 0; i < response.length(); i++) {
-                            try {
-                                JSONObject jsonObject = response.getJSONObject(i);
-
-                                TipoVisitante tipoVisitante = new TipoVisitante();
-                                tipoVisitante.setTviCod(jsonObject.getString("tviCod"));
-                                tipoVisitante.setTviNombre(jsonObject.getString("tviNombre"));
-                                tipoVisitante.setTviDescripcion(jsonObject.getString("tviDescripcion"));
-                                tipoVisitante.setHorEstado(jsonObject.getString("horEstado"));
-                                tiposVisitante.add(tipoVisitante);
-
-                                if(jsonObject.getString("tviCod").equals(visitanteRecibido.getTipoVisitante().getTviCod()))
-                                {
-                                    index = i + 1;
-                                }
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                        //adapterEmpresa.notifyDataSetChanged();
-                        tipoVisitanteS.setSelection(index);
+    private void fetchDataTipoVisitante() {
+        Retrofit retrofit = NetworkClient.getRetrofitClient(this);
+        TipoVisitanteAPIs tipoVisitanteAPIs = retrofit.create(TipoVisitanteAPIs.class);
+        Call<List<TipoVisitante>> call = tipoVisitanteAPIs.listaTipoVisitante();
+        call.enqueue(new Callback<List<TipoVisitante>>() {
+            @Override
+            public void onResponse(Call <List<TipoVisitante>> call, retrofit2.Response<List<TipoVisitante>> response) {
+                int pos = -1;
+                for(int i = 0 ; i < response.body().size() ; i++)
+                {
+                    tiposVisitante.add(response.body().get(i));
+                    if(response.body().get(i).getTviCod().equals(visitanteRecibido.getTipoVisitante().getTviCod()))
+                    {
+                        pos = i+1;
                     }
-                }, new Response.ErrorListener() {
+                }
+                tipoVisitanteS.setSelection(pos, true);
+            }
+            @Override
+            public void onFailure(Call <List<TipoVisitante>> call, Throwable t) {
 
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        // TODO: Handle error
-                        Toast.makeText(getApplicationContext(), "error "+error, Toast.LENGTH_SHORT).show();
-                    }
-                });
-        RequestQueue requestQueue = Volley.newRequestQueue(this);
-        requestQueue.add(jsonArrayRequest);
+            }
+        });
     }
 
     public void guardarVisitante(View view) {
-        //JSONObject js = new JSONObject();
-        JSONObject visitante = new JSONObject();
-        try {
-            //JSONObject visitante = new JSONObject();
-            visitante.put("vteCi", ciET.getText().toString());
-            visitante.put("vteCorreo", emailET.getText().toString());
-            //visitante.put("vteImagen", "");
-            visitante.put("vteNombre", nombreET.getText().toString());
-            visitante.put("vteApellidos", apellidosET.getText().toString());
-            visitante.put("vteTelefono", telcelET.getText().toString());
-            visitante.put("vteDireccion", direccionET.getText().toString());
-            //visitante.put("vteEstado", "ACT");
+        validator.validate();
+    }
 
-            TipoVisitante tipoVisitanteSS = (TipoVisitante) tipoVisitanteS.getSelectedItem();
-            JSONObject tipoVisitante = new JSONObject();
-            tipoVisitante.put("tviCod", tipoVisitanteSS.getTviCod());
-            tipoVisitante.put("tviNombre", tipoVisitanteSS.getTviNombre());
-            tipoVisitante.put("tviDescripcion", tipoVisitanteSS.getTviDescripcion());
-            tipoVisitante.put("horEstado", tipoVisitanteSS.getHorEstado());
-
-            Empresa empresaSS = (Empresa) empresaS.getSelectedItem();
-            JSONObject empresa = new JSONObject();
-            empresa.put("empCod", empresaSS.getEmpCod());
-            empresa.put("empNombre", empresaSS.getEmpNombre());
-            empresa.put("empObs", empresaSS.getEmpObs());
-
-            visitante.put("tipoVisitante", tipoVisitante);
-            visitante.put("empresa", empresa);
-
-            //js.put("data", visitante.toString());
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        Log.d("obVisitante",""+visitante.toString());
-
-        String url = "http://172.16.0.22:8080/ingresoVisitantes/visitante/editar";
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
-                Request.Method.PUT, url, visitante,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        Log.d("msg", response.toString());
-                        try {
-                            JSONObject jsonObjectE = new JSONObject(response.toString());
-                            if(jsonObjectE.getString("vteCi").equals(visitanteRecibido.getVteCi()))
-                            {
-                                Toast.makeText(getApplicationContext(), "El visitante fué actualizado", Toast.LENGTH_SHORT).show();
-                                finish();
-                            }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }, new Response.ErrorListener() {
-
+    private void editarVisitante() {
+        Retrofit retrofit = NetworkClient.getRetrofitClient(this);
+        VisitanteAPIs visitanteAPIs = retrofit.create(VisitanteAPIs.class);
+        Call<Visitante> call = visitanteAPIs.editarVisitante(visitante);
+        call.enqueue(new Callback <Visitante> () {
             @Override
-            public void onErrorResponse(VolleyError error) {
-                // TODO: Handle error
-                Toast.makeText(getApplicationContext(), "error " + error, Toast.LENGTH_SHORT).show();
+            public void onResponse(Call <Visitante> call, Response<Visitante> response) {
+                Visitante visitanteRecibido = response.body();
+                //Log.d("msg",""+horarioRecibido.getHorNombre());
+                Toast.makeText(getApplicationContext(), "El visitante fué actualizado", Toast.LENGTH_SHORT).show();
+                visitante.setVteEstado("0");
+                Intent intent = new Intent();
+                intent.putExtra("visitanteResult", visitante);
+                intent.putExtra("position", position);
+                setResult(RESULT_OK, intent);
+                finish();
+            }
+            @Override
+            public void onFailure(Call <Visitante> call, Throwable t) {
+
             }
         });
-        RequestQueue requestQueue = Volley.newRequestQueue(this);
-        requestQueue.add(jsonObjectRequest);
+    }
+
+    @Override
+    public void onValidationSucceeded() {
+        //Toast.makeText(this, "We got it right!", Toast.LENGTH_SHORT).show();
+        if(hasNullOrEmptyDrawable(visitanteIV))
+        {
+            Toast.makeText(this, "Debes añadir una fotografía", Toast.LENGTH_SHORT).show();
+        }
+        else
+        {
+            //Visitante visitante = new Visitante();
+            visitante = new Visitante();
+            visitante.setVteCi(ciET.getText().toString());
+            visitante.setVteCorreo(emailET.getText().toString());
+            visitante.setVteImagen("");
+            visitante.setVteNombre(nombreET.getText().toString());
+            visitante.setVteApellidos(apellidosET.getText().toString());
+            visitante.setVteTelefono(telcelET.getText().toString());
+            visitante.setVteDireccion(direccionET.getText().toString());
+            TipoVisitante tipoVisitante = (TipoVisitante) tipoVisitanteS.getSelectedItem();
+            Empresa empresa = (Empresa) empresaS.getSelectedItem();
+            visitante.setTipoVisitante(tipoVisitante);
+            visitante.setEmpresa(empresa);
+
+            showLoadingwDialog();
+            Gson gson = new Gson();
+            String descripcion = gson.toJson(visitante);
+
+            editarVisitante();
+
+            /*visitante.setVteEstado("0");
+            Intent intent = new Intent();
+            intent.putExtra("visitanteResult", visitante);
+            intent.putExtra("position", position);
+            setResult(RESULT_OK, intent);
+            finish();*/
+        }
+    }
+
+    @Override
+    public void onValidationFailed(List<ValidationError> errors) {
+        for (ValidationError error : errors) {
+            View view = error.getView();
+            String message = error.getCollatedErrorMessage(this);
+            // Display error messages
+            if (view instanceof EditText) {
+                //((EditText) view).setError(message);
+                ((EditText) view).setError("Este campo es requerido");
+            }
+            else if (view instanceof Spinner) {
+                //((TextView) ((Spinner) view).getSelectedView()).setError(message);
+                ((TextView) ((Spinner) view).getSelectedView()).setError("Este campo es requerido");
+            } else {
+                Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+
+    public static boolean hasNullOrEmptyDrawable(ImageView iv)
+    {
+        Drawable drawable = iv.getDrawable();
+        BitmapDrawable bitmapDrawable = drawable instanceof BitmapDrawable ? (BitmapDrawable)drawable : null;
+
+        return bitmapDrawable == null || bitmapDrawable.getBitmap() == null;
+    }
+
+    void showLoadingwDialog() {
+
+        final LoadingFragment dialogFragment = new LoadingFragment();
+        FragmentTransaction ft;
+        Bundle bundle = new Bundle();
+        bundle.putInt("tiempo", 0);
+        dialogFragment.setArguments(bundle);
+        //dialogFragment.setTargetFragment(this, 1);
+        ft = getSupportFragmentManager().beginTransaction();
+        Fragment prev = getSupportFragmentManager().findFragmentByTag("dialog");
+        if (prev != null) {
+            ft.remove(prev);
+        }
+        ft.addToBackStack(null);
+        dialogFragment.show(ft, "dialog");
     }
 
 }
