@@ -274,8 +274,8 @@ public class EditarVisitanteActivity extends AppCompatActivity implements Valida
             String descripcion = gson.toJson(visitanteRecibido);
             Log.d("msg", ""+descripcion);
 
-            //imagenObtenida = finalFile.toString();
-            imagenObtenida = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/prueba.jpg";
+            imagenObtenida = finalFile.toString();
+            //imagenObtenida = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/prueba.jpg";
 
             subirImagen(descripcion);
         }
@@ -481,7 +481,8 @@ public class EditarVisitanteActivity extends AppCompatActivity implements Valida
 
         Retrofit retrofit = NetworkClient.getRetrofitClient(this);
         SubirImagenAPIs subirImagenAPIs = retrofit.create(SubirImagenAPIs.class);
-        File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/prueba.jpg");
+        //File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/prueba.jpg");
+        File file = new File(imagenObtenida);
         RequestBody fileReqBody = RequestBody.create(MediaType.parse("image/*"), file);
         MultipartBody.Part part = MultipartBody.Part.createFormData("file", file.getName(), fileReqBody);
         RequestBody description = RequestBody.create(MediaType.parse("text/plain"), descripcion);
