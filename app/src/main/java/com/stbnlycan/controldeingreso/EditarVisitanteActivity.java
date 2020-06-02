@@ -167,15 +167,11 @@ public class EditarVisitanteActivity extends AppCompatActivity implements Valida
         btnNF.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                /*Intent imageTakeIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                Intent imageTakeIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                 if(imageTakeIntent.resolveActivity(getPackageManager())!=null)
                 {
                     startActivityForResult(imageTakeIntent, REQUEST_IMAGE_CAPTURE);
-                }*/
-                Gson gson = new Gson();
-                String descripcion = gson.toJson(visitanteRecibido);
-                imagenObtenida = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/windows.png";
-                subirImagen(descripcion);
+                }
             }
         });
         btnGV.setOnClickListener(new View.OnClickListener() {
@@ -279,8 +275,7 @@ public class EditarVisitanteActivity extends AppCompatActivity implements Valida
             Log.d("msg", ""+descripcion);
 
             //imagenObtenida = finalFile.toString();
-            //imagenObtenida = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/prueba.jpg";
-            imagenObtenida = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/windows.png";
+            imagenObtenida = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/prueba.jpg";
 
             subirImagen(descripcion);
         }
@@ -486,7 +481,7 @@ public class EditarVisitanteActivity extends AppCompatActivity implements Valida
 
         Retrofit retrofit = NetworkClient.getRetrofitClient(this);
         SubirImagenAPIs subirImagenAPIs = retrofit.create(SubirImagenAPIs.class);
-        File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/windows.png");
+        File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/prueba.jpg");
         RequestBody fileReqBody = RequestBody.create(MediaType.parse("image/*"), file);
         MultipartBody.Part part = MultipartBody.Part.createFormData("file", file.getName(), fileReqBody);
         RequestBody description = RequestBody.create(MediaType.parse("text/plain"), descripcion);
