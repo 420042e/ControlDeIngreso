@@ -49,12 +49,12 @@
             </LinearLayout>
 
             <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnNF"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_margin="16dp"
-                android:gravity="center"
 
-                android:onClick="takePicture"
+                android:gravity="center"
                 android:text="Obtener Foto"
                 android:textAllCaps="true"
                 app:backgroundTint="#fc0"
@@ -177,7 +177,7 @@
                 android:layout_height="wrap_content" />
 
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/button"
+                android:id="@+id/btnGV"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:onClick="guardarVisitante"

@@ -18,6 +18,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
@@ -42,6 +43,7 @@ import com.squareup.picasso.Picasso;
 import com.stbnlycan.fragments.LoadingFragment;
 import com.stbnlycan.interfaces.EmpresaAPIs;
 import com.stbnlycan.interfaces.EnviarCorreoIAPIs;
+import com.stbnlycan.interfaces.SubirImagenAPIs;
 import com.stbnlycan.interfaces.TipoVisitanteAPIs;
 import com.stbnlycan.interfaces.UploadAPIs;
 import com.stbnlycan.interfaces.VisitanteAPIs;
@@ -101,6 +103,9 @@ public class EditarVisitanteActivity extends AppCompatActivity implements Valida
     private Visitante visitanteRecibido;
     private int position;
     private Toolbar toolbar;
+    private Button btnNF;
+    private Button btnGV;
+    private String imagenObtenida;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -121,6 +126,9 @@ public class EditarVisitanteActivity extends AppCompatActivity implements Valida
         empresaS = findViewById(R.id.empresa);
         tipoVisitanteS = findViewById(R.id.tipo_visitante);
 
+        btnNF = findViewById(R.id.btnNF);
+        btnGV = findViewById(R.id.btnGV);
+
         /*ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);*/
 
@@ -132,9 +140,9 @@ public class EditarVisitanteActivity extends AppCompatActivity implements Valida
         iniciarSpinnerEmpresa();
         iniciarSpinnerTipoVisitante();
 
-        visitanteRecibido = (Visitante) getIntent().getSerializableExtra("Visitante");
+        visitanteRecibido = (Visitante) getIntent().getSerializableExtra("visitante");
         position = getIntent().getIntExtra("position", -1);
-        Log.d("msg2", ""+position);
+        //Log.d("msg2", ""+position);
 
 
         fetchDataEmpresa();
@@ -143,6 +151,9 @@ public class EditarVisitanteActivity extends AppCompatActivity implements Valida
         //getDataTipoVisitante();
 
         Picasso.get().load("http://190.129.90.115:8083/ingresoVisitantes/visitante/mostrarFoto?foto=" + visitanteRecibido.getVteImagen()).centerCrop().resize(150, 150).into(visitanteIV);
+        //Picasso.get().load(new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/prueba.jpg")).centerCrop().resize(150, 150).into(visitanteIV);
+
+
 
         ciET.setText(visitanteRecibido.getVteCi());
         nombreET.setText(visitanteRecibido.getVteNombre());
@@ -152,6 +163,23 @@ public class EditarVisitanteActivity extends AppCompatActivity implements Valida
         direccionET.setText(visitanteRecibido.getVteDireccion());
         /*empresaS.setSelection(0);
         tipoVisitanteS.setSelection(0);*/
+
+        btnNF.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent imageTakeIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                if(imageTakeIntent.resolveActivity(getPackageManager())!=null)
+                {
+                    startActivityForResult(imageTakeIntent, REQUEST_IMAGE_CAPTURE);
+                }
+            }
+        });
+        btnGV.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                validator.validate();
+            }
+        });
     }
 
     public void iniciarSpinnerEmpresa() {
@@ -216,15 +244,15 @@ public class EditarVisitanteActivity extends AppCompatActivity implements Valida
         //Toast.makeText(this, userData, Toast.LENGTH_LONG).show();
     }
 
-    public void takePicture(View view)
+    /*public void takePicture(View view)
     {
-        /*Intent imageTakeIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        Intent imageTakeIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if(imageTakeIntent.resolveActivity(getPackageManager())!=null)
         {
             startActivityForResult(imageTakeIntent, REQUEST_IMAGE_CAPTURE);
-        }*/
-        Picasso.get().load("http://dineroclub.net/wp-content/uploads/2019/11/DEVELOPER3-696x465.jpg").centerCrop().resize(150, 150).into(visitanteIV);
-    }
+        }
+        //Picasso.get().load("http://dineroclub.net/wp-content/uploads/2019/11/DEVELOPER3-696x465.jpg").centerCrop().resize(150, 150).into(visitanteIV);
+    }*/
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -239,6 +267,17 @@ public class EditarVisitanteActivity extends AppCompatActivity implements Valida
 
             // CALL THIS METHOD TO GET THE ACTUAL PATH
             File finalFile = new File(getRealPathFromURI(tempUri));
+
+            Log.d("msg", "Foto obtenida");
+            //showLoadingwDialog();
+            Gson gson = new Gson();
+            String descripcion = gson.toJson(visitanteRecibido);
+            Log.d("msg", ""+descripcion);
+
+            //imagenObtenida = finalFile.toString();
+            imagenObtenida = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/prueba.jpg";
+
+            subirImagen(descripcion);
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
@@ -326,9 +365,9 @@ public class EditarVisitanteActivity extends AppCompatActivity implements Valida
         });
     }
 
-    public void guardarVisitante(View view) {
+    /*public void guardarVisitante(View view) {
         validator.validate();
-    }
+    }*/
 
     private void editarVisitante() {
         Retrofit retrofit = NetworkClient.getRetrofitClient(this);
@@ -434,6 +473,31 @@ public class EditarVisitanteActivity extends AppCompatActivity implements Valida
         }
         ft.addToBackStack(null);
         dialogFragment.show(ft, "dialog");
+    }
+
+    private void subirImagen(String descripcion) {
+        Log.d("msg",""+imagenObtenida);
+        //Picasso.get().load(new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/prueba.jpg")).centerCrop().resize(150, 150).into(visitanteIV);
+
+        Retrofit retrofit = NetworkClient.getRetrofitClient(this);
+        SubirImagenAPIs subirImagenAPIs = retrofit.create(SubirImagenAPIs.class);
+        File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/prueba.jpg");
+        RequestBody fileReqBody = RequestBody.create(MediaType.parse("image/*"), file);
+        MultipartBody.Part part = MultipartBody.Part.createFormData("file", file.getName(), fileReqBody);
+        RequestBody description = RequestBody.create(MediaType.parse("text/plain"), descripcion);
+        Call<ResponseBody> call = subirImagenAPIs.subirImagen(part, description);
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call <ResponseBody> call, retrofit2.Response <ResponseBody> response) {
+                Log.d("msg1",""+response);
+                Toast.makeText(getApplicationContext(), "Se guardó el nuevo asistente", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFailure(Call call, Throwable t) {
+                Log.d("msg2",""+t);
+            }
+        });
     }
 
 }

@@ -18,6 +18,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
@@ -97,6 +98,9 @@ public class NuevoVisitanteActivity extends AppCompatActivity implements Validat
 
     private Validator validator;
     private Toolbar toolbar;
+    private Button btnNF;
+    private Button btnGV;
+    private String imagenObtenida;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -117,6 +121,9 @@ public class NuevoVisitanteActivity extends AppCompatActivity implements Validat
         empresaS = findViewById(R.id.empresa);
         tipoVisitanteS = findViewById(R.id.tipo_visitante);
 
+        btnNF = findViewById(R.id.btnNF);
+        btnGV = findViewById(R.id.btnGV);
+
         /*ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);*/
 
@@ -132,6 +139,23 @@ public class NuevoVisitanteActivity extends AppCompatActivity implements Validat
         fetchDataTipoVisitante();
         //getDataEmpresa();
         //getDataTipoVisitante();
+
+        btnNF.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+            Intent imageTakeIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            if(imageTakeIntent.resolveActivity(getPackageManager())!=null)
+            {
+                startActivityForResult(imageTakeIntent, REQUEST_IMAGE_CAPTURE);
+            }
+            }
+        });
+        btnGV.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                validator.validate();
+            }
+        });
     }
 
     public void iniciarSpinnerEmpresa() {
@@ -196,16 +220,6 @@ public class NuevoVisitanteActivity extends AppCompatActivity implements Validat
         //Toast.makeText(this, userData, Toast.LENGTH_LONG).show();
     }
 
-    public void takePicture(View view)
-    {
-        /*Intent imageTakeIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        if(imageTakeIntent.resolveActivity(getPackageManager())!=null)
-        {
-            startActivityForResult(imageTakeIntent, REQUEST_IMAGE_CAPTURE);
-        }*/
-        Picasso.get().load("http://dineroclub.net/wp-content/uploads/2019/11/DEVELOPER3-696x465.jpg").centerCrop().resize(150, 150).into(visitanteIV);
-    }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if(requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK)
@@ -219,6 +233,9 @@ public class NuevoVisitanteActivity extends AppCompatActivity implements Validat
 
             // CALL THIS METHOD TO GET THE ACTUAL PATH
             File finalFile = new File(getRealPathFromURI(tempUri));
+
+            //Log.d("msg", ""+finalFile.toString());
+            imagenObtenida = finalFile.toString();
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
@@ -294,9 +311,9 @@ public class NuevoVisitanteActivity extends AppCompatActivity implements Validat
         });
     }
 
-    public void guardarVisitante(View view) {
+    /*public void guardarVisitante(View view) {
         validator.validate();
-    }
+    }*/
 
     private void uploadToServer(String filePath, String descripcion) {
         //Log.d("msg","Enviando "+Environment.getExternalStorageDirectory().getAbsolutePath());
@@ -311,14 +328,14 @@ public class NuevoVisitanteActivity extends AppCompatActivity implements Validat
         call.enqueue(new Callback() {
             @Override
             public void onResponse(Call call, retrofit2.Response response) {
-                //Log.d("msg1",""+response);
+                Log.d("msg1",""+response);
                 Toast.makeText(getApplicationContext(), "Se guardó el nuevo asistente", Toast.LENGTH_SHORT).show();
                 enviarCorreoIngreso();
             }
 
             @Override
             public void onFailure(Call call, Throwable t) {
-                //Log.d("msg2",""+t);
+                Log.d("msg2",""+t);
             }
         });
     }
@@ -331,10 +348,11 @@ public class NuevoVisitanteActivity extends AppCompatActivity implements Validat
             @Override
             public void onResponse(Call call, retrofit2.Response response) {
                 if (response.body() != null) {
-                    Log.d("msg","" + response.body().toString());
+                    Log.d("msg3","" + response.body().toString());
                     //Aqui se debería cerrar esta actividad al recibir respuesta del server
                     Toast.makeText(getApplicationContext(), "Se envió el correo de ingreso", Toast.LENGTH_SHORT).show();
                     //finish();
+                    //visitante.setVteImagen(imagenObtenida);
                     visitante.setVteEstado("0");
                     Intent intent = new Intent();
                     intent.putExtra("visitanteResult", visitante);
@@ -347,6 +365,7 @@ public class NuevoVisitanteActivity extends AppCompatActivity implements Validat
                 /*
                 Error callback
                 */
+                Log.d("msg4",""+t);
             }
         });
     }
@@ -378,7 +397,9 @@ public class NuevoVisitanteActivity extends AppCompatActivity implements Validat
             Gson gson = new Gson();
             String descripcion = gson.toJson(visitante);
 
-            uploadToServer(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/windows.png", descripcion);
+
+            //uploadToServer(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/windows.png", descripcion);
+            uploadToServer(imagenObtenida, descripcion);
             /*visitante.setVteEstado("0");
             Intent intent = new Intent();
             intent.putExtra("visitanteResult", visitante);

@@ -184,7 +184,7 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
     public void onEventoClick(Visitante visitante, int position) {
         Log.d("msg1",""+position);
         Intent intent = new Intent(Visitantes.this, EditarVisitanteActivity.class);
-        intent.putExtra("Visitante", visitante);
+        intent.putExtra("visitante", visitante);
         intent.putExtra("position", position);
         //startActivity(intent);
         startActivityForResult(intent, REQUEST_CODE_EV);
