@@ -299,7 +299,7 @@ public class NuevoVisitanteActivity extends AppCompatActivity implements Validat
     }
 
     private void uploadToServer(String filePath, String descripcion) {
-        Log.d("msg","Enviando "+Environment.getExternalStorageDirectory().getAbsolutePath());
+        //Log.d("msg","Enviando "+Environment.getExternalStorageDirectory().getAbsolutePath());
 
         Retrofit retrofit = NetworkClient.getRetrofitClient(this);
         UploadAPIs uploadAPIs = retrofit.create(UploadAPIs.class);
@@ -311,14 +311,14 @@ public class NuevoVisitanteActivity extends AppCompatActivity implements Validat
         call.enqueue(new Callback() {
             @Override
             public void onResponse(Call call, retrofit2.Response response) {
-                Log.d("msg1",""+response);
+                //Log.d("msg1",""+response);
                 Toast.makeText(getApplicationContext(), "Se guardó el nuevo asistente", Toast.LENGTH_SHORT).show();
                 enviarCorreoIngreso();
             }
 
             @Override
             public void onFailure(Call call, Throwable t) {
-                Log.d("msg2",""+t);
+                //Log.d("msg2",""+t);
             }
         });
     }

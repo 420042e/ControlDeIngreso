@@ -110,13 +110,15 @@ public class RecintoActivity extends AppCompatActivity implements RecintoAdapter
         if(position == 0)
         {
             Intent intent = new Intent(RecintoActivity.this, RegistrarVisitasActivity.class);
-            intent.putExtra("recCod", getIntent().getStringExtra("recCod"));
+            intent.putExtra("recinto", recintoRecibido);
+            //intent.putExtra("recCod", getIntent().getStringExtra("recCod"));
             startActivity(intent);
         }
         else if(position == 1)
         {
             Intent intent = new Intent(RecintoActivity.this, RegistrarSalidasActivity.class);
-            intent.putExtra("recCod", getIntent().getStringExtra("recCod"));
+            intent.putExtra("recinto", recintoRecibido);
+            //intent.putExtra("recCod", getIntent().getStringExtra("recCod"));
             startActivity(intent);
         }
         else if(position == 2)

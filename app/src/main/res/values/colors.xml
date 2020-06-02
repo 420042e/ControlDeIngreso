@@ -5,4 +5,9 @@
     <color name="colorAccent">#D81B60</color>
     <color name="white">#FFFFFF</color>
     <color name="signupColor">#066e8a</color>
+
+    <color name="enabled_color">#F7FE2E</color>
+    <color name="disabled_color">#000000</color>
+    <color name="normal_color">#000000</color>
+    <color name="hint_color">#666666</color>
 </resources>

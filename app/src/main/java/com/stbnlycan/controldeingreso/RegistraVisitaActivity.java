@@ -3,6 +3,7 @@ package com.stbnlycan.controldeingreso;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import android.os.Bundle;
 import android.util.Log;
@@ -10,7 +11,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -20,6 +23,7 @@ import com.mobsandgeeks.saripaar.ValidationError;
 import com.mobsandgeeks.saripaar.Validator;
 import com.mobsandgeeks.saripaar.annotation.NotEmpty;
 import com.mobsandgeeks.saripaar.annotation.Select;
+import com.squareup.picasso.Picasso;
 import com.stbnlycan.interfaces.AreaRecintoAPIs;
 import com.stbnlycan.interfaces.RegistrarIngresoAPIs;
 import com.stbnlycan.interfaces.RegistrarSalidaAPIs;
@@ -47,13 +51,23 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
     private ArrayList<AreaRecinto> areaRecinto;
     private ArrayAdapter<AreaRecinto> adapterAreaR;
     private Visitante visitanteRecibido;
+    private Recinto recintoRecibido;
 
     @Select
     private Spinner areaRecintoS;
 
+    private EditText ciET;
+    private EditText nombreET;
+    private EditText apellidosET;
+
     @NotEmpty
     private EditText observacion;
     private Validator validator;
+
+    private Toolbar toolbar;
+    private Button btnRV;
+
+    private ImageView visitanteIV;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,19 +75,51 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
         setContentView(R.layout.activity_registrar_visita);
 
         setTitle("Registrar Ingreso");
+        visitanteIV = findViewById(R.id.visitanteIV);
+        ciET = findViewById(R.id.ci);
+        nombreET = findViewById(R.id.nombre);
+        apellidosET = findViewById(R.id.apellidos);
         areaRecintoS = findViewById(R.id.area_recinto);
         observacion = findViewById(R.id.observacion);
+        btnRV = findViewById(R.id.btnRV);
 
         validator = new Validator(this);
         validator.setValidationListener(this);
 
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);
+        /*ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);*/
+        toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-        visitanteRecibido = (Visitante) getIntent().getSerializableExtra("Visitante");
+        visitanteRecibido = (Visitante) getIntent().getSerializableExtra("visitante");
+        recintoRecibido = (Recinto) getIntent().getSerializableExtra("recinto");
+
+        Picasso.get().load("http://190.129.90.115:8083/ingresoVisitantes/visitante/mostrarFoto?foto=" + visitanteRecibido.getVteImagen()).centerCrop().resize(150, 150).into(visitanteIV);
+
+        ciET.setText(visitanteRecibido.getVteCi());
+        nombreET.setText(visitanteRecibido.getVteNombre());
+        apellidosET.setText(visitanteRecibido.getVteApellidos());
+
+        ciET.setEnabled(false);
+        ciET.setFocusable(false);
+        nombreET.setEnabled(false);
+        nombreET.setFocusable(false);
+        apellidosET.setEnabled(false);
+        apellidosET.setFocusable(false);
+
 
         iniciarSpinnerArea();
-        fetchAreaRecintos(getIntent().getStringExtra("recCod"));
+        fetchAreaRecintos();
+
+        btnRV.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                validator.validate();
+                //Log.d("msg", "hola");
+            }
+        });
     }
 
     public void iniciarSpinnerArea() {
@@ -101,13 +147,15 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
         });
     }
 
-    private void fetchAreaRecintos(String recCod) {
+    private void fetchAreaRecintos() {
         Retrofit retrofit = NetworkClient.getRetrofitClient(this);
         AreaRecintoAPIs areaRecintoAPIs = retrofit.create(AreaRecintoAPIs.class);
-        Call<List<AreaRecinto>> call = areaRecintoAPIs.listaPorRecinto(recCod);
+        Call<List<AreaRecinto>> call = areaRecintoAPIs.listaPorRecinto(recintoRecibido.getRecCod());
         call.enqueue(new Callback<List<AreaRecinto>>() {
             @Override
             public void onResponse(Call <List<AreaRecinto>> call, retrofit2.Response<List<AreaRecinto>> response) {
+
+                Log.d("msg",""+response.body());
                 for(int i = 0 ; i < response.body().size() ; i++)
                 {
                     areaRecinto.add(response.body().get(i));
@@ -129,16 +177,11 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
         //Toast.makeText(this, userData, Toast.LENGTH_LONG).show();
     }
 
-    public void registrarVisita(View view) {
-        /*Visita visita = new Visita();
-        AreaRecinto areaRecinto = (AreaRecinto) areaRecintoS.getSelectedItem();
-        visita.setVisObs(observacion.getText().toString());
-        visita.setVisitante(visitanteRecibido);
-        visita.setAreaRecinto(areaRecinto);
-        registrarIngreso(visita);*/
+    //borrar
+    /*public void registrarVisita(View view) {
 
         validator.validate();
-    }
+    }*/
 
     @Override
     public void onValidationSucceeded() {
@@ -178,7 +221,7 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
                 Visita visitaRecibida = response.body();
                 if(visitaRecibida.getVisCod() != null)
                 {
-                    Toast.makeText(getApplicationContext(), "La visita fué registrada", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), visitaRecibida.getVisitante().getVteNombre()+ " " + visitaRecibida.getVisitante().getVteApellidos() + " ha ingresado a " + visitaRecibida.getAreaRecinto().getAreaNombre(), Toast.LENGTH_SHORT).show();
                     finish();
                 }
                 else

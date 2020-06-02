@@ -23,8 +23,8 @@ public class DetallesVisitanteActivity extends AppCompatActivity {
 
         setTitle("Detalles visitante");
 
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);
+        /*ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);*/
 
         Spinner spinner = findViewById(R.id.empresa);
         ArrayList<String> empresas = new ArrayList<String>();

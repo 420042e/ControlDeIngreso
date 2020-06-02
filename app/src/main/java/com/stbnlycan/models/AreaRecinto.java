@@ -1,10 +1,29 @@
 package com.stbnlycan.models;
 
-public class AreaRecinto {
+import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
+
+import java.io.Serializable;
+
+public class AreaRecinto implements Serializable {
+    @SerializedName("areaCod")
+    @Expose
     private String areaCod;
+
+    @SerializedName("areaNombre")
+    @Expose
     private String areaNombre;
+
+    @SerializedName("areaDescripcion")
+    @Expose
     private String areaDescripcion;
+
+    @SerializedName("areaEstado")
+    @Expose
     private String areaEstado;
+
+    @SerializedName("recinto")
+    @Expose
     private Recinto recinto;
 
     public String getAreaCod() {

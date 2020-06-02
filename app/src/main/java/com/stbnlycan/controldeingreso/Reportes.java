@@ -22,8 +22,8 @@ public class Reportes extends AppCompatActivity {
 
         setTitle("Reportes");
 
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);
+        /*ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayHomeAsUpEnabled(true);*/
 
 
         ListView reporteVisitantes = findViewById(R.id.reporteVisitantes);

@@ -25,6 +25,7 @@ import com.stbnlycan.interfaces.RegistrarSalidaXCiAPIs;
 import com.stbnlycan.models.Accion;
 import com.stbnlycan.models.Empresa;
 import com.stbnlycan.models.Horario;
+import com.stbnlycan.models.Recinto;
 import com.stbnlycan.models.TipoVisitante;
 import com.stbnlycan.models.Visita;
 import com.stbnlycan.models.Visitante;
@@ -43,6 +44,7 @@ import retrofit2.Retrofit;
 public class RegistrarSalidasActivity extends AppCompatActivity implements RecintoAdapter.OnEventoListener, BusquedaCiDialogFragment.OnBusquedaCiListener{
 
     private Toolbar toolbar;
+    private Recinto recintoRecibido;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +52,8 @@ public class RegistrarSalidasActivity extends AppCompatActivity implements Recin
         setContentView(R.layout.activity_registrar_salidas);
 
         setTitle("Registrar Salida");
+
+        recintoRecibido = (Recinto) getIntent().getSerializableExtra("recinto");
 
         /*ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);*/
@@ -139,7 +143,7 @@ public class RegistrarSalidasActivity extends AppCompatActivity implements Recin
                 //ciExiste(session_key, sid, result.getContents().toString());
                 //buscarXQR(result.getContents().toString());
 
-                registrarSalida(getIntent().getStringExtra("recCod"), result.getContents().toString());
+                registrarSalida(result.getContents().toString());
             }
         }
         else
@@ -148,17 +152,26 @@ public class RegistrarSalidasActivity extends AppCompatActivity implements Recin
         }
     }
 
-    private void registrarSalida(String recCod, String llave) {
+    private void registrarSalida(String llave) {
         Retrofit retrofit = NetworkClient.getRetrofitClient(this);
         RegistrarSalidaAPIs registrarSalidaAPIs = retrofit.create(RegistrarSalidaAPIs.class);
-        Call<Visita> call = registrarSalidaAPIs.registrarSalida(recCod, llave);
+        Call<Visita> call = registrarSalidaAPIs.registrarSalida(recintoRecibido.getRecCod(), llave);
         call.enqueue(new Callback<Visita>() {
             @Override
             public void onResponse(Call <Visita> call, retrofit2.Response<Visita> response) {
                 Visita visitaRecibida = response.body();
-                //Log.d("msg",""+horarioRecibido.getHorNombre());
-                Toast.makeText(getApplicationContext(), "La salida fué registrada", Toast.LENGTH_SHORT).show();
-                finish();
+                /*Toast.makeText(getApplicationContext(), visitaRecibida.getVisitante().getVteNombre() + " " + visitaRecibida.getVisitante().getVteApellidos()+ " ha salido de " + visitaRecibida.getAreaRecinto().getAreaNombre(), Toast.LENGTH_SHORT).show();
+                finish();*/
+                if(visitaRecibida.getVisCod() != null)
+                {
+                    Toast.makeText(getApplicationContext(), visitaRecibida.getVisitante().getVteNombre()+ " " + visitaRecibida.getVisitante().getVteApellidos() + " ha salido de " + visitaRecibida.getAreaRecinto().getAreaNombre(), Toast.LENGTH_SHORT).show();
+                    finish();
+                }
+                else
+                {
+                    Toast.makeText(getApplicationContext(), "No tiene registrado ningún ingreso o ya registró su salida", Toast.LENGTH_SHORT).show();
+                    finish();
+                }
             }
             @Override
             public void onFailure(Call <Visita> call, Throwable t) {
@@ -167,15 +180,25 @@ public class RegistrarSalidasActivity extends AppCompatActivity implements Recin
         });
     }
 
-    private void registrarSalidaXCi(String recCod, String ci) {
+    private void registrarSalidaXCi(String ci) {
         Retrofit retrofit = NetworkClient.getRetrofitClient(this);
         RegistrarSalidaXCiAPIs registrarSalidaXCiAPIs = retrofit.create(RegistrarSalidaXCiAPIs.class);
-        Call<Visita> call = registrarSalidaXCiAPIs.registrarSalidaXCi(recCod, ci);
+        Call<Visita> call = registrarSalidaXCiAPIs.registrarSalidaXCi(recintoRecibido.getRecCod(), ci);
         call.enqueue(new Callback<Visita>() {
             @Override
             public void onResponse(Call <Visita> call, retrofit2.Response<Visita> response) {
                 Visita visitaRecibida = response.body();
                 if(visitaRecibida.getVisCod() != null)
+                {
+                    Toast.makeText(getApplicationContext(), visitaRecibida.getVisitante().getVteNombre()+ " " + visitaRecibida.getVisitante().getVteApellidos() + " ha salido de " + visitaRecibida.getAreaRecinto().getAreaNombre(), Toast.LENGTH_SHORT).show();
+                    finish();
+                }
+                else
+                {
+                    Toast.makeText(getApplicationContext(), "No tiene registrado ningún ingreso o ya registró su salida", Toast.LENGTH_SHORT).show();
+                    finish();
+                }
+                /*if(visitaRecibida.getVisCod() != null)
                 {
                     Toast.makeText(getApplicationContext(), "La salida fué registrada", Toast.LENGTH_SHORT).show();
                     finish();
@@ -184,7 +207,7 @@ public class RegistrarSalidasActivity extends AppCompatActivity implements Recin
                 {
                     Toast.makeText(getApplicationContext(), "No tiene registrado ningún ingreso o ya registró su salida.", Toast.LENGTH_SHORT).show();
                     finish();
-                }
+                }*/
                 //Log.d("msg",""+horarioRecibido.getHorNombre());
                 /*Toast.makeText(getApplicationContext(), "La salida fué registrada", Toast.LENGTH_SHORT).show();
                 finish();*/
@@ -198,9 +221,9 @@ public class RegistrarSalidasActivity extends AppCompatActivity implements Recin
 
     @Override
     public void onBusquedaCiListener(String ci) {
-        Log.d("result", ""+ci);
-        Toast.makeText(getApplicationContext(),  "ID Participante "+ci, Toast.LENGTH_LONG).show();
-        registrarSalidaXCi(getIntent().getStringExtra("recCod"), ci);
+        //Log.d("result", ""+ci);
+        //Toast.makeText(getApplicationContext(),  "ID Participante "+ci, Toast.LENGTH_LONG).show();
+        registrarSalidaXCi(ci);
     }
 
 }

@@ -23,6 +23,7 @@ import com.stbnlycan.interfaces.BuscarXQRAPIs;
 import com.stbnlycan.interfaces.RegistrarSalidaAPIs;
 import com.stbnlycan.models.Accion;
 import com.stbnlycan.models.Empresa;
+import com.stbnlycan.models.Recinto;
 import com.stbnlycan.models.TipoVisitante;
 import com.stbnlycan.models.Visita;
 import com.stbnlycan.models.Visitante;
@@ -40,8 +41,9 @@ import retrofit2.Retrofit;
 
 public class RegistrarVisitasActivity extends AppCompatActivity implements RecintoAdapter.OnEventoListener, BusquedaCiDialogFragment.OnBusquedaCiListener{
 
-    private String recCod;
+    //private String recCod;
     private Toolbar toolbar;
+    private Recinto recintoRecibido;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,12 +52,15 @@ public class RegistrarVisitasActivity extends AppCompatActivity implements Recin
 
         setTitle("Registrar Visita");
 
-        recCod = getIntent().getStringExtra("recCod");
+        recintoRecibido = (Recinto) getIntent().getSerializableExtra("recinto");
+        //recCod = getIntent().getStringExtra("recCod");
 
         /*ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);*/
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         List<Accion> cards = new ArrayList<>();
         cards.add(new Accion(0, "Escanear QR", R.drawable.icono_scan_qr));
@@ -135,8 +140,8 @@ public class RegistrarVisitasActivity extends AppCompatActivity implements Recin
             }
             else
             {
-                //Toast.makeText(this,  "ID Participante "+result.getContents().toString(), Toast.LENGTH_LONG).show();
-                buscarXQR(result.getContents().toString());
+                //Toast.makeText(this,  "ID Participante "+result.getContents(), Toast.LENGTH_LONG).show();
+                buscarXQR(result.getContents());
             }
         }
         else
@@ -157,8 +162,8 @@ public class RegistrarVisitasActivity extends AppCompatActivity implements Recin
                 {
                     Toast.makeText(getApplicationContext(), "Se encontró el visitante", Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(RegistrarVisitasActivity.this, RegistraVisitaActivity.class);
-                    intent.putExtra("Visitante", visitanteRecibido);
-                    intent.putExtra("recCod", recCod);
+                    intent.putExtra("visitante", visitanteRecibido);
+                    intent.putExtra("recinto", recintoRecibido);
                     startActivity(intent);
                 }
                 else
@@ -182,7 +187,7 @@ public class RegistrarVisitasActivity extends AppCompatActivity implements Recin
     public void onBusquedaCiListener(String ci) {
         Log.d("result", ""+ci);
         Toast.makeText(getApplicationContext(),  "CI Visitante "+ci, Toast.LENGTH_LONG).show();
-        //Prueba
+        //Prueba, borrar
         if(ci.equals("1"))
         {
             buscarXQR("7f66c2927bab25eaa6e6c450eae5d267d87ecadba0f44e92fbd0fdd941779ca4503bc58468b4de9cb80f8c7872a99e141c991edda701e139428b539e92b2e1d3");

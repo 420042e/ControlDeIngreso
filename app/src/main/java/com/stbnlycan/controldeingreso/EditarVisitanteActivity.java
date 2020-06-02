@@ -110,7 +110,7 @@ public class EditarVisitanteActivity extends AppCompatActivity implements Valida
         validator = new Validator(this);
         validator.setValidationListener(this);
 
-        setTitle("Nuevo visitante");
+        setTitle("Editar visitante");
         visitanteIV = findViewById(R.id.visitanteIV);
         ciET = findViewById(R.id.ci);
         nombreET = findViewById(R.id.nombre);
@@ -142,7 +142,7 @@ public class EditarVisitanteActivity extends AppCompatActivity implements Valida
         //getDataEmpresa();
         //getDataTipoVisitante();
 
-        Picasso.get().load("http://172.16.0.22:8080/ingresoVisitantes/visitante/mostrarFoto?foto=" + visitanteRecibido.getVteImagen()).centerCrop().resize(150, 150).into(visitanteIV);
+        Picasso.get().load("http://190.129.90.115:8083/ingresoVisitantes/visitante/mostrarFoto?foto=" + visitanteRecibido.getVteImagen()).centerCrop().resize(150, 150).into(visitanteIV);
 
         ciET.setText(visitanteRecibido.getVteCi());
         nombreET.setText(visitanteRecibido.getVteNombre());
