@@ -13,6 +13,6 @@ import retrofit2.http.Part;
 public interface SubirImagenAPIs {
     @Multipart
     @POST("visitante/subirImagen")
-    Call<ResponseBody> subirImagen(@Part MultipartBody.Part file, @Part("vte") RequestBody requestBody);
-    //Call<String> subirImagen(@Part MultipartBody.Part file, @Part("vte") Visitante visitante);
+    //Call<ResponseBody> subirImagen(@Part MultipartBody.Part file, @Part("vte") RequestBody requestBody);
+    Call<Visitante> subirImagen(@Part MultipartBody.Part file, @Part("vte") RequestBody requestBody);
 }

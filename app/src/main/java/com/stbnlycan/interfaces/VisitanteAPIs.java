@@ -4,9 +4,9 @@ import com.stbnlycan.models.Visitante;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
-import retrofit2.http.POST;
+import retrofit2.http.PUT;
 
 public interface VisitanteAPIs {
-    @POST("visitante/editar")
+    @PUT("visitante/editar")
     Call<Visitante> editarVisitante(@Body Visitante body);
 }

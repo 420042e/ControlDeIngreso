@@ -268,14 +268,12 @@ public class EditarVisitanteActivity extends AppCompatActivity implements Valida
             // CALL THIS METHOD TO GET THE ACTUAL PATH
             File finalFile = new File(getRealPathFromURI(tempUri));
 
-            Log.d("msg", "Foto obtenida");
             //showLoadingwDialog();
             Gson gson = new Gson();
             String descripcion = gson.toJson(visitanteRecibido);
-            Log.d("msg", ""+descripcion);
 
-            //imagenObtenida = finalFile.toString();
-            imagenObtenida = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/prueba.jpg";
+            imagenObtenida = finalFile.toString();
+            //imagenObtenida = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/prueba.jpg";
 
             subirImagen(descripcion);
         }
@@ -377,9 +375,9 @@ public class EditarVisitanteActivity extends AppCompatActivity implements Valida
             @Override
             public void onResponse(Call <Visitante> call, Response<Visitante> response) {
                 Visitante visitanteRecibido = response.body();
-                //Log.d("msg",""+horarioRecibido.getHorNombre());
                 Toast.makeText(getApplicationContext(), "El visitante fué actualizado", Toast.LENGTH_SHORT).show();
-                visitante.setVteEstado("0");
+                //visitante.setVteEstado("ACT");
+
                 Intent intent = new Intent();
                 intent.putExtra("visitanteResult", visitante);
                 intent.putExtra("position", position);
@@ -406,11 +404,18 @@ public class EditarVisitanteActivity extends AppCompatActivity implements Valida
             visitante = new Visitante();
             visitante.setVteCi(ciET.getText().toString());
             visitante.setVteCorreo(emailET.getText().toString());
-            visitante.setVteImagen("");
+
+            visitante.setVteImagen(visitanteRecibido.getVteImagen());
+
             visitante.setVteNombre(nombreET.getText().toString());
             visitante.setVteApellidos(apellidosET.getText().toString());
             visitante.setVteTelefono(telcelET.getText().toString());
             visitante.setVteDireccion(direccionET.getText().toString());
+
+            visitante.setVteEstado(visitanteRecibido.getVteEstado());
+            visitante.setVteLlave(visitanteRecibido.getVteLlave());
+            visitante.setVteFecha(visitanteRecibido.getVteFecha());
+
             TipoVisitante tipoVisitante = (TipoVisitante) tipoVisitanteS.getSelectedItem();
             Empresa empresa = (Empresa) empresaS.getSelectedItem();
             visitante.setTipoVisitante(tipoVisitante);
@@ -476,21 +481,23 @@ public class EditarVisitanteActivity extends AppCompatActivity implements Valida
     }
 
     private void subirImagen(String descripcion) {
-        Log.d("msg",""+imagenObtenida);
-        //Picasso.get().load(new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/prueba.jpg")).centerCrop().resize(150, 150).into(visitanteIV);
-
         Retrofit retrofit = NetworkClient.getRetrofitClient(this);
         SubirImagenAPIs subirImagenAPIs = retrofit.create(SubirImagenAPIs.class);
-        File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/prueba.jpg");
+        File file = new File(imagenObtenida);
         RequestBody fileReqBody = RequestBody.create(MediaType.parse("image/*"), file);
         MultipartBody.Part part = MultipartBody.Part.createFormData("file", file.getName(), fileReqBody);
         RequestBody description = RequestBody.create(MediaType.parse("text/plain"), descripcion);
-        Call<ResponseBody> call = subirImagenAPIs.subirImagen(part, description);
-        call.enqueue(new Callback<ResponseBody>() {
+        Call<Visitante> call = subirImagenAPIs.subirImagen(part, description);
+        call.enqueue(new Callback<Visitante>() {
             @Override
-            public void onResponse(Call <ResponseBody> call, retrofit2.Response <ResponseBody> response) {
-                Log.d("msg1",""+response);
-                Toast.makeText(getApplicationContext(), "Se guardó el nuevo asistente", Toast.LENGTH_SHORT).show();
+            public void onResponse(Call <Visitante> call, retrofit2.Response <Visitante> response) {
+
+                Visitante visitanteCB = response.body();
+
+                Toast.makeText(getApplicationContext(), "Se guardó la nueva imágen", Toast.LENGTH_SHORT).show();
+
+                visitanteRecibido.setVteImagen(visitanteCB.getVteImagen());
+
             }
 
             @Override

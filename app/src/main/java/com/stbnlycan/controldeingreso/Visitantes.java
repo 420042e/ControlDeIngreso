@@ -88,7 +88,6 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
                 finish();
                 return false;
             case R.id.action_nuevo_visitante:
-                //Log.d("msg", "nuevo visitante");
                 Intent intent = new Intent(Visitantes.this, NuevoVisitanteActivity.class);
                 intent.putExtra("recCod", getIntent().getStringExtra("recCod"));
                 //startActivity(intent);
