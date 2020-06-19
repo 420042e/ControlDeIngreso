@@ -118,7 +118,7 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
                     Log.d("msg3", ""+b.getInt("position", -1));
                     int position = b.getInt("position", -1);
                     visitantes.add(position, visitanteResult);
-                    visitantesAdapter.notifyItemInserted(position);
+                    visitantesAdapter.notifyItemChanged(position);
                     recyclerView.scrollToPosition(position);
                 }
             }

@@ -1,19 +1,17 @@
 package com.stbnlycan.controldeingreso;
 
-import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
-import android.os.FileUtils;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -27,10 +25,8 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
@@ -42,21 +38,14 @@ import com.mobsandgeeks.saripaar.annotation.Select;
 import com.squareup.picasso.Picasso;
 import com.stbnlycan.fragments.LoadingFragment;
 import com.stbnlycan.interfaces.EmpresaAPIs;
-import com.stbnlycan.interfaces.EnviarCorreoIAPIs;
 import com.stbnlycan.interfaces.SubirImagenAPIs;
 import com.stbnlycan.interfaces.TipoVisitanteAPIs;
-import com.stbnlycan.interfaces.UploadAPIs;
 import com.stbnlycan.interfaces.VisitanteAPIs;
 import com.stbnlycan.models.Empresa;
 import com.stbnlycan.models.Recinto;
 import com.stbnlycan.models.TipoVisitante;
 import com.stbnlycan.models.Visitante;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -64,7 +53,6 @@ import java.util.List;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
-import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -306,8 +294,33 @@ public class EditarVisitanteActivity extends AppCompatActivity implements Valida
             case android.R.id.home:
                 finish();
                 return false;
+            case R.id.action_editar_visitante:
+                validator.validate();
+                return false;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_ev, menu);
+        /*MenuItem searchItem = menu.findItem(R.id.action_search);
+        SearchView searchView = (SearchView) searchItem.getActionView();
+        searchView.setMaxWidth(Integer.MAX_VALUE);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                visitantesAdapter.getFilter().filter(newText);
+                return false;
+            }
+        });*/
+        return true;
     }
 
     private void fetchDataEmpresa() {
@@ -481,6 +494,8 @@ public class EditarVisitanteActivity extends AppCompatActivity implements Valida
     }
 
     private void subirImagen(String descripcion) {
+        Log.d("msgCB1", descripcion);
+
         Retrofit retrofit = NetworkClient.getRetrofitClient(this);
         SubirImagenAPIs subirImagenAPIs = retrofit.create(SubirImagenAPIs.class);
         File file = new File(imagenObtenida);
@@ -497,6 +512,12 @@ public class EditarVisitanteActivity extends AppCompatActivity implements Valida
                 Toast.makeText(getApplicationContext(), "Se guardó la nueva imágen", Toast.LENGTH_SHORT).show();
 
                 visitanteRecibido.setVteImagen(visitanteCB.getVteImagen());
+
+
+
+                /*Gson gson2 = new Gson();
+                String descripcion2 = gson2.toJson(visitanteCB);
+                Log.d("msgCB2", descripcion2);*/
 
             }
 
