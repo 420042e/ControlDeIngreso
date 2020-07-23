@@ -12,6 +12,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Toast;
 
@@ -19,6 +21,7 @@ import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 import com.stbnlycan.adapters.RecintoAdapter;
 import com.stbnlycan.fragments.BusquedaCiDialogFragment;
+import com.stbnlycan.interfaces.BuscarXCIAPIs;
 import com.stbnlycan.interfaces.BuscarXQRAPIs;
 import com.stbnlycan.interfaces.RegistrarSalidaAPIs;
 import com.stbnlycan.models.Accion;
@@ -183,15 +186,42 @@ public class RegistrarVisitasActivity extends AppCompatActivity implements Recin
         });
     }
 
+    private void buscarXCI(String ci) {
+        Retrofit retrofit = NetworkClient.getRetrofitClient(this);
+        BuscarXCIAPIs buscarXCIAPIs = retrofit.create(BuscarXCIAPIs.class);
+        Call<Visitante> call = buscarXCIAPIs.buscarXQR(ci);
+        call.enqueue(new Callback<Visitante>() {
+            @Override
+            public void onResponse(Call <Visitante> call, retrofit2.Response<Visitante> response) {
+                Visitante visitanteRecibido = response.body();
+                if(visitanteRecibido.getVteCi() != null)
+                {
+                    Toast.makeText(getApplicationContext(), "Se encontró el visitante", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(RegistrarVisitasActivity.this, RegistraVisitaActivity.class);
+                    intent.putExtra("visitante", visitanteRecibido);
+                    intent.putExtra("recinto", recintoRecibido);
+                    startActivity(intent);
+                }
+                else
+                {
+                    Toast.makeText(getApplicationContext(), "No se encontró el visitante", Toast.LENGTH_SHORT).show();
+                }
+                /*Toast.makeText(getApplicationContext(), "Se encontró el visitante", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(RegistrarVisitasActivity.this, RegistraVisitaActivity.class);
+                intent.putExtra("Visitante", visitanteRecibido);
+                intent.putExtra("recCod", recCod);
+                startActivity(intent);*/
+            }
+            @Override
+            public void onFailure(Call <Visitante> call, Throwable t) {
+
+            }
+        });
+    }
+
     @Override
     public void onBusquedaCiListener(String ci) {
-        Log.d("result", ""+ci);
-        Toast.makeText(getApplicationContext(),  "CI Visitante "+ci, Toast.LENGTH_LONG).show();
-        //Prueba, borrar
-        if(ci.equals("1"))
-        {
-            buscarXQR("7f66c2927bab25eaa6e6c450eae5d267d87ecadba0f44e92fbd0fdd941779ca4503bc58468b4de9cb80f8c7872a99e141c991edda701e139428b539e92b2e1d3");
-        }
+        buscarXCI(ci);
     }
 
 }

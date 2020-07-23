@@ -7,6 +7,8 @@ import androidx.appcompat.widget.Toolbar;
 
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -65,7 +67,6 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
     private Validator validator;
 
     private Toolbar toolbar;
-    private Button btnRV;
 
     private ImageView visitanteIV;
 
@@ -81,7 +82,6 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
         apellidosET = findViewById(R.id.apellidos);
         areaRecintoS = findViewById(R.id.area_recinto);
         observacion = findViewById(R.id.observacion);
-        btnRV = findViewById(R.id.btnRV);
 
         validator = new Validator(this);
         validator.setValidationListener(this);
@@ -96,7 +96,7 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
         visitanteRecibido = (Visitante) getIntent().getSerializableExtra("visitante");
         recintoRecibido = (Recinto) getIntent().getSerializableExtra("recinto");
 
-        Picasso.get().load("http://190.129.90.115:8083/ingresoVisitantes/visitante/mostrarFoto?foto=" + visitanteRecibido.getVteImagen()).centerCrop().resize(150, 150).into(visitanteIV);
+        Picasso.get().load("http://190.129.90.115:8083/ingresoVisitantes/visitante/mostrarFoto?foto=" + visitanteRecibido.getVteImagen()).centerCrop().resize(500, 500).into(visitanteIV);
 
         ciET.setText(visitanteRecibido.getVteCi());
         nombreET.setText(visitanteRecibido.getVteNombre());
@@ -113,13 +113,6 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
         iniciarSpinnerArea();
         fetchAreaRecintos();
 
-        btnRV.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                validator.validate();
-                //Log.d("msg", "hola");
-            }
-        });
     }
 
     public void iniciarSpinnerArea() {
@@ -154,8 +147,6 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
         call.enqueue(new Callback<List<AreaRecinto>>() {
             @Override
             public void onResponse(Call <List<AreaRecinto>> call, retrofit2.Response<List<AreaRecinto>> response) {
-
-                Log.d("msg",""+response.body());
                 for(int i = 0 ; i < response.body().size() ; i++)
                 {
                     areaRecinto.add(response.body().get(i));
@@ -246,8 +237,19 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
             case android.R.id.home:
                 finish();
                 return false;
+            case R.id.action_registrar_visitante:
+                // Registrar visitante
+                validator.validate();
+                return false;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_rv, menu);
+        return true;
     }
 
 }

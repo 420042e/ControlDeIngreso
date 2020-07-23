@@ -61,7 +61,6 @@ public class VisitanteListAdapter extends ArrayAdapter<Visitante> {
         btnEditar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //Log.d("msg","hola");
                 mListener.OnItemClick(getItem(position));
             }
         });

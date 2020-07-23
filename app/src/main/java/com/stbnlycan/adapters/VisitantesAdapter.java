@@ -6,11 +6,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Filter;
 import android.widget.Filterable;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.squareup.picasso.Picasso;
 import com.stbnlycan.controldeingreso.R;
 import com.stbnlycan.models.Visitante;
 
@@ -39,6 +41,10 @@ public class VisitantesAdapter extends RecyclerView.Adapter<VisitantesAdapter.AR
         Visitante visitante = eventosList.get(position);
         holder.artNaam.setText(visitante.getVteNombre()+" "+visitante.getVteApellidos());
         holder.lugar.setText(visitante.getVteCi());
+        holder.tipoVisitante.setText(visitante.getTipoVisitante().getTviNombre());
+        holder.empresaNombre.setText(visitante.getEmpresa().getEmpNombre());
+
+        Picasso.get().load("http://190.129.90.115:8083/ingresoVisitantes/visitante/mostrarFoto?foto=" + visitante.getVteImagen()).centerCrop().resize(150, 150).into(holder.imgVisitante);
         if(visitante.getVteEstado().equals("1"))
         {
             holder.estado.setText("Activo");
@@ -100,19 +106,23 @@ public class VisitantesAdapter extends RecyclerView.Adapter<VisitantesAdapter.AR
     public class ARV extends RecyclerView.ViewHolder implements View.OnClickListener
     {
 
-        //private ImageView artimg;
+        private ImageView imgVisitante;
         private TextView artNaam;
         private TextView lugar;
+        private TextView tipoVisitante;
+        private TextView empresaNombre;
         private TextView estado;
         Visitante visitante;
 
         public ARV(@NonNull View itemView) {
             super(itemView);
 
-            //artimg = itemView.findViewById(R.id.artthumb);
-            artNaam = itemView.findViewById(R.id.artname);
-            lugar = itemView.findViewById(R.id.lugar);
-            estado = itemView.findViewById(R.id.fecha);
+            imgVisitante = itemView.findViewById(R.id.imgVisitante);
+            artNaam = itemView.findViewById(R.id.nombres);
+            lugar = itemView.findViewById(R.id.nroCi);
+            tipoVisitante = itemView.findViewById(R.id.tipoVisitante);
+            empresaNombre = itemView.findViewById(R.id.empresaNombre);
+            estado = itemView.findViewById(R.id.estado);
             itemView.setOnClickListener(this);
         }
 

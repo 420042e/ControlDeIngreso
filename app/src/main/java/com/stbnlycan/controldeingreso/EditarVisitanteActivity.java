@@ -136,7 +136,7 @@ public class EditarVisitanteActivity extends AppCompatActivity implements Valida
         //getDataEmpresa();
         //getDataTipoVisitante();
 
-        Picasso.get().load("http://190.129.90.115:8083/ingresoVisitantes/visitante/mostrarFoto?foto=" + visitanteRecibido.getVteImagen()).centerCrop().resize(150, 150).into(visitanteIV);
+        Picasso.get().load("http://190.129.90.115:8083/ingresoVisitantes/visitante/mostrarFoto?foto=" + visitanteRecibido.getVteImagen()).centerCrop().resize(500, 500).into(visitanteIV);
         //Picasso.get().load(new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/prueba.jpg")).centerCrop().resize(150, 150).into(visitanteIV);
 
 

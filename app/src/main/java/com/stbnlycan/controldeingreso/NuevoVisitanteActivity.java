@@ -14,6 +14,8 @@ import android.os.Environment;
 import android.os.FileUtils;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -226,7 +228,6 @@ public class NuevoVisitanteActivity extends AppCompatActivity implements Validat
             // CALL THIS METHOD TO GET THE ACTUAL PATH
             File finalFile = new File(getRealPathFromURI(tempUri));
 
-            //Log.d("msg", ""+finalFile.toString());
             imagenObtenida = finalFile.toString();
         }
         super.onActivityResult(requestCode, resultCode, data);
@@ -258,8 +259,33 @@ public class NuevoVisitanteActivity extends AppCompatActivity implements Validat
             case android.R.id.home:
                 finish();
                 return false;
+            case R.id.action_nuevo_visitante:
+                validator.validate();
+                return false;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_nv, menu);
+        /*MenuItem searchItem = menu.findItem(R.id.action_search);
+        SearchView searchView = (SearchView) searchItem.getActionView();
+        searchView.setMaxWidth(Integer.MAX_VALUE);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                visitantesAdapter.getFilter().filter(newText);
+                return false;
+            }
+        });*/
+        return true;
     }
 
     private void fetchDataEmpresa() {
@@ -308,8 +334,6 @@ public class NuevoVisitanteActivity extends AppCompatActivity implements Validat
     }*/
 
     private void uploadToServer(String filePath, String descripcion) {
-        //Log.d("msg","Enviando "+Environment.getExternalStorageDirectory().getAbsolutePath());
-
         Retrofit retrofit = NetworkClient.getRetrofitClient(this);
         UploadAPIs uploadAPIs = retrofit.create(UploadAPIs.class);
         File file = new File(filePath);
@@ -336,6 +360,7 @@ public class NuevoVisitanteActivity extends AppCompatActivity implements Validat
         Retrofit retrofit = NetworkClient.getRetrofitClient(this);
         EnviarCorreoIAPIs enviarCorreoIAPIs = retrofit.create(EnviarCorreoIAPIs.class);
         Call call = enviarCorreoIAPIs.enviarCorreo(emailET.getText().toString());
+        Log.d("msg34","enviando correo");
         call.enqueue(new Callback() {
             @Override
             public void onResponse(Call call, retrofit2.Response response) {

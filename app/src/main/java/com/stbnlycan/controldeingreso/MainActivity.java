@@ -43,19 +43,23 @@ public class MainActivity extends AppCompatActivity implements RecintosAdapter.O
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        recintos = new ArrayList<>();
-
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        recintos = new ArrayList<>();
 
-
-        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
+        /*recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
         adapter = new RecintosAdapter(recintos);
         adapter.setOnEventoClickListener(MainActivity.this);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new GridLayoutManager(this, 1));
-        recyclerView.setAdapter(adapter);
+        recyclerView.setAdapter(adapter);*/
+
+        recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(new GridLayoutManager(this, 1));
+
+
 
         fetchRecintos();
 
@@ -75,12 +79,15 @@ public class MainActivity extends AppCompatActivity implements RecintosAdapter.O
         call.enqueue(new Callback<List<Recinto>>() {
             @Override
             public void onResponse(Call <List<Recinto>> call, retrofit2.Response<List<Recinto>> response) {
-                //recintos = response.body();
-
                 for(int i = 0 ; i < response.body().size() ; i++)
                 {
                     recintos.add(response.body().get(i));
                 }
+                adapter = new RecintosAdapter(recintos);
+                adapter.setOnEventoClickListener(MainActivity.this);
+
+                recyclerView.setAdapter(adapter);
+
                 adapter.notifyDataSetChanged();
             }
             @Override

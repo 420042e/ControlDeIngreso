@@ -16,7 +16,7 @@
         android:layout_height="wrap_content">
 
         <ImageView
-            android:id="@+id/artthumb"
+            android:id="@+id/imgVisitante"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/ic_person_black_96dp"
@@ -28,7 +28,7 @@
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/artname"
+                android:id="@+id/nombres"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
@@ -37,14 +37,28 @@
                 android:textSize="18sp" />
 
             <TextView
-                android:id="@+id/lugar"
+                android:id="@+id/nroCi"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:text="Lugar" />
 
             <TextView
-                android:id="@+id/fecha"
+                android:id="@+id/tipoVisitante"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="Lugar" />
+
+            <TextView
+                android:id="@+id/empresaNombre"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="Lugar" />
+
+            <TextView
+                android:id="@+id/estado"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
