@@ -177,25 +177,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnGV"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:onClick="guardarVisitante"
-                android:layout_margin="16dp"
-                android:gravity="center"
-
-                android:text="Guardar Visitante"
-                android:textAllCaps="true"
-                app:backgroundTint="#2196F3"
-                app:icon="@drawable/ic_save_black_24dp"
-                app:iconGravity="textStart"
-                app:iconPadding="20dp"
-                app:iconTint="#FFFFFF"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"/>
-
         </LinearLayout>
     </ScrollView>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

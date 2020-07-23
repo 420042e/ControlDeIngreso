@@ -99,7 +99,6 @@ public class NuevoVisitanteActivity extends AppCompatActivity implements Validat
     private Validator validator;
     private Toolbar toolbar;
     private Button btnNF;
-    private Button btnGV;
     private String imagenObtenida;
 
     @Override
@@ -122,7 +121,6 @@ public class NuevoVisitanteActivity extends AppCompatActivity implements Validat
         tipoVisitanteS = findViewById(R.id.tipo_visitante);
 
         btnNF = findViewById(R.id.btnNF);
-        btnGV = findViewById(R.id.btnGV);
 
         /*ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);*/
@@ -148,12 +146,6 @@ public class NuevoVisitanteActivity extends AppCompatActivity implements Validat
             {
                 startActivityForResult(imageTakeIntent, REQUEST_IMAGE_CAPTURE);
             }
-            }
-        });
-        btnGV.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                validator.validate();
             }
         });
     }

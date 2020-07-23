@@ -13,6 +13,7 @@ import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.stbnlycan.adapters.RecintosAdapter;
 import com.stbnlycan.interfaces.RecintosAPIs;
@@ -35,6 +36,7 @@ public class MainActivity extends AppCompatActivity implements RecintosAdapter.O
     private RecintosAdapter adapter;
     private List<Recinto> recintos;
     private Toolbar toolbar;
+    private SwipeRefreshLayout swipeRefreshLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +58,14 @@ public class MainActivity extends AppCompatActivity implements RecintosAdapter.O
         recyclerView.setAdapter(adapter);
 
         fetchRecintos();
+
+        swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                actualizarRecintos();
+            }
+        });
     }
 
     private void fetchRecintos() {
@@ -72,6 +82,29 @@ public class MainActivity extends AppCompatActivity implements RecintosAdapter.O
                     recintos.add(response.body().get(i));
                 }
                 adapter.notifyDataSetChanged();
+            }
+            @Override
+            public void onFailure(Call <List<Recinto>> call, Throwable t) {
+
+            }
+        });
+    }
+
+    private void actualizarRecintos() {
+        Retrofit retrofit = NetworkClient.getRetrofitClient(this);
+        RecintosAPIs recintosAPIs = retrofit.create(RecintosAPIs.class);
+        Call<List<Recinto>> call = recintosAPIs.listaRecintos();
+        call.enqueue(new Callback<List<Recinto>>() {
+            @Override
+            public void onResponse(Call <List<Recinto>> call, retrofit2.Response<List<Recinto>> response) {
+                //recintos = response.body();
+                recintos.clear();
+                for(int i = 0 ; i < response.body().size() ; i++)
+                {
+                    recintos.add(response.body().get(i));
+                }
+                adapter.notifyDataSetChanged();
+                swipeRefreshLayout.setRefreshing(false);
             }
             @Override
             public void onFailure(Call <List<Recinto>> call, Throwable t) {

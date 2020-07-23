@@ -25,7 +25,7 @@ public class VisitantesAdapter extends RecyclerView.Adapter<VisitantesAdapter.AR
 
     public VisitantesAdapter(List<Visitante> eventosList) {
         this.eventosList = eventosList;
-        eventosListFull = new ArrayList<>(eventosList);
+        this.eventosListFull = new ArrayList<>(eventosList);
     }
 
     @NonNull
@@ -64,12 +64,14 @@ public class VisitantesAdapter extends RecyclerView.Adapter<VisitantesAdapter.AR
             if(constraint == null || constraint.length() == 0)
             {
                 filteredList.addAll(eventosListFull);
+                Log.d("msg1", "hola "+eventosListFull.size());
             }
             else
             {
                 String filterPattern = constraint.toString().toLowerCase().trim();
                 for (Visitante item : eventosListFull)
                 {
+                    //Log.d("msg2", ""+item.getVteNombre());
                     if(item.getVteNombre().toLowerCase().contains(filterPattern))
                     {
                         filteredList.add(item);

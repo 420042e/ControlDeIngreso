@@ -8,6 +8,7 @@ import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -45,6 +46,7 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
     private final static int REQUEST_CODE_NV = 1;
     private final static int REQUEST_CODE_EV = 2;
     private RecyclerView recyclerView;
+    private SwipeRefreshLayout swipeRefreshLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,32 +55,36 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
 
         setTitle("Visitantes");
 
-        /*ActionBar actionBar = getSupportActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);*/
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-        //listaVisitantes = findViewById(R.id.visitantes);
-
         visitantes = new ArrayList<>();
 
-        /*adapter = new VisitanteListAdapter(this, R.layout.adapter_view_layout, visitantes);
-        adapter.setOnItemClickListener(Visitantes.this);
-        listaVisitantes.setAdapter(adapter);*/
-
+        /*visitantesAdapter = new VisitantesAdapter(visitantes);
+        visitantesAdapter.setOnVisitanteClickListener(Visitantes.this);
 
         recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
-        visitantesAdapter = new VisitantesAdapter(visitantes);
-        visitantesAdapter.setOnVisitanteClickListener(Visitantes.this);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new GridLayoutManager(this, 1));
-        recyclerView.setAdapter(visitantesAdapter);
+        recyclerView.setAdapter(visitantesAdapter);*/
+
+        recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(new GridLayoutManager(getApplicationContext(), 1));
 
 
-        //getDataVisitante();
+
         fetchVisitantes();
+
+        swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                actualizarVisitantes();
+            }
+        });
     }
 
     @Override
@@ -132,13 +138,40 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
         call.enqueue(new Callback<List<Visitante>>() {
             @Override
             public void onResponse(Call <List<Visitante>> call, retrofit2.Response<List<Visitante>> response) {
-                //recintos = response.body();
+                for(int i = 0 ; i < response.body().size() ; i++)
+                {
+                    visitantes.add(response.body().get(i));
+                }
+                visitantesAdapter = new VisitantesAdapter(visitantes);
+                visitantesAdapter.setOnVisitanteClickListener(Visitantes.this);
 
+                recyclerView.setAdapter(visitantesAdapter);
+
+                visitantesAdapter.notifyDataSetChanged();
+                swipeRefreshLayout.setRefreshing(false);
+            }
+            @Override
+            public void onFailure(Call <List<Visitante>> call, Throwable t) {
+
+            }
+        });
+    }
+
+    private void actualizarVisitantes() {
+        Retrofit retrofit = NetworkClient.getRetrofitClient(this);
+        ListaVisitantesAPIs listaVisitantesAPIs = retrofit.create(ListaVisitantesAPIs.class);
+        Call<List<Visitante>> call = listaVisitantesAPIs.listaVisitantes();
+        call.enqueue(new Callback<List<Visitante>>() {
+            @Override
+            public void onResponse(Call <List<Visitante>> call, retrofit2.Response<List<Visitante>> response) {
+                //recintos = response.body();
+                visitantes.clear();
                 for(int i = 0 ; i < response.body().size() ; i++)
                 {
                     visitantes.add(response.body().get(i));
                 }
                 visitantesAdapter.notifyDataSetChanged();
+                swipeRefreshLayout.setRefreshing(false);
             }
             @Override
             public void onFailure(Call <List<Visitante>> call, Throwable t) {

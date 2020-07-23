@@ -92,7 +92,6 @@ public class EditarVisitanteActivity extends AppCompatActivity implements Valida
     private int position;
     private Toolbar toolbar;
     private Button btnNF;
-    private Button btnGV;
     private String imagenObtenida;
 
     @Override
@@ -115,7 +114,6 @@ public class EditarVisitanteActivity extends AppCompatActivity implements Valida
         tipoVisitanteS = findViewById(R.id.tipo_visitante);
 
         btnNF = findViewById(R.id.btnNF);
-        btnGV = findViewById(R.id.btnGV);
 
         /*ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);*/
@@ -160,12 +158,6 @@ public class EditarVisitanteActivity extends AppCompatActivity implements Valida
                 {
                     startActivityForResult(imageTakeIntent, REQUEST_IMAGE_CAPTURE);
                 }
-            }
-        });
-        btnGV.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                validator.validate();
             }
         });
     }
