@@ -1,5 +1,7 @@
 package com.stbnlycan.interfaces;
 
+import com.stbnlycan.models.Visitante;
+
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
@@ -11,5 +13,5 @@ import retrofit2.http.Part;
 public interface UploadAPIs {
     @Multipart
     @POST("visitante/registrar")
-    Call<ResponseBody> uploadImage(@Part MultipartBody.Part file, @Part("vte") RequestBody requestBody);
+    Call<Visitante> uploadImage(@Part MultipartBody.Part file, @Part("vte") RequestBody requestBody);
 }

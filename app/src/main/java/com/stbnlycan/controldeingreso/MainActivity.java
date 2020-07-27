@@ -139,6 +139,7 @@ public class MainActivity extends AppCompatActivity implements RecintosAdapter.O
         MenuItem searchItem = menu.findItem(R.id.action_search);
         SearchView searchView = (SearchView) searchItem.getActionView();
         searchView.setMaxWidth(Integer.MAX_VALUE);
+        searchView.setQueryHint("Buscar recinto");
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {

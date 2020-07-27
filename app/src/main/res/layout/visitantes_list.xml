@@ -41,21 +41,21 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:text="Lugar" />
+                android:text="Cédula de identidad" />
 
             <TextView
                 android:id="@+id/tipoVisitante"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:text="Lugar" />
+                android:text="Tipo de visitante" />
 
             <TextView
                 android:id="@+id/empresaNombre"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:text="Lugar" />
+                android:text="Empresa" />
 
             <TextView
                 android:id="@+id/estado"
@@ -64,7 +64,7 @@
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="2dp"
                 android:layout_marginBottom="6dp"
-                android:text="Fecha" />
+                android:text="Estado" />
 
         </LinearLayout>
 

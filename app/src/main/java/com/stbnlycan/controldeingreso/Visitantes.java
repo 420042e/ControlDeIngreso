@@ -197,6 +197,7 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
         MenuItem searchItem = menu.findItem(R.id.action_search);
         SearchView searchView = (SearchView) searchItem.getActionView();
         searchView.setMaxWidth(Integer.MAX_VALUE);
+        searchView.setQueryHint("Buscar visitante");
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {

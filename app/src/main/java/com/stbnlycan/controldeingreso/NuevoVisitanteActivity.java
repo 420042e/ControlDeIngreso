@@ -67,6 +67,7 @@ import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
+import retrofit2.Response;
 import retrofit2.Retrofit;
 
 public class NuevoVisitanteActivity extends AppCompatActivity implements Validator.ValidationListener{
@@ -340,17 +341,18 @@ public class NuevoVisitanteActivity extends AppCompatActivity implements Validat
         RequestBody fileReqBody = RequestBody.create(MediaType.parse("image/*"), file);
         MultipartBody.Part part = MultipartBody.Part.createFormData("file", file.getName(), fileReqBody);
         RequestBody description = RequestBody.create(MediaType.parse("text/plain"), descripcion);
-        Call call = uploadAPIs.uploadImage(part, description);
-        call.enqueue(new Callback() {
+        Call <Visitante> call = uploadAPIs.uploadImage(part, description);
+        call.enqueue(new Callback<Visitante>() {
             @Override
-            public void onResponse(Call call, retrofit2.Response response) {
-                Log.d("msg1",""+response);
+        public void onResponse(Call <Visitante> call, Response<Visitante> response) {
+                //Log.d("msg1",""+response);
+                visitante.setVteImagen(response.body().getVteImagen());
                 Toast.makeText(getApplicationContext(), "Se guardó el nuevo asistente", Toast.LENGTH_SHORT).show();
                 enviarCorreoIngreso();
             }
 
             @Override
-            public void onFailure(Call call, Throwable t) {
+            public void onFailure(Call <Visitante>call, Throwable t) {
                 Log.d("msg2",""+t);
             }
         });
@@ -400,7 +402,9 @@ public class NuevoVisitanteActivity extends AppCompatActivity implements Validat
             visitante = new Visitante();
             visitante.setVteCi(ciET.getText().toString());
             visitante.setVteCorreo(emailET.getText().toString());
+
             visitante.setVteImagen("");
+
             visitante.setVteNombre(nombreET.getText().toString());
             visitante.setVteApellidos(apellidosET.getText().toString());
             visitante.setVteTelefono(telcelET.getText().toString());
