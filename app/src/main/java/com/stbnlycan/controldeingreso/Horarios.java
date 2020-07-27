@@ -223,7 +223,6 @@ public class Horarios extends AppCompatActivity implements HorariosAdapter.OnVis
                         displayTipoVisitanteData(tipoVisitanteSel);
 
                         fetchHorarios(recintoRecibido.getRecCod(), tipoVisitanteSel.getTviCod(),"%","%");
-                        //fetchHorarios("YAC01","2","%","%");
                     }
                     @Override
                     public void onNothingSelected(AdapterView<?> parent) {

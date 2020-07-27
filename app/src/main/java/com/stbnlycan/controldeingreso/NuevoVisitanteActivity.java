@@ -144,11 +144,11 @@ public class NuevoVisitanteActivity extends AppCompatActivity implements Validat
         btnNF.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-            Intent imageTakeIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-            if(imageTakeIntent.resolveActivity(getPackageManager())!=null)
-            {
-                startActivityForResult(imageTakeIntent, REQUEST_IMAGE_CAPTURE);
-            }
+                Intent imageTakeIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                if(imageTakeIntent.resolveActivity(getPackageManager())!=null)
+                {
+                    startActivityForResult(imageTakeIntent, REQUEST_IMAGE_CAPTURE);
+                }
             }
         });
     }

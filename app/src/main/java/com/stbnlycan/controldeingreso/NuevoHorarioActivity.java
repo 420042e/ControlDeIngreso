@@ -9,6 +9,8 @@ import androidx.fragment.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -73,8 +75,6 @@ public class NuevoHorarioActivity extends AppCompatActivity implements Validator
     private CheckBox dia4;
     private CheckBox dia5;
 
-    private Button btnNH;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -99,8 +99,6 @@ public class NuevoHorarioActivity extends AppCompatActivity implements Validator
         entrada = findViewById(R.id.entrada);
         salida = findViewById(R.id.salida);
 
-        btnNH = findViewById(R.id.btnNH);
-
         /*ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);*/
 
@@ -115,13 +113,6 @@ public class NuevoHorarioActivity extends AppCompatActivity implements Validator
         salida = (TimePicker)findViewById(R.id.salida);
         salida.setIs24HourView(true);
 
-        btnNH.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                validator.validate();
-                //Log.d("msg", "hola");
-            }
-        });
     }
 
     @Override
@@ -130,8 +121,18 @@ public class NuevoHorarioActivity extends AppCompatActivity implements Validator
             case android.R.id.home:
                 finish();
                 return false;
+            case R.id.action_nuevo_horario:
+                validator.validate();
+                return false;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_nh, menu);
+        return true;
     }
 
     private void registrarHorario() {

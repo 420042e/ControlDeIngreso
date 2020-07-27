@@ -19,6 +19,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.stbnlycan.adapters.VisitantesAdapter;
@@ -47,6 +49,8 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
     private final static int REQUEST_CODE_EV = 2;
     private RecyclerView recyclerView;
     private SwipeRefreshLayout swipeRefreshLayout;
+    private ProgressBar bar;
+    private TextView tvFallo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,7 +78,11 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new GridLayoutManager(getApplicationContext(), 1));
 
-
+        bar = (ProgressBar) findViewById(R.id.progressBar);
+        tvFallo = (TextView) findViewById(R.id.tvFallo);
+        bar.setVisibility(View.VISIBLE);
+        recyclerView.setVisibility(View.GONE);
+        tvFallo.setVisibility(View.GONE);
 
         fetchVisitantes();
 
@@ -82,6 +90,7 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
+                tvFallo.setVisibility(View.GONE);
                 actualizarVisitantes();
             }
         });
@@ -138,6 +147,8 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
         call.enqueue(new Callback<List<Visitante>>() {
             @Override
             public void onResponse(Call <List<Visitante>> call, retrofit2.Response<List<Visitante>> response) {
+                bar.setVisibility(View.GONE);
+                recyclerView.setVisibility(View.VISIBLE);
                 for(int i = 0 ; i < response.body().size() ; i++)
                 {
                     visitantes.add(response.body().get(i));
@@ -152,7 +163,8 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
             }
             @Override
             public void onFailure(Call <List<Visitante>> call, Throwable t) {
-
+                bar.setVisibility(View.GONE);
+                tvFallo.setVisibility(View.VISIBLE);
             }
         });
     }
@@ -175,7 +187,8 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
             }
             @Override
             public void onFailure(Call <List<Visitante>> call, Throwable t) {
-
+                tvFallo.setVisibility(View.VISIBLE);
+                swipeRefreshLayout.setRefreshing(false);
             }
         });
     }

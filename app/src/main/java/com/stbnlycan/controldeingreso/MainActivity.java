@@ -6,6 +6,9 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -22,6 +25,7 @@ import com.stbnlycan.models.Recinto;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,6 +41,8 @@ public class MainActivity extends AppCompatActivity implements RecintosAdapter.O
     private List<Recinto> recintos;
     private Toolbar toolbar;
     private SwipeRefreshLayout swipeRefreshLayout;
+    private ProgressBar bar;
+    private TextView tvFallo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,7 +65,11 @@ public class MainActivity extends AppCompatActivity implements RecintosAdapter.O
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new GridLayoutManager(this, 1));
 
-
+        bar = (ProgressBar) findViewById(R.id.progressBar);
+        tvFallo = (TextView) findViewById(R.id.tvFallo);
+        bar.setVisibility(View.VISIBLE);
+        recyclerView.setVisibility(View.GONE);
+        tvFallo.setVisibility(View.GONE);
 
         fetchRecintos();
 
@@ -67,6 +77,7 @@ public class MainActivity extends AppCompatActivity implements RecintosAdapter.O
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
+                tvFallo.setVisibility(View.GONE);
                 actualizarRecintos();
             }
         });
@@ -79,6 +90,8 @@ public class MainActivity extends AppCompatActivity implements RecintosAdapter.O
         call.enqueue(new Callback<List<Recinto>>() {
             @Override
             public void onResponse(Call <List<Recinto>> call, retrofit2.Response<List<Recinto>> response) {
+                bar.setVisibility(View.GONE);
+                recyclerView.setVisibility(View.VISIBLE);
                 for(int i = 0 ; i < response.body().size() ; i++)
                 {
                     recintos.add(response.body().get(i));
@@ -92,7 +105,8 @@ public class MainActivity extends AppCompatActivity implements RecintosAdapter.O
             }
             @Override
             public void onFailure(Call <List<Recinto>> call, Throwable t) {
-
+                bar.setVisibility(View.GONE);
+                tvFallo.setVisibility(View.VISIBLE);
             }
         });
     }
@@ -104,6 +118,7 @@ public class MainActivity extends AppCompatActivity implements RecintosAdapter.O
         call.enqueue(new Callback<List<Recinto>>() {
             @Override
             public void onResponse(Call <List<Recinto>> call, retrofit2.Response<List<Recinto>> response) {
+
                 //recintos = response.body();
                 recintos.clear();
                 for(int i = 0 ; i < response.body().size() ; i++)
@@ -115,7 +130,8 @@ public class MainActivity extends AppCompatActivity implements RecintosAdapter.O
             }
             @Override
             public void onFailure(Call <List<Recinto>> call, Throwable t) {
-
+                tvFallo.setVisibility(View.VISIBLE);
+                swipeRefreshLayout.setRefreshing(false);
             }
         });
     }
