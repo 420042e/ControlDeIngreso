@@ -330,10 +330,6 @@ public class NuevoVisitanteActivity extends AppCompatActivity implements Validat
         });
     }
 
-    /*public void guardarVisitante(View view) {
-        validator.validate();
-    }*/
-
     private void uploadToServer(String filePath, String descripcion) {
         Retrofit retrofit = NetworkClient.getRetrofitClient(this);
         UploadAPIs uploadAPIs = retrofit.create(UploadAPIs.class);
@@ -345,7 +341,6 @@ public class NuevoVisitanteActivity extends AppCompatActivity implements Validat
         call.enqueue(new Callback<Visitante>() {
             @Override
         public void onResponse(Call <Visitante> call, Response<Visitante> response) {
-                //Log.d("msg1",""+response);
                 visitante.setVteImagen(response.body().getVteImagen());
                 Toast.makeText(getApplicationContext(), "Se guardó el nuevo asistente", Toast.LENGTH_SHORT).show();
                 enviarCorreoIngreso();
@@ -370,8 +365,6 @@ public class NuevoVisitanteActivity extends AppCompatActivity implements Validat
                     Log.d("msg3","" + response.body().toString());
                     //Aqui se debería cerrar esta actividad al recibir respuesta del server
                     Toast.makeText(getApplicationContext(), "Se envió el correo de ingreso", Toast.LENGTH_SHORT).show();
-                    //finish();
-                    //visitante.setVteImagen(imagenObtenida);
                     visitante.setVteEstado("0");
                     Intent intent = new Intent();
                     intent.putExtra("visitanteResult", visitante);
@@ -381,9 +374,6 @@ public class NuevoVisitanteActivity extends AppCompatActivity implements Validat
             }
             @Override
             public void onFailure(Call call, Throwable t) {
-                /*
-                Error callback
-                */
                 Log.d("msg4",""+t);
             }
         });

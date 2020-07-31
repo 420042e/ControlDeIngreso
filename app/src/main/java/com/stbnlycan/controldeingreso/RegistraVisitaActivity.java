@@ -21,6 +21,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.mobsandgeeks.saripaar.ValidationError;
 import com.mobsandgeeks.saripaar.Validator;
 import com.mobsandgeeks.saripaar.annotation.NotEmpty;
@@ -32,6 +33,7 @@ import com.stbnlycan.interfaces.RegistrarSalidaAPIs;
 import com.stbnlycan.models.Aduana;
 import com.stbnlycan.models.AreaRecinto;
 import com.stbnlycan.models.Empresa;
+import com.stbnlycan.models.Error;
 import com.stbnlycan.models.Recinto;
 import com.stbnlycan.models.TipoVisitante;
 import com.stbnlycan.models.Visita;
@@ -203,12 +205,20 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
     }
 
     private void registrarIngreso(Visita visita) {
-        Retrofit retrofit = NetworkClient.getRetrofitClient(this);
+        Gson gson = new Gson();
+        String descripcion = gson.toJson(visita);
+        Log.d("msgVisita",""+descripcion);
+
+        /*Retrofit retrofit = NetworkClient.getRetrofitClient(this);
         RegistrarIngresoAPIs registrarIngresoAPIs = retrofit.create(RegistrarIngresoAPIs.class);
         Call<Visita> call = registrarIngresoAPIs.registrarIngreso(visita);
         call.enqueue(new Callback<Visita>() {
             @Override
             public void onResponse(Call <Visita> call, retrofit2.Response<Visita> response) {
+                Gson gson = new Gson();
+                String descripcion = gson.toJson(response.body());
+                Log.d("msg",""+descripcion);
+
                 Visita visitaRecibida = response.body();
                 if(visitaRecibida.getVisCod() != null)
                 {
@@ -220,15 +230,61 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
                     Toast.makeText(getApplicationContext(), "El Visitante tiene Salidas Pendientes", Toast.LENGTH_SHORT).show();
                     finish();
                 }
-                //Log.d("msg",""+horarioRecibido.getHorNombre());
-                /*Toast.makeText(getApplicationContext(), "La salida fué registrada", Toast.LENGTH_SHORT).show();
-                finish();*/
             }
             @Override
             public void onFailure(Call <Visita> call, Throwable t) {
                 Log.d("msg",""+t.toString());
             }
+        });*/
+
+        Retrofit retrofit = NetworkClient.getRetrofitClient(this);
+        RegistrarIngresoAPIs registrarIngresoAPIs = retrofit.create(RegistrarIngresoAPIs.class);
+        Call<Object> call = registrarIngresoAPIs.registrarIngreso(visita);
+        call.enqueue(new Callback<Object>() {
+            @Override
+            public void onResponse(Call <Object> call, retrofit2.Response<Object> response) {
+
+                Log.d("msg0",""+response.body().getClass().getName());
+                if (response.body() instanceof Visita )
+                {
+                    Log.d("msg1","hola");
+                    Visita visitaRecibida = (Visita) response.body();
+                    if(visitaRecibida.getVisCod() != null)
+                    {
+                        Toast.makeText(getApplicationContext(), visitaRecibida.getVisitante().getVteNombre()+ " " + visitaRecibida.getVisitante().getVteApellidos() + " ha ingresado a " + visitaRecibida.getAreaRecinto().getAreaNombre(), Toast.LENGTH_SHORT).show();
+                        finish();
+                    }
+                }
+                else if (response.body() instanceof Error)
+                {
+                    Log.d("msg2","hola2");
+                    Error errorRecibido = (Error) response.body();
+                    //handle error object
+                    Toast.makeText(getApplicationContext(), ""+errorRecibido.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+
+            }
+            @Override
+            public void onFailure(Call <Object> call, Throwable t) {
+                Log.d("msg",""+t.toString());
+            }
         });
+
+        /*Call<JsonObject> call = registrarIngresoAPIs.registrarIngreso(visita);
+        call.enqueue(new Callback<JsonObject>() {
+            @Override
+            public void onResponse(Call <JsonObject> call, retrofit2.Response<JsonObject> response) {
+                Gson gson = new Gson();
+                String descripcion = gson.toJson(response.body());
+                Log.d("msg",""+descripcion);
+
+
+            }
+            @Override
+            public void onFailure(Call <JsonObject> call, Throwable t) {
+                Log.d("msg",""+t.toString());
+            }
+        });*/
     }
 
     @Override

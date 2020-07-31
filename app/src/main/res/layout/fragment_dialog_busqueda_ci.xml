@@ -30,6 +30,7 @@
             android:gravity="center"
             android:onClick="registrarVisita"
 
+            android:padding="5dp"
             android:text="Cancelar"
             android:textAllCaps="true"
             app:backgroundTint="#2196F3" />
@@ -43,6 +44,7 @@
             android:gravity="center"
             android:onClick="registrarVisita"
 
+            android:padding="5dp"
             android:text="Buscar"
             android:textAllCaps="true"
             app:backgroundTint="#2196F3" />
