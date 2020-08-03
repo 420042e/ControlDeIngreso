@@ -158,7 +158,7 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
 
                 recyclerView.setAdapter(visitantesAdapter);
 
-                visitantesAdapter.notifyDataSetChanged();
+                //visitantesAdapter.notifyDataSetChanged();
                 //swipeRefreshLayout.setRefreshing(false);
             }
             @Override

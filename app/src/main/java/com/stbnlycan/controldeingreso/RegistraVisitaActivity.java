@@ -205,9 +205,6 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
     }
 
     private void registrarIngreso(Visita visita) {
-        Gson gson = new Gson();
-        String descripcion = gson.toJson(visita);
-        Log.d("msgVisita",""+descripcion);
 
         /*Retrofit retrofit = NetworkClient.getRetrofitClient(this);
         RegistrarIngresoAPIs registrarIngresoAPIs = retrofit.create(RegistrarIngresoAPIs.class);
@@ -237,17 +234,17 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
             }
         });*/
 
-        Retrofit retrofit = NetworkClient.getRetrofitClient(this);
+        /*Retrofit retrofit = NetworkClient.getRetrofitClient(this);
         RegistrarIngresoAPIs registrarIngresoAPIs = retrofit.create(RegistrarIngresoAPIs.class);
         Call<Object> call = registrarIngresoAPIs.registrarIngreso(visita);
         call.enqueue(new Callback<Object>() {
             @Override
             public void onResponse(Call <Object> call, retrofit2.Response<Object> response) {
 
-                Log.d("msg0",""+response.body().getClass().getName());
+                Log.d("msg0",""+response.body());
                 if (response.body() instanceof Visita )
                 {
-                    Log.d("msg1","hola");
+                    Log.d("msg1","objeto tipo Visita");
                     Visita visitaRecibida = (Visita) response.body();
                     if(visitaRecibida.getVisCod() != null)
                     {
@@ -257,7 +254,7 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
                 }
                 else if (response.body() instanceof Error)
                 {
-                    Log.d("msg2","hola2");
+                    Log.d("msg2","objeto tipo Error");
                     Error errorRecibido = (Error) response.body();
                     //handle error object
                     Toast.makeText(getApplicationContext(), ""+errorRecibido.getMessage(), Toast.LENGTH_SHORT).show();
@@ -268,23 +265,30 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
             public void onFailure(Call <Object> call, Throwable t) {
                 Log.d("msg",""+t.toString());
             }
-        });
+        });*/
 
-        /*Call<JsonObject> call = registrarIngresoAPIs.registrarIngreso(visita);
+        Retrofit retrofit = NetworkClient.getRetrofitClient(this);
+        RegistrarIngresoAPIs registrarIngresoAPIs = retrofit.create(RegistrarIngresoAPIs.class);
+        Call<JsonObject> call = registrarIngresoAPIs.registrarIngreso(visita);
         call.enqueue(new Callback<JsonObject>() {
             @Override
             public void onResponse(Call <JsonObject> call, retrofit2.Response<JsonObject> response) {
-                Gson gson = new Gson();
-                String descripcion = gson.toJson(response.body());
-                Log.d("msg",""+descripcion);
-
-
+                String jsonString = response.body().toString();
+                if (jsonString.contains("visCod")) {
+                    Visita visitaRecibida = new Gson().fromJson(jsonString, Visita.class);
+                    Toast.makeText(getApplicationContext(), visitaRecibida.getVisitante().getVteNombre()+ " " + visitaRecibida.getVisitante().getVteApellidos() + " ha ingresado a " + visitaRecibida.getAreaRecinto().getAreaNombre(), Toast.LENGTH_SHORT).show();
+                    finish();
+                } else {
+                    Error error = new Gson().fromJson(jsonString, Error.class);
+                    Toast.makeText(getApplicationContext(), ""+error.getMessage(), Toast.LENGTH_SHORT).show();
+                    finish();
+                }
             }
             @Override
             public void onFailure(Call <JsonObject> call, Throwable t) {
                 Log.d("msg",""+t.toString());
             }
-        });*/
+        });
     }
 
     @Override

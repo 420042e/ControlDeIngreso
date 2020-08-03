@@ -15,6 +15,8 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 import com.stbnlycan.adapters.RecintoAdapter;
@@ -24,6 +26,7 @@ import com.stbnlycan.interfaces.RegistrarSalidaAPIs;
 import com.stbnlycan.interfaces.RegistrarSalidaXCiAPIs;
 import com.stbnlycan.models.Accion;
 import com.stbnlycan.models.Empresa;
+import com.stbnlycan.models.Error;
 import com.stbnlycan.models.Horario;
 import com.stbnlycan.models.Recinto;
 import com.stbnlycan.models.TipoVisitante;
@@ -51,7 +54,7 @@ public class RegistrarSalidasActivity extends AppCompatActivity implements Recin
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registrar_salidas);
 
-        setTitle("Registrar Salida");
+        setTitle("Salidas");
 
         recintoRecibido = (Recinto) getIntent().getSerializableExtra("recinto");
 
@@ -59,10 +62,13 @@ public class RegistrarSalidasActivity extends AppCompatActivity implements Recin
         actionBar.setDisplayHomeAsUpEnabled(true);*/
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         List<Accion> cards = new ArrayList<>();
         cards.add(new Accion(0, "Escanear QR", R.drawable.icono_scan_qr));
         cards.add(new Accion(1, "Buscar CI", R.drawable.icono_carnet));
+        cards.add(new Accion(2, "Visitantes Sin Salidas", R.drawable.pendientes));
 
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
         RecintoAdapter adapter = new RecintoAdapter(cards);
@@ -93,6 +99,17 @@ public class RegistrarSalidasActivity extends AppCompatActivity implements Recin
         {
             showCiDialog();
         }
+        else if(position == 2)
+        {
+            iniciarAVSSalida();
+        }
+    }
+
+    public void iniciarAVSSalida()
+    {
+        Intent intent = new Intent(RegistrarSalidasActivity.this, VSSalidaActivity.class);
+        intent.putExtra("recinto", recintoRecibido);
+        startActivity(intent);
     }
 
     //Metodo para escanear
@@ -153,15 +170,13 @@ public class RegistrarSalidasActivity extends AppCompatActivity implements Recin
     }
 
     private void registrarSalida(String llave) {
-        Retrofit retrofit = NetworkClient.getRetrofitClient(this);
+        /*Retrofit retrofit = NetworkClient.getRetrofitClient(this);
         RegistrarSalidaAPIs registrarSalidaAPIs = retrofit.create(RegistrarSalidaAPIs.class);
         Call<Visita> call = registrarSalidaAPIs.registrarSalida(recintoRecibido.getRecCod(), llave);
         call.enqueue(new Callback<Visita>() {
             @Override
             public void onResponse(Call <Visita> call, retrofit2.Response<Visita> response) {
                 Visita visitaRecibida = response.body();
-                /*Toast.makeText(getApplicationContext(), visitaRecibida.getVisitante().getVteNombre() + " " + visitaRecibida.getVisitante().getVteApellidos()+ " ha salido de " + visitaRecibida.getAreaRecinto().getAreaNombre(), Toast.LENGTH_SHORT).show();
-                finish();*/
                 if(visitaRecibida.getVisCod() != null)
                 {
                     Toast.makeText(getApplicationContext(), visitaRecibida.getVisitante().getVteNombre()+ " " + visitaRecibida.getVisitante().getVteApellidos() + " ha salido de " + visitaRecibida.getAreaRecinto().getAreaNombre(), Toast.LENGTH_SHORT).show();
@@ -176,6 +191,29 @@ public class RegistrarSalidasActivity extends AppCompatActivity implements Recin
             @Override
             public void onFailure(Call <Visita> call, Throwable t) {
 
+            }
+        });*/
+
+        Retrofit retrofit = NetworkClient.getRetrofitClient(this);
+        RegistrarSalidaAPIs registrarSalidaAPIs = retrofit.create(RegistrarSalidaAPIs.class);
+        Call<JsonObject> call = registrarSalidaAPIs.registrarSalida(recintoRecibido.getRecCod(), llave);
+        call.enqueue(new Callback<JsonObject>() {
+            @Override
+            public void onResponse(Call <JsonObject> call, retrofit2.Response<JsonObject> response) {
+                String jsonString = response.body().toString();
+                if (jsonString.contains("visCod")) {
+                    Visita visitaRecibida = new Gson().fromJson(jsonString, Visita.class);
+                    Toast.makeText(getApplicationContext(), visitaRecibida.getVisitante().getVteNombre()+ " " + visitaRecibida.getVisitante().getVteApellidos() + " ha salido de " + visitaRecibida.getAreaRecinto().getAreaNombre(), Toast.LENGTH_SHORT).show();
+                    finish();
+                } else {
+                    Error error = new Gson().fromJson(jsonString, Error.class);
+                    Toast.makeText(getApplicationContext(), ""+error.getMessage(), Toast.LENGTH_SHORT).show();
+                    finish();
+                }
+            }
+            @Override
+            public void onFailure(Call <JsonObject> call, Throwable t) {
+                Log.d("msg",""+t.toString());
             }
         });
     }

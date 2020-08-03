@@ -41,16 +41,9 @@ public class RecintoActivity extends AppCompatActivity implements RecintoAdapter
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-        /*List<Accion> cards = new ArrayList<>();
-        cards.add(new Accion(0, "Registrar Visita", R.drawable.icono_registro_visita));
-        cards.add(new Accion(1, "Registrar Salida", R.drawable.icono_registro_salida));
-        cards.add(new Accion(2, "Visitantes", R.drawable.icono_reportes));
-        cards.add(new Accion(3, "Nuevo visitante", R.drawable.icono_nuevo_registro));
-        cards.add(new Accion(4, "Horarios", R.drawable.icono_horario));
-        cards.add(new Accion(5, "Nuevo horario", R.drawable.icono_nuevo_horario));*/
         List<Accion> cards = new ArrayList<>();
-        cards.add(new Accion(0, "Registrar Visita", R.drawable.icono_registro_visita));
-        cards.add(new Accion(1, "Registrar Salida", R.drawable.icono_registro_salida));
+        cards.add(new Accion(0, "Visitas", R.drawable.icono_registro_visita));
+        cards.add(new Accion(1, "Salidas", R.drawable.icono_registro_salida));
         cards.add(new Accion(2, "Visitantes", R.drawable.icono_visitantes));
         cards.add(new Accion(3, "Horarios", R.drawable.icono_horario));
 

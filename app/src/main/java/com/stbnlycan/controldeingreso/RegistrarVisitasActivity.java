@@ -53,7 +53,7 @@ public class RegistrarVisitasActivity extends AppCompatActivity implements Recin
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registrar_visitas);
 
-        setTitle("Registrar Visita");
+        setTitle("Visitas");
 
         recintoRecibido = (Recinto) getIntent().getSerializableExtra("recinto");
         //recCod = getIntent().getStringExtra("recCod");
@@ -68,6 +68,7 @@ public class RegistrarVisitasActivity extends AppCompatActivity implements Recin
         List<Accion> cards = new ArrayList<>();
         cards.add(new Accion(0, "Escanear QR", R.drawable.icono_scan_qr));
         cards.add(new Accion(1, "Buscar CI", R.drawable.icono_carnet));
+        cards.add(new Accion(2, "Visitantes Con Salidas", R.drawable.pendientes));
 
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
         RecintoAdapter adapter = new RecintoAdapter(cards);
@@ -98,6 +99,17 @@ public class RegistrarVisitasActivity extends AppCompatActivity implements Recin
         {
             showCiDialog();
         }
+        else if(position == 2)
+        {
+            iniciarAVCSalida();
+        }
+    }
+
+    public void iniciarAVCSalida()
+    {
+        Intent intent = new Intent(RegistrarVisitasActivity.this, VCSalidaActivity.class);
+        intent.putExtra("recinto", recintoRecibido);
+        startActivity(intent);
     }
 
     //Metodo para escanear

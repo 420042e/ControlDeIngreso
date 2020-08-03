@@ -87,18 +87,9 @@ public class Horarios extends AppCompatActivity implements HorariosAdapter.OnVis
 
         horarios = new ArrayList<>();
 
-        /*RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
-        horariosAdapter = new HorariosAdapter(horarios);
-        horariosAdapter.setOnVisitanteClickListener(Horarios.this);
-        recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(new GridLayoutManager(this, 1));
-        recyclerView.setAdapter(horariosAdapter);*/
-
         iniciarSpinnerTipoVisitante();
 
         fetchTipoVisitantes();
-
-        //fetchHorarios("YAC01","2","%","%");
     }
 
     @Override
@@ -143,20 +134,17 @@ public class Horarios extends AppCompatActivity implements HorariosAdapter.OnVis
     private void fetchHorarios(String recCod, String tviCod, String horNombre, String dia) {
         Retrofit retrofit = NetworkClient.getRetrofitClient(this);
         HorariosAPIs horariosAPIs = retrofit.create(HorariosAPIs.class);
-        //Call <List<Horario>> call = horariosAPIs.listaHorarios("YAC01","2","%","%");
         Call <List<Horario>> call = horariosAPIs.listaHorarios(recCod,tviCod,horNombre,dia);
         call.enqueue(new Callback <List<Horario>> () {
             @Override
             public void onResponse(Call <List<Horario>> call, Response <List<Horario>> response) {
                 horarios = response.body();
-                //RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
                 horariosAdapter = new HorariosAdapter(horarios);
                 horariosAdapter.setOnVisitanteClickListener(Horarios.this);
                 recyclerView.setHasFixedSize(true);
                 recyclerView.setLayoutManager(new GridLayoutManager(getApplicationContext(), 1));
                 recyclerView.setAdapter(horariosAdapter);
 
-                Log.d("msg",""+response.body().size());
                 if (response.body().size() == 0) {
                     recyclerView.setVisibility(View.GONE);
                     emptyView.setVisibility(View.VISIBLE);
@@ -222,7 +210,7 @@ public class Horarios extends AppCompatActivity implements HorariosAdapter.OnVis
                         tipoVisitanteSel = (TipoVisitante) parent.getSelectedItem();
                         displayTipoVisitanteData(tipoVisitanteSel);
 
-                        fetchHorarios(recintoRecibido.getRecCod(), tipoVisitanteSel.getTviCod(),"%","%");
+                        fetchHorarios(recintoRecibido.getRecCod(), tipoVisitanteSel.getTviCod(),"todos","todos");
                     }
                     @Override
                     public void onNothingSelected(AdapterView<?> parent) {
