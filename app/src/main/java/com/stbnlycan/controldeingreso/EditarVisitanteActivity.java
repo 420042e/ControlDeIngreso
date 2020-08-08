@@ -38,10 +38,12 @@ import com.mobsandgeeks.saripaar.annotation.Select;
 import com.squareup.picasso.Picasso;
 import com.stbnlycan.fragments.LoadingFragment;
 import com.stbnlycan.interfaces.EmpresaAPIs;
+import com.stbnlycan.interfaces.ListaEmpresasAPIs;
 import com.stbnlycan.interfaces.SubirImagenAPIs;
 import com.stbnlycan.interfaces.TipoVisitanteAPIs;
 import com.stbnlycan.interfaces.VisitanteAPIs;
 import com.stbnlycan.models.Empresa;
+import com.stbnlycan.models.ListaEmpresas;
 import com.stbnlycan.models.Recinto;
 import com.stbnlycan.models.TipoVisitante;
 import com.stbnlycan.models.Visitante;
@@ -80,8 +82,6 @@ public class EditarVisitanteActivity extends AppCompatActivity implements Valida
     private EditText telcelET;
     @NotEmpty
     private EditText emailET;
-    @NotEmpty
-    private EditText direccionET;
     @Select
     private Spinner empresaS;
     @Select
@@ -109,7 +109,6 @@ public class EditarVisitanteActivity extends AppCompatActivity implements Valida
         apellidosET = findViewById(R.id.apellidos);
         telcelET = findViewById(R.id.telcel);
         emailET = findViewById(R.id.email);
-        direccionET = findViewById(R.id.direccion);
         empresaS = findViewById(R.id.empresa);
         tipoVisitanteS = findViewById(R.id.tipo_visitante);
 
@@ -143,7 +142,6 @@ public class EditarVisitanteActivity extends AppCompatActivity implements Valida
         apellidosET.setText(visitanteRecibido.getVteApellidos());
         telcelET.setText(visitanteRecibido.getVteTelefono());
         emailET.setText(visitanteRecibido.getVteCorreo());
-        direccionET.setText(visitanteRecibido.getVteDireccion());
         /*empresaS.setSelection(0);
         tipoVisitanteS.setSelection(0);*/
 
@@ -314,27 +312,26 @@ public class EditarVisitanteActivity extends AppCompatActivity implements Valida
 
     private void fetchDataEmpresa() {
         Retrofit retrofit = NetworkClient.getRetrofitClient(this);
-        EmpresaAPIs empresaAPIs = retrofit.create(EmpresaAPIs.class);
-        Call<List<Empresa>> call = empresaAPIs.listaEmpresas();
-        call.enqueue(new Callback<List<Empresa>>() {
+        ListaEmpresasAPIs listaEmpresasAPIs = retrofit.create(ListaEmpresasAPIs.class);
+        Call<ListaEmpresas> call = listaEmpresasAPIs.listaEmpresas("0","10");
+        call.enqueue(new Callback<ListaEmpresas>() {
             @Override
-            public void onResponse(Call <List<Empresa>> call, retrofit2.Response<List<Empresa>> response) {
+            public void onResponse(Call <ListaEmpresas> call, retrofit2.Response<ListaEmpresas> response) {
                 //recintos = response.body();
                 int pos = -1;
-                for(int i = 0 ; i < response.body().size() ; i++)
+                for(int i = 0 ; i < response.body().getlEmpresa().size() ; i++)
                 {
-                    empresas.add(response.body().get(i));
-                    if(response.body().get(i).getEmpCod().equals(visitanteRecibido.getEmpresa().getEmpCod()))
+                    empresas.add(response.body().getlEmpresa().get(i));
+                    if(response.body().getlEmpresa().get(i).getEmpCod().equals(visitanteRecibido.getEmpresa().getEmpCod()))
                     {
                         pos = i+1;
                     }
                 }
                 //adapter.notifyDataSetChanged();
                 empresaS.setSelection(pos, true);
-
             }
             @Override
-            public void onFailure(Call <List<Empresa>> call, Throwable t) {
+            public void onFailure(Call <ListaEmpresas> call, Throwable t) {
 
             }
         });
@@ -388,7 +385,7 @@ public class EditarVisitanteActivity extends AppCompatActivity implements Valida
             }
             @Override
             public void onFailure(Call <Visitante> call, Throwable t) {
-
+                Log.d("msg132",""+t);
             }
         });
     }
@@ -412,7 +409,7 @@ public class EditarVisitanteActivity extends AppCompatActivity implements Valida
             visitante.setVteNombre(nombreET.getText().toString());
             visitante.setVteApellidos(apellidosET.getText().toString());
             visitante.setVteTelefono(telcelET.getText().toString());
-            visitante.setVteDireccion(direccionET.getText().toString());
+            visitante.setVteDireccion("");
 
             visitante.setVteEstado(visitanteRecibido.getVteEstado());
             visitante.setVteLlave(visitanteRecibido.getVteLlave());

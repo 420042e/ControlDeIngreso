@@ -221,37 +221,23 @@ public class RegistrarSalidasActivity extends AppCompatActivity implements Recin
     private void registrarSalidaXCi(String ci) {
         Retrofit retrofit = NetworkClient.getRetrofitClient(this);
         RegistrarSalidaXCiAPIs registrarSalidaXCiAPIs = retrofit.create(RegistrarSalidaXCiAPIs.class);
-        Call<Visita> call = registrarSalidaXCiAPIs.registrarSalidaXCi(recintoRecibido.getRecCod(), ci);
-        call.enqueue(new Callback<Visita>() {
+        Call<JsonObject> call = registrarSalidaXCiAPIs.registrarSalidaXCi(recintoRecibido.getRecCod(), ci);
+        call.enqueue(new Callback<JsonObject>() {
             @Override
-            public void onResponse(Call <Visita> call, retrofit2.Response<Visita> response) {
-                Visita visitaRecibida = response.body();
-                if(visitaRecibida.getVisCod() != null)
-                {
+            public void onResponse(Call <JsonObject> call, retrofit2.Response<JsonObject> response) {
+                String jsonString = response.body().toString();
+                if (jsonString.contains("visCod")) {
+                    Visita visitaRecibida = new Gson().fromJson(jsonString, Visita.class);
                     Toast.makeText(getApplicationContext(), visitaRecibida.getVisitante().getVteNombre()+ " " + visitaRecibida.getVisitante().getVteApellidos() + " ha salido de " + visitaRecibida.getAreaRecinto().getAreaNombre(), Toast.LENGTH_SHORT).show();
-                    finish();
+                } else {
+                    Error error = new Gson().fromJson(jsonString, Error.class);
+                    Toast.makeText(getApplicationContext(), ""+error.getMessage(), Toast.LENGTH_SHORT).show();
+                    //buscar ci para verificar si existe
+                    //si existe, mostrar activity registra visita
                 }
-                else
-                {
-                    Toast.makeText(getApplicationContext(), "No tiene registrado ningún ingreso o ya registró su salida", Toast.LENGTH_SHORT).show();
-                    finish();
-                }
-                /*if(visitaRecibida.getVisCod() != null)
-                {
-                    Toast.makeText(getApplicationContext(), "La salida fué registrada", Toast.LENGTH_SHORT).show();
-                    finish();
-                }
-                else
-                {
-                    Toast.makeText(getApplicationContext(), "No tiene registrado ningún ingreso o ya registró su salida.", Toast.LENGTH_SHORT).show();
-                    finish();
-                }*/
-                //Log.d("msg",""+horarioRecibido.getHorNombre());
-                /*Toast.makeText(getApplicationContext(), "La salida fué registrada", Toast.LENGTH_SHORT).show();
-                finish();*/
             }
             @Override
-            public void onFailure(Call <Visita> call, Throwable t) {
+            public void onFailure(Call <JsonObject> call, Throwable t) {
 
             }
         });
