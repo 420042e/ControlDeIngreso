@@ -10,6 +10,14 @@ public class ListaVisitas {
     @Expose
     private List<Visita> lVisita;
 
+    @SerializedName("totalElements")
+    @Expose
+    private int totalElements;
+
+    public int getTotalElements() {
+        return totalElements;
+    }
+
     public List<Visita> getlVisita() {
         return lVisita;
     }

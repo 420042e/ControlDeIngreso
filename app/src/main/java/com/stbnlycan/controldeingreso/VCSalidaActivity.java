@@ -83,6 +83,7 @@ public class VCSalidaActivity extends AppCompatActivity implements VisitasAdapte
     private SwipeRefreshLayout swipeRefreshLayout;
 
     private String ci;
+    private TextView tvTotalVisitantes;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -147,6 +148,8 @@ public class VCSalidaActivity extends AppCompatActivity implements VisitasAdapte
         bar = (ProgressBar) findViewById(R.id.progressBar);
         tvFallo = (TextView) findViewById(R.id.tvFallo);
         tvNoData = (TextView) findViewById(R.id.tvNoData);
+        tvTotalVisitantes = (TextView) findViewById(R.id.tvTotalVisitantes);
+
         bar.setVisibility(View.VISIBLE);
         recyclerView.setVisibility(View.GONE);
         tvNoData.setVisibility(View.GONE);
@@ -288,7 +291,7 @@ public class VCSalidaActivity extends AppCompatActivity implements VisitasAdapte
         //String currentDate = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(new Date());
         Retrofit retrofit = NetworkClient.getRetrofitClient(this);
         ListaVSSalidaAPIs listaVSSalidaAPIs = retrofit.create(ListaVSSalidaAPIs.class);
-        Call<ListaVisitas> call = listaVSSalidaAPIs.listaVSSalida(fechaIni, fechaFin, recintoRecibido.getRecCod(), "1",Integer.toString(nPag),"5");
+        Call<ListaVisitas> call = listaVSSalidaAPIs.listaVSSalida(fechaIni, fechaFin, recintoRecibido.getRecCod(), "1",Integer.toString(nPag),"10");
         call.enqueue(new Callback<ListaVisitas>() {
             @Override
             public void onResponse(Call <ListaVisitas> call, retrofit2.Response<ListaVisitas> response) {
@@ -298,10 +301,12 @@ public class VCSalidaActivity extends AppCompatActivity implements VisitasAdapte
                 if(listaVisitas.getlVisita().size() == 0)
                 {
                     tvNoData.setVisibility(View.VISIBLE);
+                    tvTotalVisitantes.setText("Total de visitantes: 0");
                 }
                 else
                 {
                     tvNoData.setVisibility(View.GONE);
+                    tvTotalVisitantes.setText("Total de visitantes: " + listaVisitas.getTotalElements());
                     for(int i = 0 ; i < listaVisitas.getlVisita().size() ; i++)
                     {
                         visitas.add(listaVisitas.getlVisita().get(i));
@@ -323,7 +328,7 @@ public class VCSalidaActivity extends AppCompatActivity implements VisitasAdapte
     private void mostrarMasVisitas() {
         Retrofit retrofit = NetworkClient.getRetrofitClient(this);
         ListaVSSalidaAPIs listaVSSalidaAPIs = retrofit.create(ListaVSSalidaAPIs.class);
-        Call<ListaVisitas> call = listaVSSalidaAPIs.listaVSSalida(fechaIni, fechaFin, recintoRecibido.getRecCod(), areaRecintoSel.getAreaCod(),Integer.toString(nPag),"5");
+        Call<ListaVisitas> call = listaVSSalidaAPIs.listaVSSalida(fechaIni, fechaFin, recintoRecibido.getRecCod(), areaRecintoSel.getAreaCod(),Integer.toString(nPag),"10");
         call.enqueue(new Callback<ListaVisitas>() {
             @Override
             public void onResponse(Call <ListaVisitas> call, retrofit2.Response<ListaVisitas> response) {
@@ -352,7 +357,7 @@ public class VCSalidaActivity extends AppCompatActivity implements VisitasAdapte
     private void actualizarVisitas() {
         Retrofit retrofit = NetworkClient.getRetrofitClient(this);
         ListaVSSalidaAPIs listaVSSalidaAPIs = retrofit.create(ListaVSSalidaAPIs.class);
-        Call<ListaVisitas> call = listaVSSalidaAPIs.listaVSSalida(fechaIni, fechaFin, recintoSel, areaRecintoSel.getAreaCod(),"0","5");
+        Call<ListaVisitas> call = listaVSSalidaAPIs.listaVSSalida(fechaIni, fechaFin, recintoSel, areaRecintoSel.getAreaCod(),"0","10");
         call.enqueue(new Callback<ListaVisitas>() {
             @Override
             public void onResponse(Call <ListaVisitas> call, retrofit2.Response<ListaVisitas> response) {
@@ -363,9 +368,11 @@ public class VCSalidaActivity extends AppCompatActivity implements VisitasAdapte
                 if(listaVisitas.getlVisita().size() == 0)
                 {
                     tvNoData.setVisibility(View.VISIBLE);
+                    tvTotalVisitantes.setText("Total de visitantes: 0");
                 }
                 else {
                     tvNoData.setVisibility(View.GONE);
+                    tvTotalVisitantes.setText("Total de visitantes: " + listaVisitas.getTotalElements());
                     for(int i = 0 ; i < listaVisitas.getlVisita().size() ; i++)
                     {
                         visitas.add(listaVisitas.getlVisita().get(i));
@@ -392,7 +399,7 @@ public class VCSalidaActivity extends AppCompatActivity implements VisitasAdapte
     private void buscarVisitaXCi() {
         Retrofit retrofit = NetworkClient.getRetrofitClient(this);
         ListaVisitaXCiAPIs listaVisitaXCiAPIs = retrofit.create(ListaVisitaXCiAPIs.class);
-        Call<ListaVisitas> call = listaVisitaXCiAPIs.listaVisitaXCi(ci, fechaIni, fechaFin,"0","5");
+        Call<ListaVisitas> call = listaVisitaXCiAPIs.listaVisitaXCi(ci, fechaIni, fechaFin,"0","10");
         call.enqueue(new Callback<ListaVisitas>() {
             @Override
             public void onResponse(Call <ListaVisitas> call, retrofit2.Response<ListaVisitas> response) {
@@ -403,9 +410,11 @@ public class VCSalidaActivity extends AppCompatActivity implements VisitasAdapte
                 if(listaVisitas.getlVisita().size() == 0)
                 {
                     tvNoData.setVisibility(View.VISIBLE);
+                    tvTotalVisitantes.setText("Total de visitantes: 0");
                 }
                 else {
                     tvNoData.setVisibility(View.GONE);
+                    tvTotalVisitantes.setText("Total de visitantes: " + listaVisitas.getTotalElements());
                     for(int i = 0 ; i < listaVisitas.getlVisita().size() ; i++)
                     {
                         visitas.add(listaVisitas.getlVisita().get(i));

@@ -77,7 +77,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:ems="10"
-                    android:hint="Cédula de identidad"
+                    android:hint="Cédula de identidad *"
                     android:inputType="number" />
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -90,7 +90,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:ems="10"
-                    android:hint="Nombres"
+                    android:hint="Nombres *"
                     android:inputType="textPersonName" />
 
             </com.google.android.material.textfield.TextInputLayout>
@@ -105,7 +105,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:ems="10"
-                    android:hint="Apellidos"
+                    android:hint="Apellidos *"
                     android:inputType="textPersonName" />
 
             </com.google.android.material.textfield.TextInputLayout>
@@ -120,7 +120,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:ems="10"
-                    android:hint="Teléfono/Celular"
+                    android:hint="Teléfono/Celular *"
                     android:inputType="number" />
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -134,7 +134,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:ems="10"
-                    android:hint="Correo electrónico"
+                    android:hint="Correo electrónico *"
                     android:inputType="textEmailAddress" />
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -146,25 +146,55 @@
                 android:id="@+id/textView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Empresa"
+                android:layout_marginLeft="5dp"
+                android:text="Empresa *"
                 android:textSize="12sp" />
 
-            <Spinner
-                android:id="@+id/empresa"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="match_parent">
+
+                <Spinner
+                    android:id="@+id/empresa"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnNE"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+
+                    android:gravity="center"
+                    android:textAllCaps="true"
+                    app:backgroundTint="#FFFFFF"
+                    app:icon="@drawable/ic_add_black_24dp"
+                    app:iconGravity="textStart"
+                    app:iconPadding="0dp"
+                    app:iconTint="#000000" />
+            </LinearLayout>
 
             <TextView
                 android:id="@+id/textView2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Tipo de visitante"
+                android:layout_marginLeft="5dp"
+                android:text="Tipo de visitante *"
                 android:textSize="12sp" />
 
             <Spinner
                 android:id="@+id/tipo_visitante"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
+
+            <TextView
+                android:id="@+id/textView8"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:text="* indica campo requerido"
+                android:textSize="12sp" />
 
         </LinearLayout>
     </ScrollView>

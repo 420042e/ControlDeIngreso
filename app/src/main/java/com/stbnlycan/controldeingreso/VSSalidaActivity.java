@@ -84,11 +84,12 @@ public class VSSalidaActivity extends AppCompatActivity implements VisitasAdapte
     private SwipeRefreshLayout swipeRefreshLayout;
 
     private String ci;
+    private TextView tvTotalVisitantes;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_v_c_salida);
+        setContentView(R.layout.activity_v_s_salida);
 
         fechaRango = (EditText) findViewById(R.id.fechaRango);
 
@@ -152,6 +153,7 @@ public class VSSalidaActivity extends AppCompatActivity implements VisitasAdapte
         recyclerView.setVisibility(View.GONE);
         tvNoData.setVisibility(View.GONE);
         tvFallo.setVisibility(View.GONE);
+        tvTotalVisitantes = (TextView) findViewById(R.id.tvTotalVisitantes);
 
         iniciarSpinnerArea();
         fetchAreaRecintos();
@@ -304,10 +306,12 @@ public class VSSalidaActivity extends AppCompatActivity implements VisitasAdapte
                 if(listaVisitas.getlVisita().size() == 0)
                 {
                     tvNoData.setVisibility(View.VISIBLE);
+                    tvTotalVisitantes.setText("Total de visitantes: 0");
                 }
                 else
                 {
                     tvNoData.setVisibility(View.GONE);
+                    tvTotalVisitantes.setText("Total de visitantes: " + listaVisitas.getTotalElements());
                     for(int i = 0 ; i < listaVisitas.getlVisita().size() ; i++)
                     {
                         visitas.add(listaVisitas.getlVisita().get(i));
@@ -369,9 +373,11 @@ public class VSSalidaActivity extends AppCompatActivity implements VisitasAdapte
                 if(listaVisitas.getlVisita().size() == 0)
                 {
                     tvNoData.setVisibility(View.VISIBLE);
+                    tvTotalVisitantes.setText("Total de visitantes: 0");
                 }
                 else {
                     tvNoData.setVisibility(View.GONE);
+                    tvTotalVisitantes.setText("Total de visitantes: " + listaVisitas.getTotalElements());
                     for(int i = 0 ; i < listaVisitas.getlVisita().size() ; i++)
                     {
                         visitas.add(listaVisitas.getlVisita().get(i));
@@ -409,9 +415,11 @@ public class VSSalidaActivity extends AppCompatActivity implements VisitasAdapte
                 if(listaVisitas.getlVisita().size() == 0)
                 {
                     tvNoData.setVisibility(View.VISIBLE);
+                    tvTotalVisitantes.setText("Total de visitantes: 0");
                 }
                 else {
                     tvNoData.setVisibility(View.GONE);
+                    tvTotalVisitantes.setText("Total de visitantes: " + listaVisitas.getTotalElements());
                     for(int i = 0 ; i < listaVisitas.getlVisita().size() ; i++)
                     {
                         visitas.add(listaVisitas.getlVisita().get(i));

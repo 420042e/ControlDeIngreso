@@ -4,6 +4,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.ImageView;
@@ -24,6 +25,8 @@ public class VisitantesAdapter extends RecyclerView.Adapter<VisitantesAdapter.AR
     private List<Visitante> eventosListFull;
 
     private OnVisitanteClickListener mListener;
+    private OnVQRClickListener vqrListener;
+    private OnEEClickListener eeListener;
 
     public VisitantesAdapter(List<Visitante> eventosList) {
         this.eventosList = eventosList;
@@ -45,14 +48,6 @@ public class VisitantesAdapter extends RecyclerView.Adapter<VisitantesAdapter.AR
         holder.empresaNombre.setText(visitante.getEmpresa().getEmpNombre());
 
         Picasso.get().load("http://190.129.90.115:8083/ingresoVisitantes/visitante/mostrarFoto?foto=" + visitante.getVteImagen()).centerCrop().resize(150, 150).into(holder.imgVisitante);
-        if(visitante.getVteEstado().equals("1"))
-        {
-            holder.estado.setText("Activo");
-        }
-        else
-        {
-            holder.estado.setText("Inactivo");
-        }
 
         //holder.artimg.setImageResource(R.drawable.evento_agetic2);
         holder.visitante = eventosList.get(position);
@@ -111,7 +106,8 @@ public class VisitantesAdapter extends RecyclerView.Adapter<VisitantesAdapter.AR
         private TextView lugar;
         private TextView tipoVisitante;
         private TextView empresaNombre;
-        private TextView estado;
+        private Button btnVQR;
+        private Button btnEE;
         Visitante visitante;
 
         public ARV(@NonNull View itemView) {
@@ -122,8 +118,25 @@ public class VisitantesAdapter extends RecyclerView.Adapter<VisitantesAdapter.AR
             lugar = itemView.findViewById(R.id.nroCi);
             tipoVisitante = itemView.findViewById(R.id.tipoVisitante);
             empresaNombre = itemView.findViewById(R.id.empresaNombre);
-            estado = itemView.findViewById(R.id.estado);
+            btnVQR = itemView.findViewById(R.id.btnVQR);
+            btnEE = itemView.findViewById(R.id.btnEE);
             itemView.setOnClickListener(this);
+
+            btnVQR.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Log.d("msg435","hola");
+                    vqrListener.OnVQRClick(visitante);
+                }
+            });
+
+            btnEE.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Log.d("msg45","hola");
+                    eeListener.OnEEClick(visitante);
+                }
+            });
         }
 
         @Override
@@ -152,8 +165,26 @@ public class VisitantesAdapter extends RecyclerView.Adapter<VisitantesAdapter.AR
         mListener = listener;
     }
 
+    public void setOnVQRClickListener(OnVQRClickListener listener){
+        vqrListener = listener;
+    }
+
+    public void setOnEEClickListener(OnEEClickListener listener){
+        eeListener = listener;
+    }
+
     public interface OnVisitanteClickListener
     {
         void onEventoClick(Visitante visitante, int position);
+    }
+
+    public interface OnVQRClickListener
+    {
+        void OnVQRClick(Visitante visitante);
+    }
+
+    public interface OnEEClickListener
+    {
+        void OnEEClick(Visitante visitante);
     }
 }

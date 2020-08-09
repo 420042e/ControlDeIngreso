@@ -57,14 +57,44 @@
                 android:layout_marginStart="8dp"
                 android:text="Empresa" />
 
-            <TextView
-                android:id="@+id/estado"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="2dp"
-                android:layout_marginBottom="6dp"
-                android:text="Estado" />
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnVQR"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+
+                    android:gravity="center"
+                    android:text="Ver QR"
+                    android:textAllCaps="true"
+                    app:backgroundTint="#03A9F4"
+                    app:icon="@drawable/ic_photo_black_24dp"
+                    app:iconGravity="textStart"
+                    app:iconTint="#FFFFFF"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnEE"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+
+                    android:gravity="center"
+                    android:text="Enviar Email"
+                    android:textAllCaps="true"
+                    app:backgroundTint="#8BC34A"
+                    app:icon="@drawable/ic_mail_black_24dp"
+                    app:iconGravity="textStart"
+                    app:iconTint="#FFFFFF"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+            </LinearLayout>
 
         </LinearLayout>
 

@@ -1,6 +1,7 @@
 package com.stbnlycan.controldeingreso;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -103,6 +104,8 @@ public class NuevoVisitanteActivity extends AppCompatActivity implements Validat
     private Toolbar toolbar;
     private Button btnNF;
     private String imagenObtenida;
+    private Button btnNE;
+    private final static int REQUEST_CODE_NE = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -121,6 +124,7 @@ public class NuevoVisitanteActivity extends AppCompatActivity implements Validat
         emailET = findViewById(R.id.email);
         empresaS = findViewById(R.id.empresa);
         tipoVisitanteS = findViewById(R.id.tipo_visitante);
+        btnNE = findViewById(R.id.btnNE);
 
         btnNF = findViewById(R.id.btnNF);
 
@@ -148,6 +152,14 @@ public class NuevoVisitanteActivity extends AppCompatActivity implements Validat
                 {
                     startActivityForResult(imageTakeIntent, REQUEST_IMAGE_CAPTURE);
                 }
+            }
+        });
+
+        btnNE.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(NuevoVisitanteActivity.this, NuevaEmpresa.class);
+                startActivityForResult(intent, REQUEST_CODE_NE);
             }
         });
     }
@@ -229,6 +241,16 @@ public class NuevoVisitanteActivity extends AppCompatActivity implements Validat
             File finalFile = new File(getRealPathFromURI(tempUri));
 
             imagenObtenida = finalFile.toString();
+        }
+        if (resultCode == Activity.RESULT_OK) {
+            if (requestCode == REQUEST_CODE_NE) {
+                Bundle b = data.getExtras();
+                if (data != null) {
+                    Empresa empresaResult = (Empresa) b.getSerializable("empresaResult");
+                    empresas.add(1, empresaResult);
+                    empresaS.setSelection(1, true);
+                }
+            }
         }
         super.onActivityResult(requestCode, resultCode, data);
     }
@@ -356,7 +378,6 @@ public class NuevoVisitanteActivity extends AppCompatActivity implements Validat
         Retrofit retrofit = NetworkClient.getRetrofitClient(this);
         EnviarCorreoIAPIs enviarCorreoIAPIs = retrofit.create(EnviarCorreoIAPIs.class);
         Call call = enviarCorreoIAPIs.enviarCorreo(emailET.getText().toString());
-        Log.d("msg34","enviando correo");
         call.enqueue(new Callback() {
             @Override
             public void onResponse(Call call, retrofit2.Response response) {

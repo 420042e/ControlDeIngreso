@@ -11,6 +11,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -18,11 +19,15 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AbsListView;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.stbnlycan.adapters.VisitantesAdapter;
+import com.stbnlycan.interfaces.EnviarCorreoIAPIs;
 import com.stbnlycan.interfaces.ListaVisitantesXNombreAPIs;
 import com.stbnlycan.interfaces.ListaVisitantesAPIs;
 import com.stbnlycan.models.ListaVisitantes;
@@ -34,7 +39,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Retrofit;
 
-public class Visitantes extends AppCompatActivity implements VisitantesAdapter.OnVisitanteClickListener {
+public class Visitantes extends AppCompatActivity implements VisitantesAdapter.OnVisitanteClickListener, VisitantesAdapter.OnVQRClickListener, VisitantesAdapter.OnEEClickListener{
 
     private ArrayList<Visitante> visitantes;
     private VisitantesAdapter visitantesAdapter;
@@ -194,6 +199,8 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
                     }
                     visitantesAdapter = new VisitantesAdapter(visitantes);
                     visitantesAdapter.setOnVisitanteClickListener(Visitantes.this);
+                    visitantesAdapter.setOnVQRClickListener(Visitantes.this);
+                    visitantesAdapter.setOnEEClickListener(Visitantes.this);
 
                     recyclerView.setAdapter(visitantesAdapter);
                 }
@@ -333,6 +340,30 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
         inflater.inflate(R.menu.menu2, menu);
         MenuItem searchItem = menu.findItem(R.id.action_search);
         SearchView searchView = (SearchView) searchItem.getActionView();
+
+
+
+        // Get SearchView autocomplete object.
+        final SearchView.SearchAutoComplete searchAutoComplete = (SearchView.SearchAutoComplete)searchView.findViewById(androidx.appcompat.R.id.search_src_text);
+        searchAutoComplete.setBackgroundColor(Color.BLUE);
+        searchAutoComplete.setTextColor(Color.GREEN);
+        searchAutoComplete.setDropDownBackgroundResource(android.R.color.holo_blue_light);
+        // Create a new ArrayAdapter and add data to search auto complete object.
+        String dataArr[] = {"Apple" , "Amazon" , "Amd", "Microsoft", "Microwave", "MicroNews", "Intel", "Intelligence"};
+        ArrayAdapter<String> newsAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, dataArr);
+        searchAutoComplete.setAdapter(newsAdapter);
+        // Listen to search view item on click event.
+        searchAutoComplete.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+                String queryString=(String)adapterView.getItemAtPosition(position);
+                searchAutoComplete.setText("" + queryString);
+                Toast.makeText(getApplicationContext(), "you clicked " + queryString, Toast.LENGTH_LONG).show();
+            }
+        });
+
+
+
         searchView.setMaxWidth(Integer.MAX_VALUE);
         searchView.setQueryHint("Buscar visitante");
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -362,4 +393,38 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
         startActivityForResult(intent, REQUEST_CODE_EV);
     }
 
+    @Override
+    public void OnVQRClick(Visitante visitante) {
+        iniciarQRActivity(visitante);
+    }
+
+    @Override
+    public void OnEEClick(Visitante visitante) {
+        enviarCorreoIngreso(visitante);
+    }
+
+    public void iniciarQRActivity(Visitante visitante)
+    {
+        Intent intent = new Intent(Visitantes.this, QRActivity.class);
+        intent.putExtra("visitante", visitante);
+        startActivity(intent);
+    }
+
+    private void enviarCorreoIngreso(final Visitante visitante) {
+        Retrofit retrofit = NetworkClient.getRetrofitClient(this);
+        EnviarCorreoIAPIs enviarCorreoIAPIs = retrofit.create(EnviarCorreoIAPIs.class);
+        Call call = enviarCorreoIAPIs.enviarCorreo(visitante.getVteCorreo());
+        call.enqueue(new Callback() {
+            @Override
+            public void onResponse(Call call, retrofit2.Response response) {
+                if (response.body() != null) {
+                    Toast.makeText(getApplicationContext(), "Se envió el correo de ingreso a "+visitante.getVteNombre() +" "+visitante.getVteApellidos(), Toast.LENGTH_SHORT).show();
+                }
+            }
+            @Override
+            public void onFailure(Call call, Throwable t) {
+                Log.d("msg4",""+t);
+            }
+        });
+    }
 }
