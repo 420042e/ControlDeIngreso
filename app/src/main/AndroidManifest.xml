@@ -15,9 +15,15 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".QRActivity"></activity>
-        <activity android:name=".NuevaEmpresa" />
-        <activity android:name=".Empresas" />
+        <activity
+            android:name=".QRActivity"
+            android:screenOrientation="portrait"></activity>
+        <activity
+            android:name=".NuevaEmpresa"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".Empresas"
+            android:screenOrientation="portrait"/>
         <activity android:name="com.stbnlycan.fragments.TimePickerActivity" />
         <activity
             android:name=".VSSalidaActivity"

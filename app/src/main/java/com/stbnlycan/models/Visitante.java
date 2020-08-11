@@ -153,4 +153,9 @@ public class Visitante implements Serializable {
 
     public Visitante() {
     }
+
+    @Override
+    public String toString() {
+        return vteNombre;
+    }
 }

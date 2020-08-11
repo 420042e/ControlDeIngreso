@@ -5,27 +5,30 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
+import androidx.cursoradapter.widget.CursorAdapter;
+import androidx.cursoradapter.widget.SimpleCursorAdapter;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.app.Activity;
+import android.app.SearchManager;
+import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
+import android.database.MatrixCursor;
 import android.os.Bundle;
+import android.provider.BaseColumns;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AbsListView;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.gson.Gson;
 import com.stbnlycan.adapters.VisitantesAdapter;
 import com.stbnlycan.interfaces.EnviarCorreoIAPIs;
 import com.stbnlycan.interfaces.ListaVisitantesXNombreAPIs;
@@ -34,6 +37,7 @@ import com.stbnlycan.models.ListaVisitantes;
 import com.stbnlycan.models.Visitante;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -57,6 +61,11 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
     private int nPag;
 
     private String nombre;
+    private ArrayList<Visitante> dataArr;
+
+    private SearchView searchView;
+    private List<Visitante> suggestions;
+    private CursorAdapter suggestionAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -334,33 +343,100 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
         });
     }
 
+    private void buscarVisitanteXNombre2() {
+        Retrofit retrofit = NetworkClient.getRetrofitClient(this);
+        ListaVisitantesXNombreAPIs listaVisitantesXNombreAPIs = retrofit.create(ListaVisitantesXNombreAPIs.class);
+        Call<ListaVisitantes> call = listaVisitantesXNombreAPIs.listaVisitanteXNombre(nombre,"0","5");
+        call.enqueue(new Callback<ListaVisitantes>() {
+            @Override
+            public void onResponse(Call <ListaVisitantes> call, retrofit2.Response<ListaVisitantes> response) {
+                //recintos = response.body();
+                suggestions.clear();
+                ListaVisitantes listaVisitantes = response.body();
+                if(listaVisitantes.getlVisitante().size() == 0)
+                {
+                    //tvNoData.setVisibility(View.VISIBLE);
+                }
+                else
+                {
+                    //tvNoData.setVisibility(View.GONE);
+                    for(int i = 0 ; i < listaVisitantes.getlVisitante().size() ; i++)
+                    {
+                        suggestions.add(listaVisitantes.getlVisitante().get(i));
+                        String[] columns = { BaseColumns._ID,
+                                SearchManager.SUGGEST_COLUMN_TEXT_1,
+                                SearchManager.SUGGEST_COLUMN_INTENT_DATA,
+                        };
+                        MatrixCursor cursor = new MatrixCursor(columns);
+                        for (int j = 0; j < suggestions.size(); j++) {
+                            String[] tmp = {Integer.toString(j), suggestions.get(j).getVteNombre() + " " + suggestions.get(j).getVteApellidos(), suggestions.get(j).getVteNombre()};
+                            cursor.addRow(tmp);
+                        }
+                        suggestionAdapter.swapCursor(cursor);
+                    }
+                }
+            }
+            @Override
+            public void onFailure(Call <ListaVisitantes> call, Throwable t) {
+                tvFallo.setVisibility(View.VISIBLE);
+                swipeRefreshLayout.setRefreshing(false);
+            }
+        });
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu2, menu);
         MenuItem searchItem = menu.findItem(R.id.action_search);
-        SearchView searchView = (SearchView) searchItem.getActionView();
+        searchView = (SearchView) searchItem.getActionView();
+
+
+        // Solution
+        int autoCompleteTextViewID = getResources().getIdentifier("search_src_text", "id", getPackageName());
+        AutoCompleteTextView searchAutoCompleteTextView = (AutoCompleteTextView) searchView.findViewById(autoCompleteTextViewID);
+        searchAutoCompleteTextView.setThreshold(1);
 
 
 
-        // Get SearchView autocomplete object.
-        final SearchView.SearchAutoComplete searchAutoComplete = (SearchView.SearchAutoComplete)searchView.findViewById(androidx.appcompat.R.id.search_src_text);
-        searchAutoComplete.setBackgroundColor(Color.BLUE);
-        searchAutoComplete.setTextColor(Color.GREEN);
-        searchAutoComplete.setDropDownBackgroundResource(android.R.color.holo_blue_light);
-        // Create a new ArrayAdapter and add data to search auto complete object.
-        String dataArr[] = {"Apple" , "Amazon" , "Amd", "Microsoft", "Microwave", "MicroNews", "Intel", "Intelligence"};
-        ArrayAdapter<String> newsAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, dataArr);
-        searchAutoComplete.setAdapter(newsAdapter);
-        // Listen to search view item on click event.
-        searchAutoComplete.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+
+
+
+
+        //final List<Visitante> suggestions = new ArrayList<>();
+        suggestions = new ArrayList<>();
+
+        suggestionAdapter = new SimpleCursorAdapter(this,
+                android.R.layout.simple_list_item_1,
+                null,
+                new String[]{SearchManager.SUGGEST_COLUMN_TEXT_1},
+                new int[]{android.R.id.text1},
+                0);
+
+        searchView.setSuggestionsAdapter(suggestionAdapter);
+
+        searchView.setOnSuggestionListener(new SearchView.OnSuggestionListener() {
             @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-                String queryString=(String)adapterView.getItemAtPosition(position);
-                searchAutoComplete.setText("" + queryString);
-                Toast.makeText(getApplicationContext(), "you clicked " + queryString, Toast.LENGTH_LONG).show();
+            public boolean onSuggestionSelect(int position) {
+                return false;
+            }
+
+            @Override
+            public boolean onSuggestionClick(int position) {
+                searchView.setQuery(suggestions.get(position).getVteNombre(), true);
+                searchView.clearFocus();
+
+                visitantes.clear();
+                visitantes.add(suggestions.get(position));
+                visitantesAdapter.notifyDataSetChanged();
+                return true;
             }
         });
+
+
 
 
 
@@ -370,13 +446,20 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
             @Override
             public boolean onQueryTextSubmit(String query) {
                 nombre = query;
-                buscarVisitanteXNombre();
+                //buscarVisitanteXNombre();
                 return false;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                //visitantesAdapter.getFilter().filter(newText);
+                if(newText.equals("")){
+                    //this.onQueryTextSubmit("");
+                    visitantes.clear();
+                    nPag = 0;
+                    fetchVisitantes();
+                }
+                nombre = newText;
+                buscarVisitanteXNombre2();
                 return false;
             }
         });
