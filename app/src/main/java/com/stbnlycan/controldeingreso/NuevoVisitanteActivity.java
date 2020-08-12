@@ -415,8 +415,8 @@ public class NuevoVisitanteActivity extends AppCompatActivity implements Validat
 
             visitante.setVteImagen("");
 
-            visitante.setVteNombre(nombreET.getText().toString());
-            visitante.setVteApellidos(apellidosET.getText().toString());
+            visitante.setVteNombre(nombreET.getText().toString().toUpperCase());
+            visitante.setVteApellidos(apellidosET.getText().toString().toUpperCase());
             visitante.setVteTelefono(telcelET.getText().toString());
             visitante.setVteDireccion("");
             TipoVisitante tipoVisitante = (TipoVisitante) tipoVisitanteS.getSelectedItem();

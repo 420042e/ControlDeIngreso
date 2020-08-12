@@ -174,9 +174,8 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
                 Bundle b = data.getExtras();
                 if (data != null) {
                     Visitante visitanteResult = (Visitante) b.getSerializable("visitanteResult");
-                    Log.d("msg3", ""+b.getInt("position", -1));
                     int position = b.getInt("position", -1);
-                    visitantes.add(position, visitanteResult);
+                    visitantes.set(position, visitanteResult);
                     visitantesAdapter.notifyItemChanged(position);
                     recyclerView.scrollToPosition(position);
                 }
@@ -397,16 +396,9 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
         AutoCompleteTextView searchAutoCompleteTextView = (AutoCompleteTextView) searchView.findViewById(autoCompleteTextViewID);
         searchAutoCompleteTextView.setThreshold(1);
 
-
-
-
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
 
-
-
-
-        //final List<Visitante> suggestions = new ArrayList<>();
         suggestions = new ArrayList<>();
 
         suggestionAdapter = new SimpleCursorAdapter(this,
@@ -456,9 +448,12 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
                     //this.onQueryTextSubmit("");
                     visitantes.clear();
                     nPag = 0;
+                    bar.setVisibility(View.VISIBLE);
+                    recyclerView.setVisibility(View.GONE);
+                    tvFallo.setVisibility(View.GONE);
                     fetchVisitantes();
                 }
-                nombre = newText;
+                nombre = newText.toUpperCase();
                 buscarVisitanteXNombre2();
                 return false;
             }

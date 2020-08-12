@@ -428,8 +428,8 @@ public class EditarVisitanteActivity extends AppCompatActivity implements Valida
 
             visitante.setVteImagen(visitanteRecibido.getVteImagen());
 
-            visitante.setVteNombre(nombreET.getText().toString());
-            visitante.setVteApellidos(apellidosET.getText().toString());
+            visitante.setVteNombre(nombreET.getText().toString().toUpperCase());
+            visitante.setVteApellidos(apellidosET.getText().toString().toUpperCase());
             visitante.setVteTelefono(telcelET.getText().toString());
             visitante.setVteDireccion("");
 

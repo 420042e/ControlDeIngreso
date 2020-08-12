@@ -66,8 +66,8 @@ public class RecintoActivity extends AppCompatActivity implements RecintoAdapter
         cards.add(new Accion(1, "Salidas", R.drawable.icono_registro_salida));*/
         cards.add(new Accion(0, "Escanear QR", R.drawable.icono_scan_qr));
         cards.add(new Accion(1, "Buscar CI", R.drawable.icono_carnet));
-        cards.add(new Accion(2, "Visitantes Con Salidas", R.drawable.ingreso2));
-        cards.add(new Accion(3, "Visitantes Sin Salidas", R.drawable.salida2));
+        cards.add(new Accion(2, "Visitas Con Salidas", R.drawable.ingreso2));
+        cards.add(new Accion(3, "Visitas Sin Salidas", R.drawable.salida2));
         cards.add(new Accion(4, "Visitantes", R.drawable.icono_visitantes));
         cards.add(new Accion(5, "Horarios", R.drawable.icono_horario));
         cards.add(new Accion(6, "Empresas", R.drawable.icono_empresa));

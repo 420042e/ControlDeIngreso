@@ -5,12 +5,18 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.util.Pair;
+import androidx.cursoradapter.widget.CursorAdapter;
+import androidx.cursoradapter.widget.SimpleCursorAdapter;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import android.app.SearchManager;
+import android.content.Context;
+import android.database.MatrixCursor;
 import android.os.Bundle;
+import android.provider.BaseColumns;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -19,6 +25,7 @@ import android.view.View;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
@@ -37,6 +44,7 @@ import com.stbnlycan.models.AreaRecinto;
 import com.stbnlycan.models.ListaVisitas;
 import com.stbnlycan.models.Recinto;
 import com.stbnlycan.models.Visita;
+import com.stbnlycan.models.Visitante;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -85,6 +93,10 @@ public class VCSalidaActivity extends AppCompatActivity implements VisitasAdapte
     private String ci;
     private TextView tvTotalVisitantes;
 
+    private SearchView searchView;
+    private List<Visita> suggestions;
+    private CursorAdapter suggestionAdapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -103,7 +115,7 @@ public class VCSalidaActivity extends AppCompatActivity implements VisitasAdapte
 
         fechaRango.setText(fechaIni.replace("-","/") + " - " + fechaFin.replace("-","/"));
 
-        setTitle("Visitantes con salidas");
+        setTitle("Visitas con salidas");
 
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -143,7 +155,6 @@ public class VCSalidaActivity extends AppCompatActivity implements VisitasAdapte
                 }
             }
         });
-
 
         bar = (ProgressBar) findViewById(R.id.progressBar);
         tvFallo = (TextView) findViewById(R.id.tvFallo);
@@ -302,6 +313,7 @@ public class VCSalidaActivity extends AppCompatActivity implements VisitasAdapte
                 {
                     tvNoData.setVisibility(View.VISIBLE);
                     tvTotalVisitantes.setText("Total de visitantes: 0");
+                    visitasAdapter = new VisitasAdapter(visitas);
                 }
                 else
                 {
@@ -438,25 +450,140 @@ public class VCSalidaActivity extends AppCompatActivity implements VisitasAdapte
         });
     }
 
+    private void buscarVisitaXCi2() {
+        Retrofit retrofit = NetworkClient.getRetrofitClient(this);
+        ListaVisitaXCiAPIs listaVisitaXCiAPIs = retrofit.create(ListaVisitaXCiAPIs.class);
+        Call<ListaVisitas> call = listaVisitaXCiAPIs.listaVisitaXCi(ci, fechaIni, fechaFin,"0","10");
+        call.enqueue(new Callback<ListaVisitas>() {
+            @Override
+            public void onResponse(Call <ListaVisitas> call, retrofit2.Response<ListaVisitas> response) {
+                bar.setVisibility(View.GONE);
+                recyclerView.setVisibility(View.VISIBLE);
+                //visitas.clear();
+                suggestions.clear();
+                ListaVisitas listaVisitas = response.body();
+                if(listaVisitas.getlVisita().size() == 0)
+                {
+                    tvNoData.setVisibility(View.VISIBLE);
+                    tvTotalVisitantes.setText("Total de visitantes: 0");
+                }
+                else {
+                    tvNoData.setVisibility(View.GONE);
+                    tvTotalVisitantes.setText("Total de visitantes: " + listaVisitas.getTotalElements());
+
+                    for(int i = 0 ; i < listaVisitas.getlVisita().size() ; i++)
+                    {
+                        suggestions.add(listaVisitas.getlVisita().get(i));
+                        String[] columns = { BaseColumns._ID,
+                                SearchManager.SUGGEST_COLUMN_TEXT_1,
+                                SearchManager.SUGGEST_COLUMN_INTENT_DATA,
+                        };
+                        MatrixCursor cursor = new MatrixCursor(columns);
+                        for (int j = 0; j < suggestions.size(); j++) {
+                            String[] tmp = {Integer.toString(j), suggestions.get(j).getVisitante().getVteNombre() + " " + suggestions.get(j).getVisitante().getVteApellidos(), suggestions.get(j).getVisitante().getVteNombre()};
+                            cursor.addRow(tmp);
+                        }
+                        suggestionAdapter.swapCursor(cursor);
+                    }
+
+
+                    /*for(int i = 0 ; i < listaVisitas.getlVisita().size() ; i++)
+                    {
+                        visitas.add(listaVisitas.getlVisita().get(i));
+                    }
+                    visitasAdapter = new VisitasAdapter(visitas);
+                    visitasAdapter.setOnVisitanteClickListener(VCSalidaActivity.this);
+
+                    recyclerView.setAdapter(visitasAdapter);
+
+                    visitasAdapter.notifyDataSetChanged();*/
+                }
+
+                swipeRefreshLayout.setRefreshing(false);
+                nPag = 0;
+            }
+            @Override
+            public void onFailure(Call <ListaVisitas> call, Throwable t) {
+                bar.setVisibility(View.GONE);
+                tvFallo.setVisibility(View.VISIBLE);
+            }
+        });
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.example_menu, menu);
         MenuItem searchItem = menu.findItem(R.id.action_search);
-        SearchView searchView = (SearchView) searchItem.getActionView();
+        searchView = (SearchView) searchItem.getActionView();
+
+
+        // Solution
+        int autoCompleteTextViewID = getResources().getIdentifier("search_src_text", "id", getPackageName());
+        AutoCompleteTextView searchAutoCompleteTextView = (AutoCompleteTextView) searchView.findViewById(autoCompleteTextViewID);
+        searchAutoCompleteTextView.setThreshold(1);
+
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+
+        suggestions = new ArrayList<>();
+
+        suggestionAdapter = new SimpleCursorAdapter(this,
+                android.R.layout.simple_list_item_1,
+                null,
+                new String[]{SearchManager.SUGGEST_COLUMN_TEXT_1},
+                new int[]{android.R.id.text1},
+                0);
+
+        searchView.setSuggestionsAdapter(suggestionAdapter);
+
+        searchView.setOnSuggestionListener(new SearchView.OnSuggestionListener() {
+            @Override
+            public boolean onSuggestionSelect(int position) {
+                return false;
+            }
+
+            @Override
+            public boolean onSuggestionClick(int position) {
+                searchView.setQuery(suggestions.get(position).getVisitante().getVteCi(), true);
+                searchView.clearFocus();
+
+                visitas.clear();
+                visitas.add(suggestions.get(position));
+                visitasAdapter.notifyDataSetChanged();
+
+                for(int i = 0; i < areaRecinto.size() ; i++)
+                {
+                    if(areaRecinto.get(i).getAreaCod().equals(suggestions.get(position).getAreaRecinto().getAreaCod()))
+                    {
+                        areaRecintoS.setSelection(i);
+                    }
+                }
+                return true;
+            }
+        });
+
+
         searchView.setMaxWidth(Integer.MAX_VALUE);
-        searchView.setQueryHint("Buscar visitante");
+        searchView.setQueryHint("Ingresar CI");
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 ci = query;
-                buscarVisitaXCi();
+                //buscarVisitaXCi();
                 return false;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                //adapter.getFilter().filter(newText);
+                if(newText.equals("")){
+                    //this.onQueryTextSubmit("");
+                    visitas.clear();
+                    nPag = 0;
+                    fetchVisitas();
+                }
+                ci = newText;
+                buscarVisitaXCi2();
                 return false;
             }
         });
