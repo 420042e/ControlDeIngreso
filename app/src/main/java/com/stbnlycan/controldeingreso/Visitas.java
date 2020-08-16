@@ -16,6 +16,9 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.database.MatrixCursor;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.provider.BaseColumns;
 import android.util.Log;
 import android.view.Menu;
@@ -31,19 +34,22 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.material.datepicker.CalendarConstraints;
 import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.datepicker.MaterialPickerOnPositiveButtonClickListener;
+import com.google.gson.Gson;
 import com.stbnlycan.adapters.VisitasAdapter;
 import com.stbnlycan.interfaces.AreaRecintoAPIs;
 import com.stbnlycan.interfaces.ListaVCSalidaAPIs;
+import com.stbnlycan.interfaces.ListaVSSalidaAPIs;
 import com.stbnlycan.interfaces.ListaVisitaXCiAPIs;
 import com.stbnlycan.models.AreaRecinto;
+import com.stbnlycan.models.Empresa;
 import com.stbnlycan.models.ListaVisitas;
 import com.stbnlycan.models.Recinto;
 import com.stbnlycan.models.Visita;
+import com.stbnlycan.models.Visitante;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -57,80 +63,83 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Retrofit;
 
-public class VSSalidaActivity extends AppCompatActivity implements VisitasAdapter.OnVisitanteClickListener {
+public class Visitas extends AppCompatActivity implements VisitasAdapter.OnVisitanteClickListener{
 
-    private Recinto recintoRecibido;
     private Toolbar toolbar;
-
-    private RecyclerView recyclerView;
-    private ArrayList<Visita> visitas;
-    private VisitasAdapter visitasAdapter;
+    private Recinto recintoRecibido;
 
     private ProgressBar bar;
     private TextView tvFallo;
     private TextView tvNoData;
-
-    private ArrayList<AreaRecinto> areaRecinto;
-    private ArrayAdapter<AreaRecinto> adapterAreaR;
-    private Spinner areaRecintoS;
-    private MaterialDatePicker<Pair<Long, Long>> picker;
-
-    private AreaRecinto areaRecintoSel;
-    private String fechaIni;
-    private String fechaFin;
-    private String recintoSel;
-    private String areaRecintoSelect;
-
-    private EditText fechaRango;
-    private int currentItems, totalItems, scrollOutItems;
-    private boolean isScrolling = false;
-    private LinearLayoutManager manager;
-    private int paginas;
-    private int nPag;
-
-    private SwipeRefreshLayout swipeRefreshLayout;
-
-    private String ci;
-    private TextView tvTotalVisitantes;
+    private RecyclerView recyclerView;
 
     private SearchView searchView;
     private List<Visita> suggestions;
     private CursorAdapter suggestionAdapter;
 
+    private ArrayList<Visita> visitas;
+    private VisitasAdapter visitasAdapter;
+    private String ci;
+    private TextView tvTotalVisitantes;
+
+    private String fechaIni;
+    private String fechaFin;
+
+    private SwipeRefreshLayout swipeRefreshLayout;
+    private LinearLayoutManager manager;
+    private int nPag;
+
+    private MaterialDatePicker<Pair<Long, Long>> picker;
+    private EditText fechaRango;
+    private AreaRecinto areaRecintoSel;
+    private Spinner areaRecintoS;
+    private Spinner tipoVisitaS;
+    private ArrayList<AreaRecinto> areaRecinto;
+    private ArrayAdapter<AreaRecinto> adapterAreaR;
+    private String recintoSel;
+    private int tipoVisitaSel;
+    private int currentItems, totalItems, scrollOutItems;
+    private boolean isScrolling = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_v_s_salida);
-
-        fechaRango = (EditText) findViewById(R.id.fechaRango);
+        setContentView(R.layout.activity_visitas);
 
         recintoRecibido = (Recinto) getIntent().getSerializableExtra("recinto");
 
-        fechaIni = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(new Date());
-        fechaFin = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(new Date());
-        recintoSel = recintoRecibido.getRecCod();
-        areaRecintoSelect = "1";
-
-        nPag = 0;
-
-        fechaRango.setText(fechaIni.replace("-","/") + " - " + fechaFin.replace("-","/"));
-
-        setTitle("Visitas sin salidas");
+        setTitle("Visitas");
 
         toolbar = findViewById(R.id.toolbar);
+        recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
+        bar = (ProgressBar) findViewById(R.id.progressBar);
+        tvFallo = (TextView) findViewById(R.id.tvFallo);
+        tvNoData = (TextView) findViewById(R.id.tvNoData);
+        tvTotalVisitantes = (TextView) findViewById(R.id.tvTotalVisitantes);
+        areaRecintoS = (Spinner) findViewById(R.id.area_recinto);
+        tipoVisitaS = (Spinner) findViewById(R.id.tipoVisita);
+        fechaRango = (EditText) findViewById(R.id.fechaRango);
+        swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout);
+
+        fechaIni = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(new Date());
+        fechaFin = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(new Date());
+        /*fechaIni = "14-07-2020";
+        fechaFin = "14-08-2020";*/
+        fechaRango.setText(fechaIni.replace("-","/") + " - " + fechaFin.replace("-","/"));
+
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-        areaRecintoS = findViewById(R.id.area_recinto);
+        manager = new LinearLayoutManager(this);
 
         visitas = new ArrayList<>();
-
-        manager = new LinearLayoutManager(this);
-        recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
-        recyclerView.setHasFixedSize(true);
-        //recyclerView.setLayoutManager(new GridLayoutManager(getApplicationContext(), 1));
+        visitasAdapter = new VisitasAdapter(visitas);
+        recyclerView.setAdapter(visitasAdapter);
+        //recyclerView.setLayoutManager(new GridLayoutManager(this, 1));
         recyclerView.setLayoutManager(manager);
+        recyclerView.setVisibility(View.GONE);
+
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
@@ -151,32 +160,29 @@ public class VSSalidaActivity extends AppCompatActivity implements VisitasAdapte
                 {
                     isScrolling = false;
                     nPag++;
-                    mostrarMasVisitas();
+                    Log.d("msg314",""+nPag);
+                    if(tipoVisitaSel == 1)
+                    {
+                        mostrarMasVCS();
+                    }
+                    else if(tipoVisitaSel == 2)
+                    {
+                        mostrarMasVSS();
+                    }
                 }
             }
         });
 
-        bar = (ProgressBar) findViewById(R.id.progressBar);
-        tvFallo = (TextView) findViewById(R.id.tvFallo);
-        tvNoData = (TextView) findViewById(R.id.tvNoData);
-        tvTotalVisitantes = (TextView) findViewById(R.id.tvTotalVisitantes);
-
         bar.setVisibility(View.VISIBLE);
-        recyclerView.setVisibility(View.GONE);
         tvNoData.setVisibility(View.GONE);
         tvFallo.setVisibility(View.GONE);
-
-        iniciarSpinnerArea();
-        fetchAreaRecintos();
-
-        fetchVisitas();
 
         MaterialDatePicker.Builder<Pair<Long, Long>> builder = MaterialDatePicker.Builder.dateRangePicker();
         CalendarConstraints.Builder constraintsBuilder = new CalendarConstraints.Builder();
         builder.setTitleText("Selecciona un rango de fechas");
         builder.setCalendarConstraints(constraintsBuilder.build());
-        picker = builder.build();
 
+        picker = builder.build();
         picker.addOnPositiveButtonClickListener(new MaterialPickerOnPositiveButtonClickListener<Pair<Long, Long>>() {
             @Override
             public void onPositiveButtonClick(Pair<Long, Long> selection) {
@@ -201,11 +207,17 @@ public class VSSalidaActivity extends AppCompatActivity implements VisitasAdapte
 
                 if(!(areaRecinto.getAreaCod().equals("cod")))
                 {
-                    actualizarVisitas();
+                    if(tipoVisitaSel == 1)
+                    {
+                        actualizarVCS();
+                    }
+                    else if(tipoVisitaSel == 2)
+                    {
+                        actualizarVSS();
+                    }
                 }
             }
         });
-
         fechaRango.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -213,14 +225,48 @@ public class VSSalidaActivity extends AppCompatActivity implements VisitasAdapte
             }
         });
 
-        swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout);
-        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+        recintoSel = recintoRecibido.getRecCod();
+
+        iniciarSpinnerArea();
+        fetchAreaRecintos();
+
+        List<String> spinnerArray =  new ArrayList<String>();
+        spinnerArray.add("Selecciona tipo de visita");
+        spinnerArray.add("Visitantes con salida");
+        spinnerArray.add("Visitantes sin salida");
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, spinnerArray);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        tipoVisitaS.setAdapter(adapter);
+        tipoVisitaS.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
-            public void onRefresh() {
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                AreaRecinto areaRecinto = (AreaRecinto) areaRecintoS.getSelectedItem();
+                recyclerView.setVisibility(View.GONE);
+                bar.setVisibility(View.VISIBLE);
+                tvNoData.setVisibility(View.GONE);
                 tvFallo.setVisibility(View.GONE);
-                actualizarVisitas();
+                if(!(areaRecinto.getAreaCod().equals("cod")))
+                {
+                    if(position == 1)
+                    {
+                        tipoVisitaSel = 1;
+                        actualizarVCS();
+                    }
+                    else if(position == 2)
+                    {
+                        tipoVisitaSel = 2;
+                        actualizarVSS();
+                    }
+                }
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
             }
         });
+        tipoVisitaS.setSelection(1);
     }
 
     public void iniciarSpinnerArea() {
@@ -232,28 +278,43 @@ public class VSSalidaActivity extends AppCompatActivity implements VisitasAdapte
         area.setAreaDescripcion("descripcion");
         area.setAreaEstado("estado");
 
+        AreaRecinto area2 = new AreaRecinto();
+        area2.setAreaCod("0");
+        area2.setAreaNombre("TODOS");
+        area2.setAreaDescripcion("descripcion");
+        area2.setAreaEstado("estado");
+
         areaRecinto.add(area);
+        areaRecinto.add(area2);
         adapterAreaR = new ArrayAdapter<AreaRecinto>(this, android.R.layout.simple_spinner_dropdown_item, areaRecinto);
         adapterAreaR.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         areaRecintoS.setAdapter(adapterAreaR);
         areaRecintoS.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                AreaRecinto areaRecinto = (AreaRecinto) parent.getSelectedItem();
-                areaRecintoSel = (AreaRecinto) parent.getSelectedItem();
-                displayAreaRData(areaRecinto);
-                //Toast.makeText(getApplicationContext(), ""+areaRecinto.getAreaCod(), Toast.LENGTH_LONG).show();
+                areaRecintoSel = (AreaRecinto) areaRecintoS.getSelectedItem();
                 recyclerView.setVisibility(View.GONE);
                 bar.setVisibility(View.VISIBLE);
-                if(!(areaRecinto.getAreaCod().equals("cod")))
+                tvNoData.setVisibility(View.GONE);
+                tvFallo.setVisibility(View.GONE);
+                if(!(areaRecintoSel.getAreaCod().equals("cod")))
                 {
-                    actualizarVisitas();
+                    if(tipoVisitaSel == 1)
+                    {
+                        actualizarVCS();
+                    }
+                    else if(tipoVisitaSel == 2)
+                    {
+                        actualizarVSS();
+                    }
                 }
             }
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
             }
         });
+        areaRecintoS.setSelection(1);
+        areaRecintoSel = (AreaRecinto) areaRecintoS.getSelectedItem();
     }
 
     private void fetchAreaRecintos() {
@@ -269,7 +330,8 @@ public class VSSalidaActivity extends AppCompatActivity implements VisitasAdapte
                 }
                 if(response.body().size() > 0)
                 {
-                    areaRecintoS.setSelection(1);
+                    //areaRecintoS.setSelection(1);
+                    tipoVisitaSel = 1;
                 }
             }
             @Override
@@ -277,15 +339,6 @@ public class VSSalidaActivity extends AppCompatActivity implements VisitasAdapte
 
             }
         });
-    }
-
-    private void displayAreaRData(AreaRecinto areaRecinto) {
-        String cod = areaRecinto.getAreaCod();
-        String nombre = areaRecinto.getAreaNombre();
-        String descripcion = areaRecinto.getAreaDescripcion();
-        String estado = areaRecinto.getAreaEstado();
-        String userData = "Cod: " + cod + "\nNombre: " + nombre + "\nObs: " + descripcion + "\nEstado: " + estado;
-        //Toast.makeText(this, userData, Toast.LENGTH_LONG).show();
     }
 
     @Override
@@ -296,218 +349,6 @@ public class VSSalidaActivity extends AppCompatActivity implements VisitasAdapte
                 return false;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    private void fetchVisitas() {
-        //String currentDate = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(new Date());
-        Retrofit retrofit = NetworkClient.getRetrofitClient(this);
-        ListaVCSalidaAPIs listaVSSalidaAPIs = retrofit.create(ListaVCSalidaAPIs.class);
-        Call<ListaVisitas> call = listaVSSalidaAPIs.listaVCSalida(fechaIni, fechaFin, recintoRecibido.getRecCod(), "1",Integer.toString(nPag),"5");
-        call.enqueue(new Callback<ListaVisitas>() {
-            @Override
-            public void onResponse(Call <ListaVisitas> call, retrofit2.Response<ListaVisitas> response) {
-                bar.setVisibility(View.GONE);
-                recyclerView.setVisibility(View.VISIBLE);
-                ListaVisitas listaVisitas = response.body();
-                if(listaVisitas.getlVisita().size() == 0)
-                {
-                    tvNoData.setVisibility(View.VISIBLE);
-                    tvTotalVisitantes.setText("Total de visitas: 0");
-                    visitasAdapter = new VisitasAdapter(visitas);
-                }
-                else
-                {
-                    tvNoData.setVisibility(View.GONE);
-                    tvTotalVisitantes.setText("Total de visitas: " + listaVisitas.getTotalElements());
-                    for(int i = 0 ; i < listaVisitas.getlVisita().size() ; i++)
-                    {
-                        visitas.add(listaVisitas.getlVisita().get(i));
-                    }
-                    visitasAdapter = new VisitasAdapter(visitas);
-                    visitasAdapter.setOnVisitanteClickListener(VSSalidaActivity.this);
-
-                    recyclerView.setAdapter(visitasAdapter);
-                }
-            }
-            @Override
-            public void onFailure(Call <ListaVisitas> call, Throwable t) {
-                bar.setVisibility(View.GONE);
-                tvFallo.setVisibility(View.VISIBLE);
-            }
-        });
-    }
-
-    private void mostrarMasVisitas() {
-        Retrofit retrofit = NetworkClient.getRetrofitClient(this);
-        ListaVCSalidaAPIs listaVSSalidaAPIs = retrofit.create(ListaVCSalidaAPIs.class);
-        Call<ListaVisitas> call = listaVSSalidaAPIs.listaVCSalida(fechaIni, fechaFin, recintoRecibido.getRecCod(), areaRecintoSel.getAreaCod(),Integer.toString(nPag),"5");
-        call.enqueue(new Callback<ListaVisitas>() {
-            @Override
-            public void onResponse(Call <ListaVisitas> call, retrofit2.Response<ListaVisitas> response) {
-                bar.setVisibility(View.GONE);
-                recyclerView.setVisibility(View.VISIBLE);
-                ListaVisitas listaVisitas = response.body();
-                for(int i = 0 ; i < listaVisitas.getlVisita().size() ; i++)
-                {
-                    visitas.add(listaVisitas.getlVisita().get(i));
-                }
-                visitasAdapter.notifyDataSetChanged();
-            }
-            @Override
-            public void onFailure(Call <ListaVisitas> call, Throwable t) {
-                bar.setVisibility(View.GONE);
-                tvFallo.setVisibility(View.VISIBLE);
-            }
-        });
-    }
-
-    @Override
-    public void onEventoClick(Visita Visita, int position) {
-
-    }
-
-    private void actualizarVisitas() {
-        Retrofit retrofit = NetworkClient.getRetrofitClient(this);
-        ListaVCSalidaAPIs listaVSSalidaAPIs = retrofit.create(ListaVCSalidaAPIs.class);
-        Call<ListaVisitas> call = listaVSSalidaAPIs.listaVCSalida(fechaIni, fechaFin, recintoSel, areaRecintoSel.getAreaCod(),"0","5");
-        call.enqueue(new Callback<ListaVisitas>() {
-            @Override
-            public void onResponse(Call <ListaVisitas> call, retrofit2.Response<ListaVisitas> response) {
-                bar.setVisibility(View.GONE);
-                recyclerView.setVisibility(View.VISIBLE);
-                visitas.clear();
-                ListaVisitas listaVisitas = response.body();
-                if(listaVisitas.getlVisita().size() == 0)
-                {
-                    tvNoData.setVisibility(View.VISIBLE);
-                    tvTotalVisitantes.setText("Total de visitas: 0");
-                }
-                else {
-                    tvNoData.setVisibility(View.GONE);
-                    tvTotalVisitantes.setText("Total de visitas: " + listaVisitas.getTotalElements());
-                    for(int i = 0 ; i < listaVisitas.getlVisita().size() ; i++)
-                    {
-                        visitas.add(listaVisitas.getlVisita().get(i));
-                    }
-                    visitasAdapter = new VisitasAdapter(visitas);
-                    visitasAdapter.setOnVisitanteClickListener(VSSalidaActivity.this);
-
-                    recyclerView.setAdapter(visitasAdapter);
-
-                    visitasAdapter.notifyDataSetChanged();
-                }
-
-                swipeRefreshLayout.setRefreshing(false);
-                nPag = 0;
-            }
-            @Override
-            public void onFailure(Call <ListaVisitas> call, Throwable t) {
-                bar.setVisibility(View.GONE);
-                tvFallo.setVisibility(View.VISIBLE);
-            }
-        });
-    }
-
-    private void buscarVisitaXCi() {
-        Retrofit retrofit = NetworkClient.getRetrofitClient(this);
-        ListaVisitaXCiAPIs listaVisitaXCiAPIs = retrofit.create(ListaVisitaXCiAPIs.class);
-        Call<ListaVisitas> call = listaVisitaXCiAPIs.listaVisitaXCi(ci, fechaIni, fechaFin,"0","5");
-        call.enqueue(new Callback<ListaVisitas>() {
-            @Override
-            public void onResponse(Call <ListaVisitas> call, retrofit2.Response<ListaVisitas> response) {
-                bar.setVisibility(View.GONE);
-                recyclerView.setVisibility(View.VISIBLE);
-                visitas.clear();
-                ListaVisitas listaVisitas = response.body();
-                if(listaVisitas.getlVisita().size() == 0)
-                {
-                    tvNoData.setVisibility(View.VISIBLE);
-                    tvTotalVisitantes.setText("Total de visitas: 0");
-                }
-                else {
-                    tvNoData.setVisibility(View.GONE);
-                    tvTotalVisitantes.setText("Total de visitas: " + listaVisitas.getTotalElements());
-                    for(int i = 0 ; i < listaVisitas.getlVisita().size() ; i++)
-                    {
-                        visitas.add(listaVisitas.getlVisita().get(i));
-                    }
-                    visitasAdapter = new VisitasAdapter(visitas);
-                    visitasAdapter.setOnVisitanteClickListener(VSSalidaActivity.this);
-
-                    recyclerView.setAdapter(visitasAdapter);
-
-                    visitasAdapter.notifyDataSetChanged();
-                }
-
-                swipeRefreshLayout.setRefreshing(false);
-                nPag = 0;
-            }
-            @Override
-            public void onFailure(Call <ListaVisitas> call, Throwable t) {
-                bar.setVisibility(View.GONE);
-                tvFallo.setVisibility(View.VISIBLE);
-            }
-        });
-    }
-
-    private void buscarVisitaXCi2() {
-        Retrofit retrofit = NetworkClient.getRetrofitClient(this);
-        ListaVisitaXCiAPIs listaVisitaXCiAPIs = retrofit.create(ListaVisitaXCiAPIs.class);
-        Call<ListaVisitas> call = listaVisitaXCiAPIs.listaVisitaXCi(ci, fechaIni, fechaFin,"0","10");
-        call.enqueue(new Callback<ListaVisitas>() {
-            @Override
-            public void onResponse(Call <ListaVisitas> call, retrofit2.Response<ListaVisitas> response) {
-                bar.setVisibility(View.GONE);
-                recyclerView.setVisibility(View.VISIBLE);
-                //visitas.clear();
-                suggestions.clear();
-                ListaVisitas listaVisitas = response.body();
-                if(listaVisitas.getlVisita().size() == 0)
-                {
-                    tvNoData.setVisibility(View.VISIBLE);
-                    tvTotalVisitantes.setText("Total de visitas: 0");
-                }
-                else {
-                    tvNoData.setVisibility(View.GONE);
-                    tvTotalVisitantes.setText("Total de visitas: " + listaVisitas.getTotalElements());
-
-                    for(int i = 0 ; i < listaVisitas.getlVisita().size() ; i++)
-                    {
-                        suggestions.add(listaVisitas.getlVisita().get(i));
-                        String[] columns = { BaseColumns._ID,
-                                SearchManager.SUGGEST_COLUMN_TEXT_1,
-                                SearchManager.SUGGEST_COLUMN_INTENT_DATA,
-                        };
-                        MatrixCursor cursor = new MatrixCursor(columns);
-                        for (int j = 0; j < suggestions.size(); j++) {
-                            String[] tmp = {Integer.toString(j), suggestions.get(j).getVisitante().getVteNombre() + " " + suggestions.get(j).getVisitante().getVteApellidos(), suggestions.get(j).getVisitante().getVteNombre()};
-                            cursor.addRow(tmp);
-                        }
-                        suggestionAdapter.swapCursor(cursor);
-                    }
-
-
-                    /*for(int i = 0 ; i < listaVisitas.getlVisita().size() ; i++)
-                    {
-                        visitas.add(listaVisitas.getlVisita().get(i));
-                    }
-                    visitasAdapter = new VisitasAdapter(visitas);
-                    visitasAdapter.setOnVisitanteClickListener(VCSalidaActivity.this);
-
-                    recyclerView.setAdapter(visitasAdapter);
-
-                    visitasAdapter.notifyDataSetChanged();*/
-                }
-
-                swipeRefreshLayout.setRefreshing(false);
-                nPag = 0;
-            }
-            @Override
-            public void onFailure(Call <ListaVisitas> call, Throwable t) {
-                bar.setVisibility(View.GONE);
-                tvFallo.setVisibility(View.VISIBLE);
-            }
-        });
     }
 
     @Override
@@ -545,24 +386,30 @@ public class VSSalidaActivity extends AppCompatActivity implements VisitasAdapte
 
             @Override
             public boolean onSuggestionClick(int position) {
-                Log.d("msg85",""+suggestions.get(position).getVisitante().getVteCi());
                 searchView.setQuery(suggestions.get(position).getVisitante().getVteCi(), true);
                 searchView.clearFocus();
+
+                Gson gson = new Gson();
+                String descripcion = gson.toJson(suggestions.get(position));
+                Log.d("msg476",""+descripcion);
+
+
+                /*for(int i = 0 ; i < areaRecinto.size() ; i++)
+                {
+                    if(suggestions.get(position).getAreaRecinto().getAreaCod().equals(areaRecinto.get(i).getAreaCod()))
+                    {
+                        areaRecintoS.setSelection(i);
+                    }
+                }*/
 
                 visitas.clear();
                 visitas.add(suggestions.get(position));
                 visitasAdapter.notifyDataSetChanged();
-
-                for(int i = 0; i < areaRecinto.size() ; i++)
-                {
-                    if(areaRecinto.get(i).getAreaCod().equals(suggestions.get(position).getAreaRecinto().getAreaCod()))
-                    {
-                        areaRecintoS.setSelection(i);
-                    }
-                }
+                recyclerView.setVisibility(View.VISIBLE);
                 return true;
             }
         });
+
 
 
         searchView.setMaxWidth(Integer.MAX_VALUE);
@@ -570,25 +417,204 @@ public class VSSalidaActivity extends AppCompatActivity implements VisitasAdapte
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                ci = query;
-                //buscarVisitaXCi();
+                //ci = query;
+                //buscarVisitaXCi2();
                 return false;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                if(newText.equals("")){
+                /*if(newText.equals("")){
                     //this.onQueryTextSubmit("");
                     visitas.clear();
                     nPag = 0;
                     fetchVisitas();
+                }*/
+                if(newText.length() > 4)
+                {
+                    ci = newText;
+                    buscarVisitaXCi2();
                 }
-                ci = newText;
-                buscarVisitaXCi2();
+                /*ci = newText;
+                buscarVisitaXCi2();*/
                 return false;
             }
         });
         return true;
     }
 
+    private void buscarVisitaXCi2() {
+        Retrofit retrofit = NetworkClient.getRetrofitClient(this);
+        ListaVisitaXCiAPIs listaVisitaXCiAPIs = retrofit.create(ListaVisitaXCiAPIs.class);
+        Call<ListaVisitas> call = listaVisitaXCiAPIs.listaVisitaXCi(ci, fechaIni, fechaFin,"0","10");
+        call.enqueue(new Callback<ListaVisitas>() {
+            @Override
+            public void onResponse(Call <ListaVisitas> call, retrofit2.Response<ListaVisitas> response) {
+                bar.setVisibility(View.GONE);
+                recyclerView.setVisibility(View.VISIBLE);
+                //visitas.clear();
+                suggestions.clear();
+                ListaVisitas listaVisitas = response.body();
+
+                if(listaVisitas.getlVisita().size() == 0)
+                {
+                    tvNoData.setVisibility(View.VISIBLE);
+                    tvTotalVisitantes.setText("Total de visitas: 0");
+                }
+                else {
+                    tvNoData.setVisibility(View.GONE);
+                    tvTotalVisitantes.setText("Total de visitas: " + listaVisitas.getTotalElements());
+
+                    for(int i = 0 ; i < listaVisitas.getlVisita().size() ; i++)
+                    {
+                        suggestions.add(listaVisitas.getlVisita().get(i));
+                        String[] columns = { BaseColumns._ID,
+                                SearchManager.SUGGEST_COLUMN_TEXT_1
+                        };
+                        MatrixCursor cursor = new MatrixCursor(columns);
+                        for (int j = 0; j < suggestions.size(); j++) {
+                            String[] tmp = {Integer.toString(j), suggestions.get(j).getVisitante().getVteNombre() + " " + suggestions.get(j).getVisitante().getVteApellidos()};
+                            cursor.addRow(tmp);
+                        }
+                        suggestionAdapter.swapCursor(cursor);
+                        //visitas.add(listaVisitas.getlVisita().get(i));
+                    }
+                    //visitasAdapter.notifyDataSetChanged();
+                }
+
+                swipeRefreshLayout.setRefreshing(false);
+                nPag = 0;
+            }
+            @Override
+            public void onFailure(Call <ListaVisitas> call, Throwable t) {
+                bar.setVisibility(View.GONE);
+                tvFallo.setVisibility(View.VISIBLE);
+            }
+        });
+    }
+
+    @Override
+    public void onEventoClick(Visita Visita, int position) {
+
+    }
+
+    private void actualizarVCS() {
+        Retrofit retrofit = NetworkClient.getRetrofitClient(this);
+        ListaVSSalidaAPIs listaVSSalidaAPIs = retrofit.create(ListaVSSalidaAPIs.class);
+        Call<ListaVisitas> call = listaVSSalidaAPIs.listaVSSalida(fechaIni, fechaFin, recintoSel, areaRecintoSel.getAreaCod(),"0","10");
+        call.enqueue(new Callback<ListaVisitas>() {
+            @Override
+            public void onResponse(Call <ListaVisitas> call, retrofit2.Response<ListaVisitas> response) {
+                bar.setVisibility(View.GONE);
+                recyclerView.setVisibility(View.VISIBLE);
+                visitas.clear();
+                ListaVisitas listaVisitas = response.body();
+                if(listaVisitas.getlVisita().size() == 0)
+                {
+                    tvNoData.setVisibility(View.VISIBLE);
+                    tvTotalVisitantes.setText("Total de visitas: 0");
+                }
+                else {
+                    tvNoData.setVisibility(View.GONE);
+                    tvTotalVisitantes.setText("Total de visitas: " + listaVisitas.getTotalElements());
+                    for(int i = 0 ; i < listaVisitas.getlVisita().size() ; i++)
+                    {
+                        visitas.add(listaVisitas.getlVisita().get(i));
+                    }
+                    visitasAdapter.notifyDataSetChanged();
+                }
+                swipeRefreshLayout.setRefreshing(false);
+                nPag = 0;
+            }
+            @Override
+            public void onFailure(Call <ListaVisitas> call, Throwable t) {
+                bar.setVisibility(View.GONE);
+                tvFallo.setVisibility(View.VISIBLE);
+            }
+        });
+    }
+
+    private void mostrarMasVCS() {
+        Retrofit retrofit = NetworkClient.getRetrofitClient(this);
+        ListaVSSalidaAPIs listaVSSalidaAPIs = retrofit.create(ListaVSSalidaAPIs.class);
+        Call<ListaVisitas> call = listaVSSalidaAPIs.listaVSSalida(fechaIni, fechaFin, recintoRecibido.getRecCod(), areaRecintoSel.getAreaCod(), Integer.toString(nPag),"10");
+        call.enqueue(new Callback<ListaVisitas>() {
+            @Override
+            public void onResponse(Call <ListaVisitas> call, retrofit2.Response<ListaVisitas> response) {
+                bar.setVisibility(View.GONE);
+                recyclerView.setVisibility(View.VISIBLE);
+                ListaVisitas listaVisitas = response.body();
+                for(int i = 0 ; i < listaVisitas.getlVisita().size() ; i++)
+                {
+                    visitas.add(listaVisitas.getlVisita().get(i));
+                }
+                visitasAdapter.notifyDataSetChanged();
+            }
+            @Override
+            public void onFailure(Call <ListaVisitas> call, Throwable t) {
+                bar.setVisibility(View.GONE);
+                tvFallo.setVisibility(View.VISIBLE);
+            }
+        });
+    }
+
+    private void actualizarVSS() {
+        Retrofit retrofit = NetworkClient.getRetrofitClient(this);
+        ListaVCSalidaAPIs listaVSSalidaAPIs = retrofit.create(ListaVCSalidaAPIs.class);
+        Call<ListaVisitas> call = listaVSSalidaAPIs.listaVCSalida(fechaIni, fechaFin, recintoSel, areaRecintoSel.getAreaCod(),"0","10");
+        call.enqueue(new Callback<ListaVisitas>() {
+            @Override
+            public void onResponse(Call <ListaVisitas> call, retrofit2.Response<ListaVisitas> response) {
+                bar.setVisibility(View.GONE);
+                recyclerView.setVisibility(View.VISIBLE);
+                visitas.clear();
+                ListaVisitas listaVisitas = response.body();
+                if(listaVisitas.getlVisita().size() == 0)
+                {
+                    tvNoData.setVisibility(View.VISIBLE);
+                    tvTotalVisitantes.setText("Total de visitas: 0");
+                }
+                else {
+                    tvNoData.setVisibility(View.GONE);
+                    tvTotalVisitantes.setText("Total de visitas: " + listaVisitas.getTotalElements());
+                    for(int i = 0 ; i < listaVisitas.getlVisita().size() ; i++)
+                    {
+                        visitas.add(listaVisitas.getlVisita().get(i));
+                    }
+                    visitasAdapter.notifyDataSetChanged();
+                }
+                swipeRefreshLayout.setRefreshing(false);
+                nPag = 0;
+            }
+            @Override
+            public void onFailure(Call <ListaVisitas> call, Throwable t) {
+                bar.setVisibility(View.GONE);
+                tvFallo.setVisibility(View.VISIBLE);
+            }
+        });
+    }
+
+    private void mostrarMasVSS() {
+        Retrofit retrofit = NetworkClient.getRetrofitClient(this);
+        ListaVCSalidaAPIs listaVSSalidaAPIs = retrofit.create(ListaVCSalidaAPIs.class);
+        Call<ListaVisitas> call = listaVSSalidaAPIs.listaVCSalida(fechaIni, fechaFin, recintoRecibido.getRecCod(), areaRecintoSel.getAreaCod(), Integer.toString(nPag),"10");
+        call.enqueue(new Callback<ListaVisitas>() {
+            @Override
+            public void onResponse(Call <ListaVisitas> call, retrofit2.Response<ListaVisitas> response) {
+                bar.setVisibility(View.GONE);
+                recyclerView.setVisibility(View.VISIBLE);
+                ListaVisitas listaVisitas = response.body();
+                for(int i = 0 ; i < listaVisitas.getlVisita().size() ; i++)
+                {
+                    visitas.add(listaVisitas.getlVisita().get(i));
+                }
+                visitasAdapter.notifyDataSetChanged();
+            }
+            @Override
+            public void onFailure(Call <ListaVisitas> call, Throwable t) {
+                bar.setVisibility(View.GONE);
+                tvFallo.setVisibility(View.VISIBLE);
+            }
+        });
+    }
 }

@@ -48,7 +48,6 @@ public class HorariosAdapter extends RecyclerView.Adapter<HorariosAdapter.ARV> i
             holder.estado.setText("Inactivo");
         }
 
-        //holder.artimg.setImageResource(R.drawable.evento_agetic2);
         holder.horario = eventosList.get(position);
     }
 

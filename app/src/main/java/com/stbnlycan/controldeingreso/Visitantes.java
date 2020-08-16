@@ -54,6 +54,7 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
     private SwipeRefreshLayout swipeRefreshLayout;
     private ProgressBar bar;
     private TextView tvFallo;
+    private TextView tvNoData;
 
     private int currentItems, totalItems, scrollOutItems;
     private boolean isScrolling = false;
@@ -76,23 +77,26 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
 
         setTitle("Visitantes");
 
+        swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout);
+        bar = (ProgressBar) findViewById(R.id.progressBar);
+        tvFallo = (TextView) findViewById(R.id.tvFallo);
+        tvNoData = (TextView) findViewById(R.id.tvNoData);
+        recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-        visitantes = new ArrayList<>();
-
-        /*visitantesAdapter = new VisitantesAdapter(visitantes);
-        visitantesAdapter.setOnVisitanteClickListener(Visitantes.this);
-
-        recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
-        recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(new GridLayoutManager(this, 1));
-        recyclerView.setAdapter(visitantesAdapter);*/
-
         manager = new LinearLayoutManager(this);
-        recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
+
+        visitantes = new ArrayList<>();
+        visitantesAdapter = new VisitantesAdapter(visitantes);
+        visitantesAdapter.setOnVisitanteClickListener(Visitantes.this);
+        visitantesAdapter.setOnVQRClickListener(Visitantes.this);
+        visitantesAdapter.setOnEEClickListener(Visitantes.this);
+
+        recyclerView.setAdapter(visitantesAdapter);
+
         recyclerView.setHasFixedSize(true);
         //recyclerView.setLayoutManager(new GridLayoutManager(getApplicationContext(), 1));
         recyclerView.setLayoutManager(manager);
@@ -121,20 +125,20 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
             }
         });
 
-
-        bar = (ProgressBar) findViewById(R.id.progressBar);
-        tvFallo = (TextView) findViewById(R.id.tvFallo);
         bar.setVisibility(View.VISIBLE);
         recyclerView.setVisibility(View.GONE);
         tvFallo.setVisibility(View.GONE);
+        tvNoData.setVisibility(View.GONE);
 
-        fetchVisitantes();
+        //fetchVisitantes();
+        actualizarVisitantes();
 
-        swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout);
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                tvFallo.setVisibility(View.GONE);
+                bar.setVisibility(View.VISIBLE);
+                recyclerView.setVisibility(View.GONE);
+                //tvNoData.setVisibility(View.GONE);
                 actualizarVisitantes();
             }
         });
@@ -183,56 +187,6 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
         }
     }
 
-    private void fetchVisitantes() {
-        Retrofit retrofit = NetworkClient.getRetrofitClient(this);
-        ListaVisitantesAPIs listaVisitantesAPIs = retrofit.create(ListaVisitantesAPIs.class);
-        Call<ListaVisitantes> call = listaVisitantesAPIs.listaVisitantes(Integer.toString(nPag),"10");
-        call.enqueue(new Callback<ListaVisitantes>() {
-            @Override
-            public void onResponse(Call <ListaVisitantes> call, retrofit2.Response<ListaVisitantes> response) {
-                bar.setVisibility(View.GONE);
-                recyclerView.setVisibility(View.VISIBLE);
-                ListaVisitantes listaVisitantes = response.body();
-                if(listaVisitantes.getlVisitante().size() == 0)
-                {
-                    //tvNoData.setVisibility(View.VISIBLE);
-                }
-                else
-                {
-                    //tvNoData.setVisibility(View.GONE);
-                    for(int i = 0 ; i < listaVisitantes.getlVisitante().size() ; i++)
-                    {
-                        visitantes.add(listaVisitantes.getlVisitante().get(i));
-                        //Log.d("msg1233",""+listaVisitantes.getlVisitante().get(i).getVteNombre());
-                    }
-                    visitantesAdapter = new VisitantesAdapter(visitantes);
-                    visitantesAdapter.setOnVisitanteClickListener(Visitantes.this);
-                    visitantesAdapter.setOnVQRClickListener(Visitantes.this);
-                    visitantesAdapter.setOnEEClickListener(Visitantes.this);
-
-                    recyclerView.setAdapter(visitantesAdapter);
-                }
-
-                /*for(int i = 0 ; i < response.body().size() ; i++)
-                {
-                    visitantes.add(response.body().get(i));
-                }
-                visitantesAdapter = new VisitantesAdapter(visitantes);
-                visitantesAdapter.setOnVisitanteClickListener(Visitantes.this);
-
-                recyclerView.setAdapter(visitantesAdapter);*/
-
-                //visitantesAdapter.notifyDataSetChanged();
-                //swipeRefreshLayout.setRefreshing(false);
-            }
-            @Override
-            public void onFailure(Call <ListaVisitantes> call, Throwable t) {
-                bar.setVisibility(View.GONE);
-                tvFallo.setVisibility(View.VISIBLE);
-            }
-        });
-    }
-
     private void mostrarMasVisitantes() {
         Retrofit retrofit = NetworkClient.getRetrofitClient(this);
         ListaVisitantesAPIs listaVisitantesAPIs = retrofit.create(ListaVisitantesAPIs.class);
@@ -265,16 +219,17 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
         call.enqueue(new Callback<ListaVisitantes>() {
             @Override
             public void onResponse(Call <ListaVisitantes> call, retrofit2.Response<ListaVisitantes> response) {
-                //recintos = response.body();
                 visitantes.clear();
                 ListaVisitantes listaVisitantes = response.body();
                 if(listaVisitantes.getlVisitante().size() == 0)
                 {
-                    //tvNoData.setVisibility(View.VISIBLE);
+                    tvNoData.setVisibility(View.VISIBLE);
                 }
                 else
                 {
-                    //tvNoData.setVisibility(View.GONE);
+                    bar.setVisibility(View.GONE);
+                    recyclerView.setVisibility(View.VISIBLE);
+                    tvNoData.setVisibility(View.GONE);
                     for(int i = 0 ; i < listaVisitantes.getlVisitante().size() ; i++)
                     {
                         visitantes.add(listaVisitantes.getlVisitante().get(i));
@@ -282,14 +237,7 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
                     visitantesAdapter.notifyDataSetChanged();
                     swipeRefreshLayout.setRefreshing(false);
                 }
-
-
-                /*for(int i = 0 ; i < response.body().size() ; i++)
-                {
-                    visitantes.add(response.body().get(i));
-                }
-                visitantesAdapter.notifyDataSetChanged();
-                swipeRefreshLayout.setRefreshing(false);*/
+                nPag = 0;
             }
             @Override
             public void onFailure(Call <ListaVisitantes> call, Throwable t) {
@@ -309,39 +257,6 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
         //Toast.makeText(this, "Hola", Toast.LENGTH_LONG).show();
     }
 
-    private void buscarVisitanteXNombre() {
-        Retrofit retrofit = NetworkClient.getRetrofitClient(this);
-        ListaVisitantesXNombreAPIs listaVisitantesXNombreAPIs = retrofit.create(ListaVisitantesXNombreAPIs.class);
-        Call<ListaVisitantes> call = listaVisitantesXNombreAPIs.listaVisitanteXNombre(nombre,"0","5");
-        call.enqueue(new Callback<ListaVisitantes>() {
-            @Override
-            public void onResponse(Call <ListaVisitantes> call, retrofit2.Response<ListaVisitantes> response) {
-                //recintos = response.body();
-                visitantes.clear();
-                ListaVisitantes listaVisitantes = response.body();
-                if(listaVisitantes.getlVisitante().size() == 0)
-                {
-                    //tvNoData.setVisibility(View.VISIBLE);
-                }
-                else
-                {
-                    //tvNoData.setVisibility(View.GONE);
-                    for(int i = 0 ; i < listaVisitantes.getlVisitante().size() ; i++)
-                    {
-                        visitantes.add(listaVisitantes.getlVisitante().get(i));
-                    }
-                    visitantesAdapter.notifyDataSetChanged();
-                    swipeRefreshLayout.setRefreshing(false);
-                }
-            }
-            @Override
-            public void onFailure(Call <ListaVisitantes> call, Throwable t) {
-                tvFallo.setVisibility(View.VISIBLE);
-                swipeRefreshLayout.setRefreshing(false);
-            }
-        });
-    }
-
     private void buscarVisitanteXNombre2() {
         Retrofit retrofit = NetworkClient.getRetrofitClient(this);
         ListaVisitantesXNombreAPIs listaVisitantesXNombreAPIs = retrofit.create(ListaVisitantesXNombreAPIs.class);
@@ -349,16 +264,15 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
         call.enqueue(new Callback<ListaVisitantes>() {
             @Override
             public void onResponse(Call <ListaVisitantes> call, retrofit2.Response<ListaVisitantes> response) {
-                //recintos = response.body();
                 suggestions.clear();
                 ListaVisitantes listaVisitantes = response.body();
                 if(listaVisitantes.getlVisitante().size() == 0)
                 {
-                    //tvNoData.setVisibility(View.VISIBLE);
+                    tvNoData.setVisibility(View.VISIBLE);
                 }
                 else
                 {
-                    //tvNoData.setVisibility(View.GONE);
+                    tvNoData.setVisibility(View.GONE);
                     for(int i = 0 ; i < listaVisitantes.getlVisitante().size() ; i++)
                     {
                         suggestions.add(listaVisitantes.getlVisitante().get(i));
@@ -389,7 +303,6 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
         inflater.inflate(R.menu.menu2, menu);
         MenuItem searchItem = menu.findItem(R.id.action_search);
         searchView = (SearchView) searchItem.getActionView();
-
 
         // Solution
         int autoCompleteTextViewID = getResources().getIdentifier("search_src_text", "id", getPackageName());
@@ -428,10 +341,6 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
             }
         });
 
-
-
-
-
         searchView.setMaxWidth(Integer.MAX_VALUE);
         searchView.setQueryHint("Buscar visitante");
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -451,7 +360,8 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
                     bar.setVisibility(View.VISIBLE);
                     recyclerView.setVisibility(View.GONE);
                     tvFallo.setVisibility(View.GONE);
-                    fetchVisitantes();
+                    //fetchVisitantes();
+                    actualizarVisitantes();
                 }
                 nombre = newText.toUpperCase();
                 buscarVisitanteXNombre2();
@@ -463,7 +373,6 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
 
     @Override
     public void onEventoClick(Visitante visitante, int position) {
-        Log.d("msg1",""+position);
         Intent intent = new Intent(Visitantes.this, EditarVisitanteActivity.class);
         intent.putExtra("visitante", visitante);
         intent.putExtra("position", position);

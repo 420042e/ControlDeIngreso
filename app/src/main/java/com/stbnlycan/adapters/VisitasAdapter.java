@@ -43,7 +43,6 @@ public class VisitasAdapter extends RecyclerView.Adapter<VisitasAdapter.ARV> imp
         holder.lugar.setText(Visita.getVisitante().getVteCi());
         holder.empresaNombre.setText(Visita.getVisitante().getEmpresa().getEmpNombre());
 
-        //holder.artimg.setImageResource(R.drawable.evento_agetic2);
         holder.Visita = eventosList.get(position);
     }
 

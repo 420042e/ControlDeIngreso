@@ -312,13 +312,13 @@ public class VCSalidaActivity extends AppCompatActivity implements VisitasAdapte
                 if(listaVisitas.getlVisita().size() == 0)
                 {
                     tvNoData.setVisibility(View.VISIBLE);
-                    tvTotalVisitantes.setText("Total de visitantes: 0");
+                    tvTotalVisitantes.setText("Total de visitas: 0");
                     visitasAdapter = new VisitasAdapter(visitas);
                 }
                 else
                 {
                     tvNoData.setVisibility(View.GONE);
-                    tvTotalVisitantes.setText("Total de visitantes: " + listaVisitas.getTotalElements());
+                    tvTotalVisitantes.setText("Total de visitas: " + listaVisitas.getTotalElements());
                     for(int i = 0 ; i < listaVisitas.getlVisita().size() ; i++)
                     {
                         visitas.add(listaVisitas.getlVisita().get(i));
@@ -380,11 +380,11 @@ public class VCSalidaActivity extends AppCompatActivity implements VisitasAdapte
                 if(listaVisitas.getlVisita().size() == 0)
                 {
                     tvNoData.setVisibility(View.VISIBLE);
-                    tvTotalVisitantes.setText("Total de visitantes: 0");
+                    tvTotalVisitantes.setText("Total de visitas: 0");
                 }
                 else {
                     tvNoData.setVisibility(View.GONE);
-                    tvTotalVisitantes.setText("Total de visitantes: " + listaVisitas.getTotalElements());
+                    tvTotalVisitantes.setText("Total de visitas: " + listaVisitas.getTotalElements());
                     for(int i = 0 ; i < listaVisitas.getlVisita().size() ; i++)
                     {
                         visitas.add(listaVisitas.getlVisita().get(i));
@@ -422,11 +422,11 @@ public class VCSalidaActivity extends AppCompatActivity implements VisitasAdapte
                 if(listaVisitas.getlVisita().size() == 0)
                 {
                     tvNoData.setVisibility(View.VISIBLE);
-                    tvTotalVisitantes.setText("Total de visitantes: 0");
+                    tvTotalVisitantes.setText("Total de visitas: 0");
                 }
                 else {
                     tvNoData.setVisibility(View.GONE);
-                    tvTotalVisitantes.setText("Total de visitantes: " + listaVisitas.getTotalElements());
+                    tvTotalVisitantes.setText("Total de visitas: " + listaVisitas.getTotalElements());
                     for(int i = 0 ; i < listaVisitas.getlVisita().size() ; i++)
                     {
                         visitas.add(listaVisitas.getlVisita().get(i));
@@ -465,11 +465,11 @@ public class VCSalidaActivity extends AppCompatActivity implements VisitasAdapte
                 if(listaVisitas.getlVisita().size() == 0)
                 {
                     tvNoData.setVisibility(View.VISIBLE);
-                    tvTotalVisitantes.setText("Total de visitantes: 0");
+                    tvTotalVisitantes.setText("Total de visitas: 0");
                 }
                 else {
                     tvNoData.setVisibility(View.GONE);
-                    tvTotalVisitantes.setText("Total de visitantes: " + listaVisitas.getTotalElements());
+                    tvTotalVisitantes.setText("Total de visitas: " + listaVisitas.getTotalElements());
 
                     for(int i = 0 ; i < listaVisitas.getlVisita().size() ; i++)
                     {

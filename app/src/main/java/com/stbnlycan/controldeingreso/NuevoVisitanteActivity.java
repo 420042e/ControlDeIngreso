@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -232,7 +233,7 @@ public class NuevoVisitanteActivity extends AppCompatActivity implements Validat
         {
             Bundle extras = data.getExtras();
             Bitmap imageBitmap = (Bitmap)extras.get("data");
-            visitanteIV.setImageBitmap(imageBitmap);
+            //visitanteIV.setImageBitmap(imageBitmap);
 
             // CALL THIS METHOD TO GET THE URI FROM THE BITMAP
             Uri tempUri = getImageUri(getApplicationContext(), imageBitmap);
@@ -241,6 +242,9 @@ public class NuevoVisitanteActivity extends AppCompatActivity implements Validat
             File finalFile = new File(getRealPathFromURI(tempUri));
 
             imagenObtenida = finalFile.toString();
+
+            Picasso.get().load(finalFile).into(visitanteIV);
+
         }
         if (resultCode == Activity.RESULT_OK) {
             if (requestCode == REQUEST_CODE_NE) {
@@ -408,7 +412,6 @@ public class NuevoVisitanteActivity extends AppCompatActivity implements Validat
         }
         else
         {
-            //Visitante visitante = new Visitante();
             visitante = new Visitante();
             visitante.setVteCi(ciET.getText().toString());
             visitante.setVteCorreo(emailET.getText().toString());

@@ -43,7 +43,6 @@ public class EmpresasAdapter extends RecyclerView.Adapter<EmpresasAdapter.ARV> {
         holder.artNaam.setText(empresa.getEmpNombre());
         holder.lugar.setText(empresa.getEmpObs());
 
-        //holder.artimg.setImageResource(R.drawable.evento_agetic2);
         holder.empresa = eventosList.get(position);
     }
 

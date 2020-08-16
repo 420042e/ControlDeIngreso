@@ -49,7 +49,6 @@ public class VisitantesAdapter extends RecyclerView.Adapter<VisitantesAdapter.AR
 
         Picasso.get().load("http://190.129.90.115:8083/ingresoVisitantes/visitante/mostrarFoto?foto=" + visitante.getVteImagen()).centerCrop().resize(150, 150).into(holder.imgVisitante);
 
-        //holder.artimg.setImageResource(R.drawable.evento_agetic2);
         holder.visitante = eventosList.get(position);
     }
 

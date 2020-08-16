@@ -98,7 +98,7 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
         visitanteRecibido = (Visitante) getIntent().getSerializableExtra("visitante");
         recintoRecibido = (Recinto) getIntent().getSerializableExtra("recinto");
 
-        Picasso.get().load("http://190.129.90.115:8083/ingresoVisitantes/visitante/mostrarFoto?foto=" + visitanteRecibido.getVteImagen()).centerCrop().resize(500, 500).into(visitanteIV);
+        Picasso.get().load("http://190.129.90.115:8083/ingresoVisitantes/visitante/mostrarFoto?foto=" + visitanteRecibido.getVteImagen()).into(visitanteIV);
 
         ciET.setText(visitanteRecibido.getVteCi());
         nombreET.setText(visitanteRecibido.getVteNombre());
@@ -180,7 +180,7 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
     public void onValidationSucceeded() {
         Visita visita = new Visita();
         AreaRecinto areaRecinto = (AreaRecinto) areaRecintoS.getSelectedItem();
-        visita.setVisObs(observacion.getText().toString());
+        visita.setVisObs(observacion.getText().toString().toUpperCase());
         visita.setVisitante(visitanteRecibido);
         visita.setAreaRecinto(areaRecinto);
         registrarIngreso(visita);

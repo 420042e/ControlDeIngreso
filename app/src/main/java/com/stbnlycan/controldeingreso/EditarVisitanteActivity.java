@@ -139,7 +139,7 @@ public class EditarVisitanteActivity extends AppCompatActivity implements Valida
         //getDataEmpresa();
         //getDataTipoVisitante();
 
-        Picasso.get().load("http://190.129.90.115:8083/ingresoVisitantes/visitante/mostrarFoto?foto=" + visitanteRecibido.getVteImagen()).centerCrop().resize(500, 500).into(visitanteIV);
+        Picasso.get().load("http://190.129.90.115:8083/ingresoVisitantes/visitante/mostrarFoto?foto=" + visitanteRecibido.getVteImagen()).into(visitanteIV);
 
         ciET.setText(visitanteRecibido.getVteCi());
         nombreET.setText(visitanteRecibido.getVteNombre());
@@ -247,7 +247,7 @@ public class EditarVisitanteActivity extends AppCompatActivity implements Valida
         {
             Bundle extras = data.getExtras();
             Bitmap imageBitmap = (Bitmap)extras.get("data");
-            visitanteIV.setImageBitmap(imageBitmap);
+            //visitanteIV.setImageBitmap(imageBitmap);
 
             // CALL THIS METHOD TO GET THE URI FROM THE BITMAP
             Uri tempUri = getImageUri(getApplicationContext(), imageBitmap);
@@ -260,6 +260,8 @@ public class EditarVisitanteActivity extends AppCompatActivity implements Valida
             String descripcion = gson.toJson(visitanteRecibido);
 
             imagenObtenida = finalFile.toString();
+
+            Picasso.get().load(finalFile).into(visitanteIV);
             //imagenObtenida = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/prueba.jpg";
 
             subirImagen(descripcion);

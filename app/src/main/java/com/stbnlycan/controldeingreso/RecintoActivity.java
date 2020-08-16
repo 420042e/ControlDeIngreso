@@ -62,17 +62,14 @@ public class RecintoActivity extends AppCompatActivity implements RecintoAdapter
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         List<Accion> cards = new ArrayList<>();
-        /*cards.add(new Accion(0, "Visitas", R.drawable.icono_registro_visita));
-        cards.add(new Accion(1, "Salidas", R.drawable.icono_registro_salida));*/
         cards.add(new Accion(0, "Escanear QR", R.drawable.icono_scan_qr));
         cards.add(new Accion(1, "Buscar CI", R.drawable.icono_carnet));
-        cards.add(new Accion(2, "Visitas Con Salidas", R.drawable.ingreso2));
-        cards.add(new Accion(3, "Visitas Sin Salidas", R.drawable.salida2));
-        cards.add(new Accion(4, "Visitantes", R.drawable.icono_visitantes));
-        cards.add(new Accion(5, "Horarios", R.drawable.icono_horario));
-        cards.add(new Accion(6, "Empresas", R.drawable.icono_empresa));
-        /*cards.add(new Accion(6, "Escanear QR", R.drawable.icono_scan_qr));
-        cards.add(new Accion(7, "Buscar CI", R.drawable.icono_carnet));*/
+        //cards.add(new Accion(2, "Visitas Con Salidas", R.drawable.ingreso2));
+        //cards.add(new Accion(3, "Visitas Sin Salidas", R.drawable.salida2));
+        cards.add(new Accion(2, "Visitas", R.drawable.icono_visita));
+        cards.add(new Accion(3, "Visitantes", R.drawable.icono_visitantes));
+        cards.add(new Accion(4, "Horarios", R.drawable.icono_horario));
+        cards.add(new Accion(5, "Empresas", R.drawable.icono_empresa));
 
 
 
@@ -86,18 +83,6 @@ public class RecintoActivity extends AppCompatActivity implements RecintoAdapter
 
     @Override
     public void onEventoDetailsClick(int position) {
-        /*if(position == 0)
-        {
-            Intent intent = new Intent(RecintoActivity.this, RegistrarVisitasActivity.class);
-            intent.putExtra("recinto", recintoRecibido);
-            startActivity(intent);
-        }
-        else if(position == 1)
-        {
-            Intent intent = new Intent(RecintoActivity.this, RegistrarSalidasActivity.class);
-            intent.putExtra("recinto", recintoRecibido);
-            startActivity(intent);
-        }*/
         if(position == 0)
         {
             escaner();
@@ -108,36 +93,24 @@ public class RecintoActivity extends AppCompatActivity implements RecintoAdapter
         }
         else if(position == 2)
         {
-            iniciarAVCSalida();
+            iniciarAVisitas();
         }
         else if(position == 3)
-        {
-            iniciarAVSSalida();
-        }
-        else if(position == 4)
         {
             Intent intent = new Intent(RecintoActivity.this, Visitantes.class);
             startActivity(intent);
         }
-        else if(position == 5)
+        else if(position == 4)
         {
             Intent intent = new Intent(RecintoActivity.this, Horarios.class);
             intent.putExtra("recinto", recintoRecibido);
             intent.putExtra("recCod", getIntent().getStringExtra("recCod"));
             startActivity(intent);
         }
-        else if(position == 6)
+        else if(position == 5)
         {
             iniciarAEmpresas();
         }
-        /*else if(position == 6)
-        {
-            escaner();
-        }
-        else if(position == 7)
-        {
-            showCiDialog();
-        }*/
     }
 
     public void iniciarAVCSalida()
@@ -150,6 +123,13 @@ public class RecintoActivity extends AppCompatActivity implements RecintoAdapter
     public void iniciarAVSSalida()
     {
         Intent intent = new Intent(RecintoActivity.this, VSSalidaActivity.class);
+        intent.putExtra("recinto", recintoRecibido);
+        startActivity(intent);
+    }
+
+    public void iniciarAVisitas()
+    {
+        Intent intent = new Intent(RecintoActivity.this, Visitas.class);
         intent.putExtra("recinto", recintoRecibido);
         startActivity(intent);
     }

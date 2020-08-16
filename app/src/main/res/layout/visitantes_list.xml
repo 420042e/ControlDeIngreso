@@ -59,14 +59,15 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical">
+                android:layout_height="match_parent">
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnVQR"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
 
+                    android:layout_marginRight="15dp"
+                    android:layout_weight="1"
                     android:gravity="center"
                     android:text="Ver QR"
                     android:textAllCaps="true"
@@ -83,6 +84,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
 
+                    android:layout_weight="1"
                     android:gravity="center"
                     android:text="Enviar Email"
                     android:textAllCaps="true"
