@@ -106,7 +106,6 @@ public class Horarios extends AppCompatActivity implements HorariosAdapter.OnVis
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 tipoVisitanteSel = (TipoVisitante) tipoVisitanteS.getSelectedItem();
                 displayTipoVisitanteData(tipoVisitanteSel);
-                //fetchHorarios(recintoRecibido.getRecCod(), tipoVisitanteSel.getTviCod(),"todos","todos");
                 recyclerView.setVisibility(View.GONE);
                 bar.setVisibility(View.VISIBLE);
                 tvNoData.setVisibility(View.GONE);
@@ -150,7 +149,7 @@ public class Horarios extends AppCompatActivity implements HorariosAdapter.OnVis
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu3, menu);
-        MenuItem searchItem = menu.findItem(R.id.action_search);
+        /*MenuItem searchItem = menu.findItem(R.id.action_search);
         SearchView searchView = (SearchView) searchItem.getActionView();
         searchView.setMaxWidth(Integer.MAX_VALUE);
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -164,36 +163,8 @@ public class Horarios extends AppCompatActivity implements HorariosAdapter.OnVis
                 horariosAdapter.getFilter().filter(newText);
                 return false;
             }
-        });
+        });*/
         return true;
-    }
-
-    private void fetchHorarios(String recCod, String tviCod, String horNombre, String dia) {
-        Retrofit retrofit = NetworkClient.getRetrofitClient(this);
-        HorariosAPIs horariosAPIs = retrofit.create(HorariosAPIs.class);
-        Call <List<Horario>> call = horariosAPIs.listaHorarios(recCod,tviCod,horNombre,dia);
-        call.enqueue(new Callback <List<Horario>> () {
-            @Override
-            public void onResponse(Call <List<Horario>> call, Response <List<Horario>> response) {
-                horarios = response.body();
-                horariosAdapter = new HorariosAdapter(horarios);
-                horariosAdapter.setOnVisitanteClickListener(Horarios.this);
-                recyclerView.setHasFixedSize(true);
-                recyclerView.setLayoutManager(new GridLayoutManager(getApplicationContext(), 1));
-                recyclerView.setAdapter(horariosAdapter);
-
-                if (response.body().size() == 0) {
-                    recyclerView.setVisibility(View.GONE);
-                }
-                else {
-                    recyclerView.setVisibility(View.VISIBLE);
-                }
-            }
-            @Override
-            public void onFailure(Call call, Throwable t) {
-
-            }
-        });
     }
 
     private void actualizarHorarios(String recCod, String tviCod, String horNombre, String dia) {

@@ -389,19 +389,6 @@ public class Visitas extends AppCompatActivity implements VisitasAdapter.OnVisit
                 searchView.setQuery(suggestions.get(position).getVisitante().getVteCi(), true);
                 searchView.clearFocus();
 
-                Gson gson = new Gson();
-                String descripcion = gson.toJson(suggestions.get(position));
-                Log.d("msg476",""+descripcion);
-
-
-                /*for(int i = 0 ; i < areaRecinto.size() ; i++)
-                {
-                    if(suggestions.get(position).getAreaRecinto().getAreaCod().equals(areaRecinto.get(i).getAreaCod()))
-                    {
-                        areaRecintoS.setSelection(i);
-                    }
-                }*/
-
                 visitas.clear();
                 visitas.add(suggestions.get(position));
                 visitasAdapter.notifyDataSetChanged();

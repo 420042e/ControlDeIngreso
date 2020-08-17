@@ -5,18 +5,25 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
+import androidx.cursoradapter.widget.CursorAdapter;
+import androidx.cursoradapter.widget.SimpleCursorAdapter;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.app.Activity;
+import android.app.SearchManager;
+import android.content.Context;
 import android.content.Intent;
+import android.database.MatrixCursor;
 import android.os.Bundle;
+import android.provider.BaseColumns;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AbsListView;
+import android.widget.AutoCompleteTextView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -30,6 +37,7 @@ import com.stbnlycan.models.ListaEmpresas;
 import com.stbnlycan.models.ListaVisitantes;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -50,6 +58,10 @@ public class Empresas extends AppCompatActivity implements EmpresasAdapter.OnVis
     private TextView tvFallo;
     private String nombre;
     private final static int REQUEST_CODE_NE = 1;
+
+    private SearchView searchView;
+    private List<Empresa> suggestions;
+    private CursorAdapter suggestionAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -148,20 +160,64 @@ public class Empresas extends AppCompatActivity implements EmpresasAdapter.OnVis
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_ne, menu);
         MenuItem searchItem = menu.findItem(R.id.action_search);
-        SearchView searchView = (SearchView) searchItem.getActionView();
+        searchView = (SearchView) searchItem.getActionView();
+
+
+        // Solution
+        int autoCompleteTextViewID = getResources().getIdentifier("search_src_text", "id", getPackageName());
+        AutoCompleteTextView searchAutoCompleteTextView = (AutoCompleteTextView) searchView.findViewById(autoCompleteTextViewID);
+        searchAutoCompleteTextView.setThreshold(1);
+
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+
+        suggestions = new ArrayList<>();
+
+        suggestionAdapter = new SimpleCursorAdapter(this,
+                android.R.layout.simple_list_item_1,
+                null,
+                new String[]{SearchManager.SUGGEST_COLUMN_TEXT_1},
+                new int[]{android.R.id.text1},
+                0);
+
+        searchView.setSuggestionsAdapter(suggestionAdapter);
+
+        searchView.setOnSuggestionListener(new SearchView.OnSuggestionListener() {
+            @Override
+            public boolean onSuggestionSelect(int position) {
+                return false;
+            }
+
+            @Override
+            public boolean onSuggestionClick(int position) {
+                searchView.setQuery(suggestions.get(position).getEmpNombre(), true);
+                searchView.clearFocus();
+
+                empresas.clear();
+                empresas.add(suggestions.get(position));
+                empresasAdapter.notifyDataSetChanged();
+                return true;
+            }
+        });
+
+
         searchView.setMaxWidth(Integer.MAX_VALUE);
         searchView.setQueryHint("Buscar empresa");
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                nombre = query;
-                buscarVisitanteXNombre();
+                nombre = query.toUpperCase();
+                //buscarEmpresaXNombre();
                 return false;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                //visitantesAdapter.getFilter().filter(newText);
+                if(newText.equals("")){
+                    actualizarEmpresas();
+                }
+                nombre = newText.toUpperCase();
+                buscarEmpresaXNombre();
                 return false;
             }
         });
@@ -281,7 +337,7 @@ public class Empresas extends AppCompatActivity implements EmpresasAdapter.OnVis
         });
     }
 
-    private void buscarVisitanteXNombre()
+    private void buscarEmpresaXNombre()
     {
         Retrofit retrofit = NetworkClient.getRetrofitClient(this);
         ListaEmpresasXNombreAPIs listaEmpresasXNombreAPIs = retrofit.create(ListaEmpresasXNombreAPIs.class);
@@ -289,7 +345,8 @@ public class Empresas extends AppCompatActivity implements EmpresasAdapter.OnVis
         call.enqueue(new Callback<ListaEmpresas>() {
             @Override
             public void onResponse(Call <ListaEmpresas> call, retrofit2.Response<ListaEmpresas> response) {
-                empresas.clear();
+                //empresas.clear();
+                suggestions.clear();
                 ListaEmpresas listaEmpresas = response.body();
                 if(listaEmpresas.getlEmpresa().size() == 0)
                 {
@@ -300,8 +357,19 @@ public class Empresas extends AppCompatActivity implements EmpresasAdapter.OnVis
                     //tvNoData.setVisibility(View.GONE);
                     for(int i = 0 ; i < listaEmpresas.getlEmpresa().size() ; i++)
                     {
-                        empresas.add(listaEmpresas.getlEmpresa().get(i));
-                        //Log.d("msg1233",""+listaVisitantes.getlVisitante().get(i).getVteNombre());
+                        suggestions.add(listaEmpresas.getlEmpresa().get(i));
+                        String[] columns = { BaseColumns._ID,
+                                SearchManager.SUGGEST_COLUMN_TEXT_1,
+                                SearchManager.SUGGEST_COLUMN_INTENT_DATA,
+                        };
+                        MatrixCursor cursor = new MatrixCursor(columns);
+                        for (int j = 0; j < suggestions.size(); j++) {
+                            String[] tmp = {Integer.toString(j), suggestions.get(j).getEmpNombre(), suggestions.get(j).getEmpNombre()};
+                            cursor.addRow(tmp);
+                        }
+                        suggestionAdapter.swapCursor(cursor);
+
+                        //empresas.add(listaEmpresas.getlEmpresa().get(i));
                     }
                     empresasAdapter.notifyDataSetChanged();
                     swipeRefreshLayout.setRefreshing(false);

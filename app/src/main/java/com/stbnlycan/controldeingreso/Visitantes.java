@@ -130,7 +130,6 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
         tvFallo.setVisibility(View.GONE);
         tvNoData.setVisibility(View.GONE);
 
-        //fetchVisitantes();
         actualizarVisitantes();
 
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -153,9 +152,7 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
             case R.id.action_nuevo_visitante:
                 Intent intent = new Intent(Visitantes.this, NuevoVisitanteActivity.class);
                 intent.putExtra("recCod", getIntent().getStringExtra("recCod"));
-                //startActivity(intent);
                 startActivityForResult(intent, REQUEST_CODE_NV);
-                //prueba();
                 return false;
         }
         return super.onOptionsItemSelected(item);
@@ -360,7 +357,6 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
                     bar.setVisibility(View.VISIBLE);
                     recyclerView.setVisibility(View.GONE);
                     tvFallo.setVisibility(View.GONE);
-                    //fetchVisitantes();
                     actualizarVisitantes();
                 }
                 nombre = newText.toUpperCase();
