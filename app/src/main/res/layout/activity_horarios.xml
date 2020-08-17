@@ -23,6 +23,28 @@
             app:popupTheme="@style/Theme.AppCompat.Light"/>
 
     </com.google.android.material.appbar.AppBarLayout>
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center" />
+
+    <TextView
+        android:id="@+id/tvFallo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="Fallo de conexión" />
+
+    <TextView
+        android:id="@+id/tvNoData"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="No hay datos" />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -33,6 +55,7 @@
             android:id="@+id/textView7"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:paddingLeft="5dp"
             android:text="Tipo de visitante"
             android:textSize="12sp"/>
 
@@ -48,14 +71,6 @@
             android:scrollbarSize="5dp"
             android:scrollbarThumbVertical="@android:color/darker_gray"
             android:scrollbars="vertical" />
-
-        <TextView
-            android:id="@+id/emptyView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:text="@string/no_data_available"
-            android:visibility="gone" />
 
     </LinearLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

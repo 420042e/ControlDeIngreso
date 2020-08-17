@@ -20,6 +20,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -54,12 +55,15 @@ public class Horarios extends AppCompatActivity implements HorariosAdapter.OnVis
     @Select
     private Spinner tipoVisitanteS;
     private RecyclerView recyclerView;
-    private TextView emptyView;
     private Validator validator;
     private Toolbar toolbar;
     private Recinto recintoRecibido;
     private TipoVisitante tipoVisitanteSel;
     private final static int REQUEST_CODE_NH = 1;
+
+    private ProgressBar bar;
+    private TextView tvFallo;
+    private TextView tvNoData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,7 +79,9 @@ public class Horarios extends AppCompatActivity implements HorariosAdapter.OnVis
 
         tipoVisitanteS = findViewById(R.id.tipoVisitante);
         recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
-        emptyView = (TextView) findViewById(R.id.emptyView);
+        bar = (ProgressBar) findViewById(R.id.progressBar);
+        tvFallo = (TextView) findViewById(R.id.tvFallo);
+        tvNoData = (TextView) findViewById(R.id.tvNoData);
 
         /*ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);*/
@@ -87,9 +93,40 @@ public class Horarios extends AppCompatActivity implements HorariosAdapter.OnVis
 
         horarios = new ArrayList<>();
 
-        iniciarSpinnerTipoVisitante();
+        horariosAdapter = new HorariosAdapter(horarios);
+        horariosAdapter.setOnVisitanteClickListener(Horarios.this);
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(new GridLayoutManager(getApplicationContext(), 1));
+        recyclerView.setAdapter(horariosAdapter);
 
+        iniciarSpinnerTipoVisitante();
         fetchTipoVisitantes();
+        tipoVisitanteS.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                tipoVisitanteSel = (TipoVisitante) tipoVisitanteS.getSelectedItem();
+                displayTipoVisitanteData(tipoVisitanteSel);
+                //fetchHorarios(recintoRecibido.getRecCod(), tipoVisitanteSel.getTviCod(),"todos","todos");
+                recyclerView.setVisibility(View.GONE);
+                bar.setVisibility(View.VISIBLE);
+                tvNoData.setVisibility(View.GONE);
+                tvFallo.setVisibility(View.GONE);
+                if(!(tipoVisitanteSel.getTviCod().equals("cod")))
+                {
+                    actualizarHorarios(recintoRecibido.getRecCod(), tipoVisitanteSel.getTviCod(),"todos","todos");
+                }
+                else
+                {
+                    recyclerView.setVisibility(View.GONE);
+                    bar.setVisibility(View.GONE);
+                    tvNoData.setVisibility(View.GONE);
+                    tvFallo.setVisibility(View.GONE);
+                }
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
     }
 
     @Override
@@ -147,16 +184,46 @@ public class Horarios extends AppCompatActivity implements HorariosAdapter.OnVis
 
                 if (response.body().size() == 0) {
                     recyclerView.setVisibility(View.GONE);
-                    emptyView.setVisibility(View.VISIBLE);
                 }
                 else {
                     recyclerView.setVisibility(View.VISIBLE);
-                    emptyView.setVisibility(View.GONE);
                 }
             }
             @Override
             public void onFailure(Call call, Throwable t) {
 
+            }
+        });
+    }
+
+    private void actualizarHorarios(String recCod, String tviCod, String horNombre, String dia) {
+        Retrofit retrofit = NetworkClient.getRetrofitClient(this);
+        HorariosAPIs horariosAPIs = retrofit.create(HorariosAPIs.class);
+        Call <List<Horario>> call = horariosAPIs.listaHorarios(recCod,tviCod,horNombre,dia);
+        call.enqueue(new Callback <List<Horario>> () {
+            @Override
+            public void onResponse(Call <List<Horario>> call, Response <List<Horario>> response) {
+                bar.setVisibility(View.GONE);
+                recyclerView.setVisibility(View.VISIBLE);
+                horarios.clear();
+                if (response.body().size() == 0) {
+                    recyclerView.setVisibility(View.GONE);
+                    tvNoData.setVisibility(View.VISIBLE);
+                }
+                else {
+                    recyclerView.setVisibility(View.VISIBLE);
+                    tvNoData.setVisibility(View.GONE);
+                    for(int i=0;i<response.body().size();i++)
+                    {
+                        horarios.add(response.body().get(i));
+                    }
+                    horariosAdapter.notifyDataSetChanged();
+                }
+            }
+            @Override
+            public void onFailure(Call call, Throwable t) {
+                bar.setVisibility(View.GONE);
+                tvFallo.setVisibility(View.VISIBLE);
             }
         });
     }
@@ -204,7 +271,7 @@ public class Horarios extends AppCompatActivity implements HorariosAdapter.OnVis
                     tipoVisitantes.add(response.body().get(i));
                 }
 
-                tipoVisitanteS.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                /*tipoVisitanteS.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                     @Override
                     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                         tipoVisitanteSel = (TipoVisitante) parent.getSelectedItem();
@@ -215,7 +282,7 @@ public class Horarios extends AppCompatActivity implements HorariosAdapter.OnVis
                     @Override
                     public void onNothingSelected(AdapterView<?> parent) {
                     }
-                });
+                });*/
             }
             @Override
             public void onFailure(Call call, Throwable t) {
