@@ -391,7 +391,7 @@ public class Visitas extends AppCompatActivity implements VisitasAdapter.OnVisit
 
             @Override
             public boolean onSuggestionClick(int position) {
-                searchView.setQuery(suggestions.get(position).getVteCi(), true);
+                searchView.setQuery(suggestions.get(position).getVteNombre()+" "+suggestions.get(position).getVteApellidos(), true);
                 searchView.clearFocus();
 
                 //Buscar Visita con el CI
@@ -456,11 +456,11 @@ public class Visitas extends AppCompatActivity implements VisitasAdapter.OnVisit
                 ListaVisitantes listaVisitantes = response.body();
                 if(listaVisitantes.getlVisitante().size() == 0)
                 {
-                    tvNoData.setVisibility(View.VISIBLE);
+                    //tvNoData.setVisibility(View.VISIBLE);
                 }
                 else
                 {
-                    tvNoData.setVisibility(View.GONE);
+                    //tvNoData.setVisibility(View.GONE);
                     for(int i = 0 ; i < listaVisitantes.getlVisitante().size() ; i++)
                     {
                         suggestions.add(listaVisitantes.getlVisitante().get(i));
@@ -501,10 +501,12 @@ public class Visitas extends AppCompatActivity implements VisitasAdapter.OnVisit
                 {
                     tvNoData.setVisibility(View.VISIBLE);
                     tvTotalVisitantes.setText("Total de visitas: 0");
+                    Log.d("msg412","no hay visi");
                 }
                 else {
                     tvNoData.setVisibility(View.GONE);
                     tvTotalVisitantes.setText("Total de visitas: " + listaVisitas.getTotalElements());
+                    Log.d("msg412","hay visi");
 
                     for(int i = 0 ; i < listaVisitas.getlVisita().size() ; i++)
                     {
