@@ -411,7 +411,7 @@ public class VSSalidaActivity extends AppCompatActivity implements VisitasAdapte
     private void buscarVisitaXCi() {
         Retrofit retrofit = NetworkClient.getRetrofitClient(this);
         ListaVisitaXCiAPIs listaVisitaXCiAPIs = retrofit.create(ListaVisitaXCiAPIs.class);
-        Call<ListaVisitas> call = listaVisitaXCiAPIs.listaVisitaXCi(ci, fechaIni, fechaFin,"0","5");
+        Call<ListaVisitas> call = listaVisitaXCiAPIs.listaVisitaXCi(ci, fechaIni, fechaFin, recintoRecibido.getRecCod(), areaRecintoSel.getAreaCod(), "true","0","10");
         call.enqueue(new Callback<ListaVisitas>() {
             @Override
             public void onResponse(Call <ListaVisitas> call, retrofit2.Response<ListaVisitas> response) {
@@ -453,7 +453,7 @@ public class VSSalidaActivity extends AppCompatActivity implements VisitasAdapte
     private void buscarVisitaXCi2() {
         Retrofit retrofit = NetworkClient.getRetrofitClient(this);
         ListaVisitaXCiAPIs listaVisitaXCiAPIs = retrofit.create(ListaVisitaXCiAPIs.class);
-        Call<ListaVisitas> call = listaVisitaXCiAPIs.listaVisitaXCi(ci, fechaIni, fechaFin,"0","10");
+        Call<ListaVisitas> call = listaVisitaXCiAPIs.listaVisitaXCi(ci, fechaIni, fechaFin, recintoRecibido.getRecCod(), areaRecintoSel.getAreaCod(), "true","0","10");
         call.enqueue(new Callback<ListaVisitas>() {
             @Override
             public void onResponse(Call <ListaVisitas> call, retrofit2.Response<ListaVisitas> response) {
@@ -521,7 +521,7 @@ public class VSSalidaActivity extends AppCompatActivity implements VisitasAdapte
         // Solution
         int autoCompleteTextViewID = getResources().getIdentifier("search_src_text", "id", getPackageName());
         AutoCompleteTextView searchAutoCompleteTextView = (AutoCompleteTextView) searchView.findViewById(autoCompleteTextViewID);
-        searchAutoCompleteTextView.setThreshold(1);
+        searchAutoCompleteTextView.setThreshold(0);
 
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));

@@ -3,7 +3,9 @@ package com.stbnlycan.models;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
-public class Visita {
+import java.io.Serializable;
+
+public class Visita implements Serializable {
 
     @SerializedName("visCod")
     @Expose

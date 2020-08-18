@@ -17,6 +17,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.MatrixCursor;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.BaseColumns;
 import android.util.Log;
 import android.view.Menu;
@@ -254,7 +255,7 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
         //Toast.makeText(this, "Hola", Toast.LENGTH_LONG).show();
     }
 
-    private void buscarVisitanteXNombre2() {
+    private void buscarVisitanteXNombre() {
         Retrofit retrofit = NetworkClient.getRetrofitClient(this);
         ListaVisitantesXNombreAPIs listaVisitantesXNombreAPIs = retrofit.create(ListaVisitantesXNombreAPIs.class);
         Call<ListaVisitantes> call = listaVisitantesXNombreAPIs.listaVisitanteXNombre(nombre,"0","5");
@@ -304,7 +305,7 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
         // Solution
         int autoCompleteTextViewID = getResources().getIdentifier("search_src_text", "id", getPackageName());
         AutoCompleteTextView searchAutoCompleteTextView = (AutoCompleteTextView) searchView.findViewById(autoCompleteTextViewID);
-        searchAutoCompleteTextView.setThreshold(1);
+        searchAutoCompleteTextView.setThreshold(0);
 
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
@@ -339,7 +340,7 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
         });
 
         searchView.setMaxWidth(Integer.MAX_VALUE);
-        searchView.setQueryHint("Buscar visitante");
+        searchView.setQueryHint("Ingresa nombre del visitante");
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -350,17 +351,21 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
 
             @Override
             public boolean onQueryTextChange(String newText) {
+                nombre = newText.toUpperCase();
                 if(newText.equals("")){
-                    //this.onQueryTextSubmit("");
-                    visitantes.clear();
                     nPag = 0;
-                    bar.setVisibility(View.VISIBLE);
-                    recyclerView.setVisibility(View.GONE);
-                    tvFallo.setVisibility(View.GONE);
                     actualizarVisitantes();
                 }
-                nombre = newText.toUpperCase();
-                buscarVisitanteXNombre2();
+                else
+                {
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            buscarVisitanteXNombre();
+                        }
+                    }, 300);
+                    return false;
+                }
                 return false;
             }
         });

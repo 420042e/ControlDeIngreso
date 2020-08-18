@@ -166,7 +166,7 @@ public class Empresas extends AppCompatActivity implements EmpresasAdapter.OnVis
         // Solution
         int autoCompleteTextViewID = getResources().getIdentifier("search_src_text", "id", getPackageName());
         AutoCompleteTextView searchAutoCompleteTextView = (AutoCompleteTextView) searchView.findViewById(autoCompleteTextViewID);
-        searchAutoCompleteTextView.setThreshold(1);
+        searchAutoCompleteTextView.setThreshold(0);
 
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));

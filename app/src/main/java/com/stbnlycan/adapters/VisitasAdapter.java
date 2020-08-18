@@ -43,7 +43,7 @@ public class VisitasAdapter extends RecyclerView.Adapter<VisitasAdapter.ARV> imp
         holder.lugar.setText(Visita.getVisitante().getVteCi());
         holder.empresaNombre.setText(Visita.getVisitante().getEmpresa().getEmpNombre());
 
-        holder.Visita = eventosList.get(position);
+        holder.visita = eventosList.get(position);
     }
 
     @Override
@@ -97,7 +97,7 @@ public class VisitasAdapter extends RecyclerView.Adapter<VisitasAdapter.ARV> imp
         private TextView artNaam;
         private TextView lugar;
         private TextView empresaNombre;
-        Visita Visita;
+        Visita visita;
 
         public ARV(@NonNull View itemView) {
             super(itemView);
@@ -106,6 +106,7 @@ public class VisitasAdapter extends RecyclerView.Adapter<VisitasAdapter.ARV> imp
             lugar = itemView.findViewById(R.id.nroCi);
             empresaNombre = itemView.findViewById(R.id.empresaNombre);
             itemView.setOnClickListener(this);
+            visita = new Visita();
         }
 
         @Override
@@ -124,7 +125,7 @@ public class VisitasAdapter extends RecyclerView.Adapter<VisitasAdapter.ARV> imp
             transaction.add(R.id.fragment_details, fragment, "BLANK_FRAGMENT").commit();
 
             onNoteListener.onNoteClick(getAdapterPosition());*/
-            mListener.onEventoClick(Visita, getAdapterPosition());
+            mListener.onEventoClick(visita, getAdapterPosition());
 
         }
 
@@ -136,6 +137,6 @@ public class VisitasAdapter extends RecyclerView.Adapter<VisitasAdapter.ARV> imp
 
     public interface OnVisitanteClickListener
     {
-        void onEventoClick(Visita Visita, int position);
+        void onEventoClick(Visita visita, int position);
     }
 }

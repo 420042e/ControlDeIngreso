@@ -14,6 +14,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.app.SearchManager;
 import android.content.Context;
+import android.content.Intent;
 import android.database.MatrixCursor;
 import android.os.Bundle;
 import android.os.Handler;
@@ -44,8 +45,10 @@ import com.stbnlycan.interfaces.AreaRecintoAPIs;
 import com.stbnlycan.interfaces.ListaVCSalidaAPIs;
 import com.stbnlycan.interfaces.ListaVSSalidaAPIs;
 import com.stbnlycan.interfaces.ListaVisitaXCiAPIs;
+import com.stbnlycan.interfaces.ListaVisitantesXNombreAPIs;
 import com.stbnlycan.models.AreaRecinto;
 import com.stbnlycan.models.Empresa;
+import com.stbnlycan.models.ListaVisitantes;
 import com.stbnlycan.models.ListaVisitas;
 import com.stbnlycan.models.Recinto;
 import com.stbnlycan.models.Visita;
@@ -74,7 +77,7 @@ public class Visitas extends AppCompatActivity implements VisitasAdapter.OnVisit
     private RecyclerView recyclerView;
 
     private SearchView searchView;
-    private List<Visita> suggestions;
+    private List<Visitante> suggestions;
     private CursorAdapter suggestionAdapter;
 
     private ArrayList<Visita> visitas;
@@ -100,6 +103,7 @@ public class Visitas extends AppCompatActivity implements VisitasAdapter.OnVisit
     private int tipoVisitaSel;
     private int currentItems, totalItems, scrollOutItems;
     private boolean isScrolling = false;
+    private String nombre;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -135,6 +139,7 @@ public class Visitas extends AppCompatActivity implements VisitasAdapter.OnVisit
 
         visitas = new ArrayList<>();
         visitasAdapter = new VisitasAdapter(visitas);
+        visitasAdapter.setOnVisitanteClickListener(Visitas.this);
         recyclerView.setAdapter(visitasAdapter);
         //recyclerView.setLayoutManager(new GridLayoutManager(this, 1));
         recyclerView.setLayoutManager(manager);
@@ -362,7 +367,7 @@ public class Visitas extends AppCompatActivity implements VisitasAdapter.OnVisit
         // Solution
         int autoCompleteTextViewID = getResources().getIdentifier("search_src_text", "id", getPackageName());
         AutoCompleteTextView searchAutoCompleteTextView = (AutoCompleteTextView) searchView.findViewById(autoCompleteTextViewID);
-        searchAutoCompleteTextView.setThreshold(1);
+        searchAutoCompleteTextView.setThreshold(0);
 
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
@@ -386,13 +391,16 @@ public class Visitas extends AppCompatActivity implements VisitasAdapter.OnVisit
 
             @Override
             public boolean onSuggestionClick(int position) {
-                searchView.setQuery(suggestions.get(position).getVisitante().getVteCi(), true);
+                searchView.setQuery(suggestions.get(position).getVteCi(), true);
                 searchView.clearFocus();
 
-                visitas.clear();
+                //Buscar Visita con el CI
+                /*visitas.clear();
                 visitas.add(suggestions.get(position));
                 visitasAdapter.notifyDataSetChanged();
-                recyclerView.setVisibility(View.VISIBLE);
+                recyclerView.setVisibility(View.VISIBLE);*/
+                ci = suggestions.get(position).getVteCi();
+                buscarVisitaXCi();
                 return true;
             }
         });
@@ -400,47 +408,93 @@ public class Visitas extends AppCompatActivity implements VisitasAdapter.OnVisit
 
 
         searchView.setMaxWidth(Integer.MAX_VALUE);
-        searchView.setQueryHint("Ingresar CI");
+        searchView.setQueryHint("Ingresa nombre del visitante");
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 //ci = query;
-                //buscarVisitaXCi2();
                 return false;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                /*if(newText.equals("")){
-                    //this.onQueryTextSubmit("");
-                    visitas.clear();
+                nombre = newText.toUpperCase();
+                if(newText.equals("")){
                     nPag = 0;
-                    fetchVisitas();
-                }*/
-                if(newText.length() > 4)
-                {
-                    ci = newText;
-                    buscarVisitaXCi2();
+                    if(tipoVisitaSel == 1)
+                    {
+                        actualizarVCS();
+                    }
+                    else if(tipoVisitaSel == 2)
+                    {
+                        actualizarVSS();
+                    }
                 }
-                /*ci = newText;
-                buscarVisitaXCi2();*/
+                else
+                {
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            buscarVisitanteXNombre();
+                        }
+                    }, 300);
+                }
                 return false;
             }
         });
         return true;
     }
 
-    private void buscarVisitaXCi2() {
+    private void buscarVisitanteXNombre() {
+        Retrofit retrofit = NetworkClient.getRetrofitClient(this);
+        ListaVisitantesXNombreAPIs listaVisitantesXNombreAPIs = retrofit.create(ListaVisitantesXNombreAPIs.class);
+        Call<ListaVisitantes> call = listaVisitantesXNombreAPIs.listaVisitanteXNombre(nombre,"0","5");
+        call.enqueue(new Callback<ListaVisitantes>() {
+            @Override
+            public void onResponse(Call <ListaVisitantes> call, retrofit2.Response<ListaVisitantes> response) {
+                suggestions.clear();
+                ListaVisitantes listaVisitantes = response.body();
+                if(listaVisitantes.getlVisitante().size() == 0)
+                {
+                    tvNoData.setVisibility(View.VISIBLE);
+                }
+                else
+                {
+                    tvNoData.setVisibility(View.GONE);
+                    for(int i = 0 ; i < listaVisitantes.getlVisitante().size() ; i++)
+                    {
+                        suggestions.add(listaVisitantes.getlVisitante().get(i));
+                        String[] columns = { BaseColumns._ID,
+                                SearchManager.SUGGEST_COLUMN_TEXT_1,
+                                SearchManager.SUGGEST_COLUMN_INTENT_DATA,
+                        };
+                        MatrixCursor cursor = new MatrixCursor(columns);
+                        for (int j = 0; j < suggestions.size(); j++) {
+                            String[] tmp = {Integer.toString(j), suggestions.get(j).getVteNombre() + " " + suggestions.get(j).getVteApellidos(), suggestions.get(j).getVteNombre()};
+                            cursor.addRow(tmp);
+                        }
+                        suggestionAdapter.swapCursor(cursor);
+                    }
+                }
+            }
+            @Override
+            public void onFailure(Call <ListaVisitantes> call, Throwable t) {
+                tvFallo.setVisibility(View.VISIBLE);
+                swipeRefreshLayout.setRefreshing(false);
+            }
+        });
+    }
+
+    private void buscarVisitaXCi() {
         Retrofit retrofit = NetworkClient.getRetrofitClient(this);
         ListaVisitaXCiAPIs listaVisitaXCiAPIs = retrofit.create(ListaVisitaXCiAPIs.class);
-        Call<ListaVisitas> call = listaVisitaXCiAPIs.listaVisitaXCi(ci, fechaIni, fechaFin,"0","10");
+        Call<ListaVisitas> call = listaVisitaXCiAPIs.listaVisitaXCi(ci, fechaIni, fechaFin, recintoRecibido.getRecCod(), areaRecintoSel.getAreaCod(), tipoVisitaSel == 1 ? "false":"true","0","10");
         call.enqueue(new Callback<ListaVisitas>() {
             @Override
             public void onResponse(Call <ListaVisitas> call, retrofit2.Response<ListaVisitas> response) {
                 bar.setVisibility(View.GONE);
                 recyclerView.setVisibility(View.VISIBLE);
-                //visitas.clear();
-                suggestions.clear();
+                visitas.clear();
                 ListaVisitas listaVisitas = response.body();
 
                 if(listaVisitas.getlVisita().size() == 0)
@@ -454,21 +508,10 @@ public class Visitas extends AppCompatActivity implements VisitasAdapter.OnVisit
 
                     for(int i = 0 ; i < listaVisitas.getlVisita().size() ; i++)
                     {
-                        suggestions.add(listaVisitas.getlVisita().get(i));
-                        String[] columns = { BaseColumns._ID,
-                                SearchManager.SUGGEST_COLUMN_TEXT_1
-                        };
-                        MatrixCursor cursor = new MatrixCursor(columns);
-                        for (int j = 0; j < suggestions.size(); j++) {
-                            String[] tmp = {Integer.toString(j), suggestions.get(j).getVisitante().getVteNombre() + " " + suggestions.get(j).getVisitante().getVteApellidos()};
-                            cursor.addRow(tmp);
-                        }
-                        suggestionAdapter.swapCursor(cursor);
-                        //visitas.add(listaVisitas.getlVisita().get(i));
+                        visitas.add(listaVisitas.getlVisita().get(i));
                     }
-                    //visitasAdapter.notifyDataSetChanged();
+                    visitasAdapter.notifyDataSetChanged();
                 }
-
                 swipeRefreshLayout.setRefreshing(false);
                 nPag = 0;
             }
@@ -481,8 +524,11 @@ public class Visitas extends AppCompatActivity implements VisitasAdapter.OnVisit
     }
 
     @Override
-    public void onEventoClick(Visita Visita, int position) {
-
+    public void onEventoClick(Visita visita, int position) {
+        Intent intent = new Intent(Visitas.this, DetallesVisita.class);
+        intent.putExtra("visita", visita);
+        //startActivityForResult(intent, REQUEST_CODE_NV);
+        startActivity(intent);
     }
 
     private void actualizarVCS() {
