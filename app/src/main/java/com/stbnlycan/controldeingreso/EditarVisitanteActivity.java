@@ -398,7 +398,7 @@ public class EditarVisitanteActivity extends AppCompatActivity implements Valida
             @Override
             public void onResponse(Call <Visitante> call, Response<Visitante> response) {
                 Visitante visitanteRecibido = response.body();
-                Toast.makeText(getApplicationContext(), "El visitante fué actualizado", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "El visitante fué actualizado", Toast.LENGTH_LONG).show();
                 //visitante.setVteEstado("ACT");
 
                 Intent intent = new Intent();
@@ -416,10 +416,10 @@ public class EditarVisitanteActivity extends AppCompatActivity implements Valida
 
     @Override
     public void onValidationSucceeded() {
-        //Toast.makeText(this, "We got it right!", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this, "We got it right!", Toast.LENGTH_LONG).show();
         if(hasNullOrEmptyDrawable(visitanteIV))
         {
-            Toast.makeText(this, "Debes añadir una fotografía", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Debes añadir una fotografía", Toast.LENGTH_LONG).show();
         }
         else
         {
@@ -519,7 +519,7 @@ public class EditarVisitanteActivity extends AppCompatActivity implements Valida
 
                 Visitante visitanteCB = response.body();
 
-                Toast.makeText(getApplicationContext(), "Se guardó la nueva imágen", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Se guardó la nueva imágen", Toast.LENGTH_LONG).show();
 
                 visitanteRecibido.setVteImagen(visitanteCB.getVteImagen());
 

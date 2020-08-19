@@ -18,8 +18,6 @@ import com.stbnlycan.controldeingreso.R;
 
 public class FiltroDFragment extends DialogFragment {
 
-    Button btnDone;
-    Button btnCancelar;
     EditText editText;
     private OnBusquedaCiListener onBusquedaCiListener;
 
@@ -32,8 +30,6 @@ public class FiltroDFragment extends DialogFragment {
 
         setCancelable(false);
         editText = rootView.findViewById(R.id.ci);
-        btnDone = rootView.findViewById(R.id.btnDone);
-        btnCancelar = (Button)rootView.findViewById(R.id.btnCancel);
 
         return rootView;
     }
@@ -43,19 +39,6 @@ public class FiltroDFragment extends DialogFragment {
         super.onViewCreated(view, savedInstanceState);
         if (getArguments() != null && !TextUtils.isEmpty(getArguments().getString("email")))
             editText.setText(getArguments().getString("ci"));
-        btnDone.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                onBusquedaCiListener.onBusquedaCiListener(editText.getText().toString());
-                dismiss();
-            }
-        });
-        btnCancelar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dismiss();
-            }
-        });
     }
 
     @Override

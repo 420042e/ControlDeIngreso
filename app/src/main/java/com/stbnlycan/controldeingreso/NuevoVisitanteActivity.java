@@ -163,6 +163,13 @@ public class NuevoVisitanteActivity extends AppCompatActivity implements Validat
                 startActivityForResult(intent, REQUEST_CODE_NE);
             }
         });
+
+        Bundle b=getIntent().getExtras();
+        if (b != null)
+        {
+            ciET.setText(getIntent().getStringExtra("ci"));
+
+        }
     }
 
     public void iniciarSpinnerEmpresa() {
@@ -367,7 +374,7 @@ public class NuevoVisitanteActivity extends AppCompatActivity implements Validat
             @Override
         public void onResponse(Call <Visitante> call, Response<Visitante> response) {
                 visitante.setVteImagen(response.body().getVteImagen());
-                Toast.makeText(getApplicationContext(), "Se guardó el nuevo asistente", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Se guardó el nuevo asistente", Toast.LENGTH_LONG).show();
                 enviarCorreoIngreso();
             }
 
@@ -388,7 +395,7 @@ public class NuevoVisitanteActivity extends AppCompatActivity implements Validat
                 if (response.body() != null) {
                     Log.d("msg3","" + response.body().toString());
                     //Aqui se debería cerrar esta actividad al recibir respuesta del server
-                    Toast.makeText(getApplicationContext(), "Se envió el correo de ingreso", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "Se envió el correo de ingreso", Toast.LENGTH_LONG).show();
                     visitante.setVteEstado("0");
                     Intent intent = new Intent();
                     intent.putExtra("visitanteResult", visitante);
@@ -405,10 +412,10 @@ public class NuevoVisitanteActivity extends AppCompatActivity implements Validat
 
     @Override
     public void onValidationSucceeded() {
-        //Toast.makeText(this, "We got it right!", Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this, "We got it right!", Toast.LENGTH_LONG).show();
         if(hasNullOrEmptyDrawable(visitanteIV))
         {
-            Toast.makeText(this, "Debes añadir una fotografía", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Debes añadir una fotografía", Toast.LENGTH_LONG).show();
         }
         else
         {

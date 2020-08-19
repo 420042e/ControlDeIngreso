@@ -143,7 +143,7 @@ public class Visitas extends AppCompatActivity implements VisitasAdapter.OnVisit
         recyclerView.setAdapter(visitasAdapter);
         //recyclerView.setLayoutManager(new GridLayoutManager(this, 1));
         recyclerView.setLayoutManager(manager);
-        recyclerView.setVisibility(View.GONE);
+
 
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
@@ -178,7 +178,8 @@ public class Visitas extends AppCompatActivity implements VisitasAdapter.OnVisit
             }
         });
 
-        bar.setVisibility(View.VISIBLE);
+        recyclerView.setVisibility(View.GONE);
+        bar.setVisibility(View.GONE);
         tvNoData.setVisibility(View.GONE);
         tvFallo.setVisibility(View.GONE);
 
@@ -236,9 +237,9 @@ public class Visitas extends AppCompatActivity implements VisitasAdapter.OnVisit
         fetchAreaRecintos();
 
         List<String> spinnerArray =  new ArrayList<String>();
-        spinnerArray.add("Selecciona tipo de visita");
-        spinnerArray.add("Visitantes con salida");
-        spinnerArray.add("Visitantes sin salida");
+        spinnerArray.add("SELECCIONA TIPO DE VISITA");
+        spinnerArray.add("VISITANTES SIN SALIDA");
+        spinnerArray.add("VISITANTES CON SALIDA");
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, spinnerArray);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         tipoVisitaS.setAdapter(adapter);
@@ -246,12 +247,16 @@ public class Visitas extends AppCompatActivity implements VisitasAdapter.OnVisit
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 AreaRecinto areaRecinto = (AreaRecinto) areaRecintoS.getSelectedItem();
-                recyclerView.setVisibility(View.GONE);
-                bar.setVisibility(View.VISIBLE);
-                tvNoData.setVisibility(View.GONE);
-                tvFallo.setVisibility(View.GONE);
                 if(!(areaRecinto.getAreaCod().equals("cod")))
                 {
+                    recyclerView.setVisibility(View.GONE);
+                    bar.setVisibility(View.VISIBLE);
+                    tvNoData.setVisibility(View.GONE);
+                    tvFallo.setVisibility(View.GONE);
+                    if(position == 0)
+                    {
+                        bar.setVisibility(View.GONE);
+                    }
                     if(position == 1)
                     {
                         tipoVisitaSel = 1;
@@ -262,6 +267,13 @@ public class Visitas extends AppCompatActivity implements VisitasAdapter.OnVisit
                         tipoVisitaSel = 2;
                         actualizarVSS();
                     }
+                }
+                else
+                {
+                    recyclerView.setVisibility(View.GONE);
+                    bar.setVisibility(View.GONE);
+                    tvNoData.setVisibility(View.GONE);
+                    tvFallo.setVisibility(View.GONE);
                 }
 
             }
@@ -298,12 +310,12 @@ public class Visitas extends AppCompatActivity implements VisitasAdapter.OnVisit
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 areaRecintoSel = (AreaRecinto) areaRecintoS.getSelectedItem();
-                recyclerView.setVisibility(View.GONE);
-                bar.setVisibility(View.VISIBLE);
-                tvNoData.setVisibility(View.GONE);
-                tvFallo.setVisibility(View.GONE);
                 if(!(areaRecintoSel.getAreaCod().equals("cod")))
                 {
+                    recyclerView.setVisibility(View.GONE);
+                    bar.setVisibility(View.VISIBLE);
+                    tvNoData.setVisibility(View.GONE);
+                    tvFallo.setVisibility(View.GONE);
                     if(tipoVisitaSel == 1)
                     {
                         actualizarVCS();
@@ -312,6 +324,13 @@ public class Visitas extends AppCompatActivity implements VisitasAdapter.OnVisit
                     {
                         actualizarVSS();
                     }
+                }
+                else
+                {
+                    recyclerView.setVisibility(View.GONE);
+                    bar.setVisibility(View.GONE);
+                    tvNoData.setVisibility(View.GONE);
+                    tvFallo.setVisibility(View.GONE);
                 }
             }
             @Override
@@ -393,12 +412,6 @@ public class Visitas extends AppCompatActivity implements VisitasAdapter.OnVisit
             public boolean onSuggestionClick(int position) {
                 searchView.setQuery(suggestions.get(position).getVteNombre()+" "+suggestions.get(position).getVteApellidos(), true);
                 searchView.clearFocus();
-
-                //Buscar Visita con el CI
-                /*visitas.clear();
-                visitas.add(suggestions.get(position));
-                visitasAdapter.notifyDataSetChanged();
-                recyclerView.setVisibility(View.VISIBLE);*/
                 ci = suggestions.get(position).getVteCi();
                 buscarVisitaXCi();
                 return true;
@@ -501,12 +514,10 @@ public class Visitas extends AppCompatActivity implements VisitasAdapter.OnVisit
                 {
                     tvNoData.setVisibility(View.VISIBLE);
                     tvTotalVisitantes.setText("Total de visitas: 0");
-                    Log.d("msg412","no hay visi");
                 }
                 else {
                     tvNoData.setVisibility(View.GONE);
                     tvTotalVisitantes.setText("Total de visitas: " + listaVisitas.getTotalElements());
-                    Log.d("msg412","hay visi");
 
                     for(int i = 0 ; i < listaVisitas.getlVisita().size() ; i++)
                     {

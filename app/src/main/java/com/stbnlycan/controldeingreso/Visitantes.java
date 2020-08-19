@@ -406,7 +406,7 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
             @Override
             public void onResponse(Call call, retrofit2.Response response) {
                 if (response.body() != null) {
-                    Toast.makeText(getApplicationContext(), "Se envió el correo de ingreso a "+visitante.getVteNombre() +" "+visitante.getVteApellidos(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "Se envió el correo de ingreso a "+visitante.getVteNombre() +" "+visitante.getVteApellidos(), Toast.LENGTH_LONG).show();
                 }
             }
             @Override

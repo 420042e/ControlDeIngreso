@@ -219,12 +219,12 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
                 Visita visitaRecibida = response.body();
                 if(visitaRecibida.getVisCod() != null)
                 {
-                    Toast.makeText(getApplicationContext(), visitaRecibida.getVisitante().getVteNombre()+ " " + visitaRecibida.getVisitante().getVteApellidos() + " ha ingresado a " + visitaRecibida.getAreaRecinto().getAreaNombre(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), visitaRecibida.getVisitante().getVteNombre()+ " " + visitaRecibida.getVisitante().getVteApellidos() + " ha ingresado a " + visitaRecibida.getAreaRecinto().getAreaNombre(), Toast.LENGTH_LONG).show();
                     finish();
                 }
                 else
                 {
-                    Toast.makeText(getApplicationContext(), "El Visitante tiene Salidas Pendientes", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "El Visitante tiene Salidas Pendientes", Toast.LENGTH_LONG).show();
                     finish();
                 }
             }
@@ -248,7 +248,7 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
                     Visita visitaRecibida = (Visita) response.body();
                     if(visitaRecibida.getVisCod() != null)
                     {
-                        Toast.makeText(getApplicationContext(), visitaRecibida.getVisitante().getVteNombre()+ " " + visitaRecibida.getVisitante().getVteApellidos() + " ha ingresado a " + visitaRecibida.getAreaRecinto().getAreaNombre(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), visitaRecibida.getVisitante().getVteNombre()+ " " + visitaRecibida.getVisitante().getVteApellidos() + " ha ingresado a " + visitaRecibida.getAreaRecinto().getAreaNombre(), Toast.LENGTH_LONG).show();
                         finish();
                     }
                 }
@@ -257,7 +257,7 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
                     Log.d("msg2","objeto tipo Error");
                     Error errorRecibido = (Error) response.body();
                     //handle error object
-                    Toast.makeText(getApplicationContext(), ""+errorRecibido.getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), ""+errorRecibido.getMessage(), Toast.LENGTH_LONG).show();
                 }
 
             }
@@ -276,11 +276,11 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
                 String jsonString = response.body().toString();
                 if (jsonString.contains("visCod")) {
                     Visita visitaRecibida = new Gson().fromJson(jsonString, Visita.class);
-                    Toast.makeText(getApplicationContext(), visitaRecibida.getVisitante().getVteNombre()+ " " + visitaRecibida.getVisitante().getVteApellidos() + " ha ingresado a " + visitaRecibida.getAreaRecinto().getAreaNombre(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), visitaRecibida.getVisitante().getVteNombre()+ " " + visitaRecibida.getVisitante().getVteApellidos() + " ha ingresado a " + visitaRecibida.getAreaRecinto().getAreaNombre(), Toast.LENGTH_LONG).show();
                     finish();
                 } else {
                     Error error = new Gson().fromJson(jsonString, Error.class);
-                    Toast.makeText(getApplicationContext(), ""+error.getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), ""+error.getMessage(), Toast.LENGTH_LONG).show();
                     finish();
                 }
             }

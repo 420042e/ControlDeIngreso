@@ -144,7 +144,7 @@ public class NuevoHorarioActivity extends AppCompatActivity implements Validator
             public void onResponse(Call <Horario> call, Response <Horario> response) {
                 Horario horarioRecibido = response.body();
                 //Log.d("msg",""+horarioRecibido.getHorNombre());
-                Toast.makeText(getApplicationContext(), "El nuevo horario fué registrado", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "El nuevo horario fué registrado", Toast.LENGTH_LONG).show();
                 horario.setHorEstado("0");
                 Intent intent = new Intent();
                 intent.putExtra("horarioResult", horario);
@@ -164,7 +164,7 @@ public class NuevoHorarioActivity extends AppCompatActivity implements Validator
         Log.d("msgd", ""+ dia1.isChecked());
         if (!dia1.isChecked() && !dia2.isChecked() && !dia3.isChecked() && !dia4.isChecked() && !dia5.isChecked()) {
             diasTV.setError("Este campo es requerido");
-            Toast.makeText(this, "Se debe seleccionar 1 día por lo menos", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Se debe seleccionar 1 día por lo menos", Toast.LENGTH_LONG).show();
         }
         else
         {

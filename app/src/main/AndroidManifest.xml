@@ -36,9 +36,6 @@
             android:name=".VCSalidaActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".RegistrarSalidasActivity"
-            android:screenOrientation="portrait" />
-        <activity
             android:name=".NuevoHorarioActivity"
             android:screenOrientation="portrait" />
         <activity
@@ -46,9 +43,6 @@
             android:screenOrientation="portrait" />
         <activity
             android:name=".RegistraVisitaActivity"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".RegistrarVisitasActivity"
             android:screenOrientation="portrait" />
         <activity
             android:name=".EditarVisitanteActivity"

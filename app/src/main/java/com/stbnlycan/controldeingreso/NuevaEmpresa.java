@@ -87,7 +87,7 @@ public class NuevaEmpresa extends AppCompatActivity implements Validator.Validat
                 //((TextView) ((Spinner) view).getSelectedView()).setError(message);
                 ((TextView) ((Spinner) view).getSelectedView()).setError("Este campo es requerido");
             } else {
-                Toast.makeText(getApplicationContext(), "", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "", Toast.LENGTH_LONG).show();
             }
         }
     }
@@ -100,7 +100,7 @@ public class NuevaEmpresa extends AppCompatActivity implements Validator.Validat
             @Override
             public void onResponse(Call <Empresa> call, Response<Empresa> response) {
                 Empresa empresaRecibida = response.body();
-                Toast.makeText(getApplicationContext(), "La nueva empresa fué registrada", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "La nueva empresa fué registrada", Toast.LENGTH_LONG).show();
                 Intent intent = new Intent();
                 intent.putExtra("empresaResult", empresaRecibida);
                 setResult(RESULT_OK, intent);

@@ -44,6 +44,7 @@ public class RecintoActivity extends AppCompatActivity implements RecintoAdapter
 
     private Toolbar toolbar;
     private Recinto recintoRecibido;
+    private BusquedaCiDialogFragment dialogFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,7 +78,7 @@ public class RecintoActivity extends AppCompatActivity implements RecintoAdapter
         RecintoAdapter adapter = new RecintoAdapter(cards);
         adapter.setOnEventoClickListener(RecintoActivity.this);
         recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
+        recyclerView.setLayoutManager(new GridLayoutManager(this, 3));
         recyclerView.setAdapter(adapter);
     }
 
@@ -185,10 +186,11 @@ public class RecintoActivity extends AppCompatActivity implements RecintoAdapter
     }
 
     public void showCiDialog() {
-        final BusquedaCiDialogFragment dialogFragment = new BusquedaCiDialogFragment();
+        dialogFragment = new BusquedaCiDialogFragment();
         FragmentTransaction ft;
         Bundle bundle = new Bundle();
         bundle.putBoolean("notAlertDialog", true);
+        bundle.putSerializable("recinto", recintoRecibido);
         dialogFragment.setArguments(bundle);
         dialogFragment.setOnEventoClickListener(RecintoActivity.this);
         ft = getSupportFragmentManager().beginTransaction();
@@ -201,8 +203,8 @@ public class RecintoActivity extends AppCompatActivity implements RecintoAdapter
     }
 
     @Override
-    public void onBusquedaCiListener(String ci) {
-        registrarSalidaXCi(ci);
+    public void onBusquedaCiListener(Visitante visitante) {
+        registrarSalidaXCi(visitante);
     }
 
     private void registrarSalida(final String llave) {
@@ -215,10 +217,10 @@ public class RecintoActivity extends AppCompatActivity implements RecintoAdapter
                 String jsonString = response.body().toString();
                 if (jsonString.contains("visCod")) {
                     Visita visitaRecibida = new Gson().fromJson(jsonString, Visita.class);
-                    Toast.makeText(getApplicationContext(), visitaRecibida.getVisitante().getVteNombre()+ " " + visitaRecibida.getVisitante().getVteApellidos() + " ha salido de " + visitaRecibida.getAreaRecinto().getAreaNombre(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), visitaRecibida.getVisitante().getVteNombre()+ " " + visitaRecibida.getVisitante().getVteApellidos() + " ha salido de " + visitaRecibida.getAreaRecinto().getAreaNombre(), Toast.LENGTH_LONG).show();
                 } else {
                     Error error = new Gson().fromJson(jsonString, Error.class);
-                    Toast.makeText(getApplicationContext(), ""+error.getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), ""+error.getMessage(), Toast.LENGTH_LONG).show();
                     buscarXQR(llave);
                 }
             }
@@ -229,21 +231,24 @@ public class RecintoActivity extends AppCompatActivity implements RecintoAdapter
         });
     }
 
-    private void registrarSalidaXCi(final String ci) {
+    private void registrarSalidaXCi(final Visitante visitante) {
         Retrofit retrofit = NetworkClient.getRetrofitClient(this);
         RegistrarSalidaXCiAPIs registrarSalidaXCiAPIs = retrofit.create(RegistrarSalidaXCiAPIs.class);
-        Call<JsonObject> call = registrarSalidaXCiAPIs.registrarSalidaXCi(recintoRecibido.getRecCod(), ci);
+        Call<JsonObject> call = registrarSalidaXCiAPIs.registrarSalidaXCi(recintoRecibido.getRecCod(), visitante.getVteCi());
         call.enqueue(new Callback<JsonObject>() {
             @Override
             public void onResponse(Call <JsonObject> call, retrofit2.Response<JsonObject> response) {
                 String jsonString = response.body().toString();
+                Log.d("msg542","hola "+visitante.getVteNombre());
                 if (jsonString.contains("visCod")) {
                     Visita visitaRecibida = new Gson().fromJson(jsonString, Visita.class);
-                    Toast.makeText(getApplicationContext(), visitaRecibida.getVisitante().getVteNombre()+ " " + visitaRecibida.getVisitante().getVteApellidos() + " ha salido de " + visitaRecibida.getAreaRecinto().getAreaNombre(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), visitaRecibida.getVisitante().getVteNombre()+ " " + visitaRecibida.getVisitante().getVteApellidos() + " ha salido de " + visitaRecibida.getAreaRecinto().getAreaNombre(), Toast.LENGTH_LONG).show();
                 } else {
                     Error error = new Gson().fromJson(jsonString, Error.class);
-                    Toast.makeText(getApplicationContext(), ""+error.getMessage(), Toast.LENGTH_SHORT).show();
-                    buscarXCI(ci);
+                    Toast.makeText(getApplicationContext(), ""+error.getMessage(), Toast.LENGTH_LONG).show();
+                    //buscarXCI(visitante.getVteCi());
+                    iniciarRVActivity(visitante);
+                    dialogFragment.dismiss();
                 }
             }
             @Override
@@ -263,12 +268,12 @@ public class RecintoActivity extends AppCompatActivity implements RecintoAdapter
                 Visitante visitanteRecibido = response.body();
                 if(visitanteRecibido.getVteCi() != null)
                 {
-                    Toast.makeText(getApplicationContext(), "Se encontró el visitante", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "Se encontró el visitante", Toast.LENGTH_LONG).show();
                     iniciarRVActivity(visitanteRecibido);
                 }
                 else
                 {
-                    Toast.makeText(getApplicationContext(), "No se encontró el visitante en la base de datos", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "No se encontró el visitante en la base de datos", Toast.LENGTH_LONG).show();
                 }
             }
             @Override
@@ -281,23 +286,29 @@ public class RecintoActivity extends AppCompatActivity implements RecintoAdapter
     private void buscarXCI(String ci) {
         Retrofit retrofit = NetworkClient.getRetrofitClient(this);
         BuscarXCIAPIs buscarXCIAPIs = retrofit.create(BuscarXCIAPIs.class);
-        Call<Visitante> call = buscarXCIAPIs.buscarXQR(ci);
-        call.enqueue(new Callback<Visitante>() {
+        Call<List<Visitante>> call = buscarXCIAPIs.buscarXQR(ci);
+        call.enqueue(new Callback<List<Visitante>>() {
             @Override
-            public void onResponse(Call <Visitante> call, retrofit2.Response<Visitante> response) {
-                Visitante visitanteRecibido = response.body();
+            public void onResponse(Call <List<Visitante>> call, retrofit2.Response<List<Visitante>> response) {
+                List<Visitante> visitantesRecibidos = response.body();
+                for(int i=0;i<visitantesRecibidos.size();i++)
+                {
+                    Log.d("msg164",""+visitantesRecibidos.get(i).getVteNombre());
+                }
+
+                /*Visitante visitanteRecibido = response.body();
                 if(visitanteRecibido.getVteCi() != null)
                 {
-                    Toast.makeText(getApplicationContext(), "Se encontró el visitante", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "Se encontró el visitante", Toast.LENGTH_LONG).show();
                     iniciarRVActivity(visitanteRecibido);
                 }
                 else
                 {
-                    Toast.makeText(getApplicationContext(), "No se encontró el visitante en la base de datos", Toast.LENGTH_SHORT).show();
-                }
+                    Toast.makeText(getApplicationContext(), "No se encontró el visitante en la base de datos", Toast.LENGTH_LONG).show();
+                }*/
             }
             @Override
-            public void onFailure(Call <Visitante> call, Throwable t) {
+            public void onFailure(Call <List<Visitante>> call, Throwable t) {
 
             }
         });
@@ -305,6 +316,7 @@ public class RecintoActivity extends AppCompatActivity implements RecintoAdapter
 
     public void iniciarRVActivity(Visitante visitanteRecibido)
     {
+        Log.d("msg542","hola");
         Intent intent = new Intent(RecintoActivity.this, RegistraVisitaActivity.class);
         intent.putExtra("visitante", visitanteRecibido);
         intent.putExtra("recinto", recintoRecibido);
