@@ -5,9 +5,10 @@ import com.stbnlycan.models.ListaVisitantes;
 
 import retrofit2.Call;
 import retrofit2.http.GET;
+import retrofit2.http.Header;
 import retrofit2.http.Query;
 
 public interface ListaEmpresasAPIs {
     @GET("empresa/lista")
-    Call<ListaEmpresas> listaEmpresas(@Query("page") String page, @Query("size") String size);
+    Call<ListaEmpresas> listaEmpresas(@Query("page") String page, @Query("size") String size, @Header("Authorization") String authHeader);
 }

@@ -44,19 +44,33 @@ public class VisitasAdapter extends RecyclerView.Adapter<VisitasAdapter.ARV> imp
     public void onBindViewHolder(@NonNull ARV holder, int position) {
         Visita visita = eventosList.get(position);
 
-        String dtStart = visita.getVisIngreso();
+        String dtIngreso = visita.getVisIngreso();
+        String dtSalida = visita.getVisSalida();
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
-        SimpleDateFormat hh_mm_ss = new SimpleDateFormat("HH:mm:ss");
+        SimpleDateFormat dd_MM_yyyy = new SimpleDateFormat("dd/MM/yyyy");
+        SimpleDateFormat hh_mm = new SimpleDateFormat("HH:mm");
+        String hora_fecha="";
         Date date = null;
+        Date date2 = null;
         try {
-            date = format.parse(dtStart);
-            Log.d("msg23",""+date.getTime()+" "+hh_mm_ss.format(date));
+            date = format.parse(dtIngreso);
+            if(dtSalida == null)
+            {
+                hora_fecha = dd_MM_yyyy.format(date)+" "+hh_mm.format(date);
+            }
+            else
+            {
+                date2 = format.parse(dtSalida);
+                hora_fecha = dd_MM_yyyy.format(date)+" "+hh_mm.format(date)+" - "+dd_MM_yyyy.format(date2)+" "+hh_mm.format(date2);
+            }
+            //hora_fecha = hh_mm.format(date)+" "+dd_MM_yyyy.format(date)+"-"+hh_mm.format(date2)+" "+dd_MM_yyyy.format(date2);
         } catch (ParseException e) {
             e.printStackTrace();
         }
 
         holder.artNaam.setText(visita.getVisitante().getVteNombre()+" "+visita.getVisitante().getVteApellidos());
-        holder.lugar.setText(visita.getVisIngreso()+ " "+ visita.getVisSalida());
+        //holder.lugar.setText(visita.getVisIngreso()+ " "+ visita.getVisSalida());
+        holder.lugar.setText(hora_fecha);
         holder.empresaNombre.setText(visita.getVisitante().getEmpresa().getEmpNombre());
 
         holder.visita = eventosList.get(position);

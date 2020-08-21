@@ -7,6 +7,7 @@ import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.http.GET;
+import retrofit2.http.Header;
 import retrofit2.http.Query;
 
 public interface ListaVCSalidaAPIs {
@@ -14,5 +15,5 @@ public interface ListaVCSalidaAPIs {
     Call<List<Visita>> listaVCSalida(@Query("fechaInicio") String fechaInicio, @Query("fechaFin") String fechaFin, @Query("recinto") String recinto, @Query("areaRecinto") String areaRecinto);*/
 
     @GET("visita/visitantesConSalida")
-    Call<ListaVisitas> listaVCSalida(@Query("fechaInicio") String fechaInicio, @Query("fechaFin") String fechaFin, @Query("recinto") String recinto, @Query("areaRecinto") String areaRecinto, @Query("page") String page, @Query("size") String size);
+    Call<ListaVisitas> listaVCSalida(@Query("fechaInicio") String fechaInicio, @Query("fechaFin") String fechaFin, @Query("recinto") String recinto, @Query("areaRecinto") String areaRecinto, @Query("page") String page, @Query("size") String size, @Header("Authorization") String authHeader);
 }

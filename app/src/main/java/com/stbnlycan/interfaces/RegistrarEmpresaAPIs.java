@@ -5,9 +5,10 @@ import com.stbnlycan.models.Horario;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.Header;
 import retrofit2.http.POST;
 
 public interface RegistrarEmpresaAPIs {
     @POST("empresa/registrar")
-    Call<Empresa> registrarEmpresa(@Body Empresa body);
+    Call<Empresa> registrarEmpresa(@Body Empresa body, @Header("Authorization") String authHeader);
 }

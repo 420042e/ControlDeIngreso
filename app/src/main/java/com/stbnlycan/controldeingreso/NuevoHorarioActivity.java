@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -26,6 +27,7 @@ import com.mobsandgeeks.saripaar.ValidationError;
 import com.mobsandgeeks.saripaar.Validator;
 import com.mobsandgeeks.saripaar.annotation.NotEmpty;
 import com.stbnlycan.fragments.LoadingFragment;
+import com.stbnlycan.interfaces.LogoutAPIs;
 import com.stbnlycan.interfaces.RegistrarHorarioAPIs;
 import com.stbnlycan.models.Horario;
 import com.stbnlycan.models.Recinto;
@@ -75,6 +77,10 @@ public class NuevoHorarioActivity extends AppCompatActivity implements Validator
     private CheckBox dia4;
     private CheckBox dia5;
 
+    private String authorization;
+    private SharedPreferences pref;
+    private SharedPreferences.Editor editor;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -99,8 +105,9 @@ public class NuevoHorarioActivity extends AppCompatActivity implements Validator
         entrada = findViewById(R.id.entrada);
         salida = findViewById(R.id.salida);
 
-        /*ActionBar actionBar = getSupportActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);*/
+        pref = getApplicationContext().getSharedPreferences("MyPref", 0);
+        editor = pref.edit();
+        authorization = pref.getString("token_type", null) + " " + pref.getString("access_token", null);
 
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -124,8 +131,33 @@ public class NuevoHorarioActivity extends AppCompatActivity implements Validator
             case R.id.action_nuevo_horario:
                 validator.validate();
                 return false;
+            case R.id.action_salir:
+                cerrarSesion();
+                Intent intent = new Intent(NuevoHorarioActivity.this, LoginActivity.class);
+                startActivity(intent);
+                finish();
+                return false;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void cerrarSesion() {
+        Retrofit retrofit = NetworkClient.getRetrofitClient(this);
+        LogoutAPIs logoutAPIs = retrofit.create(LogoutAPIs.class);
+        Call<Void> call = logoutAPIs.logout(pref.getString("access_token", null));
+        call.enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call <Void> call, retrofit2.Response<Void> response) {
+                editor.putString("access_token", "");
+                editor.putString("token_type", "");
+                editor.apply();
+                Toast.makeText(getApplicationContext(), "Sesión finalizada", Toast.LENGTH_LONG).show();
+            }
+            @Override
+            public void onFailure(Call <Void> call, Throwable t) {
+                Log.d("msg4125","hola "+t.toString());
+            }
+        });
     }
 
     @Override
@@ -138,7 +170,7 @@ public class NuevoHorarioActivity extends AppCompatActivity implements Validator
     private void registrarHorario() {
         Retrofit retrofit = NetworkClient.getRetrofitClient(this);
         RegistrarHorarioAPIs registrarHorarioAPIs = retrofit.create(RegistrarHorarioAPIs.class);
-        Call<Horario> call = registrarHorarioAPIs.registrarHorario(horario);
+        Call<Horario> call = registrarHorarioAPIs.registrarHorario(horario, authorization);
         call.enqueue(new Callback <Horario> () {
             @Override
             public void onResponse(Call <Horario> call, Response <Horario> response) {

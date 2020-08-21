@@ -15,9 +15,11 @@ import android.app.Activity;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.MatrixCursor;
 import android.os.Bundle;
 import android.provider.BaseColumns;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -26,12 +28,14 @@ import android.widget.AbsListView;
 import android.widget.AutoCompleteTextView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.stbnlycan.adapters.EmpresasAdapter;
 import com.stbnlycan.adapters.VisitantesAdapter;
 import com.stbnlycan.interfaces.ListaEmpresasAPIs;
 import com.stbnlycan.interfaces.ListaEmpresasXNombreAPIs;
 import com.stbnlycan.interfaces.ListaVisitantesAPIs;
+import com.stbnlycan.interfaces.LogoutAPIs;
 import com.stbnlycan.models.Empresa;
 import com.stbnlycan.models.ListaEmpresas;
 import com.stbnlycan.models.ListaVisitantes;
@@ -63,6 +67,10 @@ public class Empresas extends AppCompatActivity implements EmpresasAdapter.OnVis
     private List<Empresa> suggestions;
     private CursorAdapter suggestionAdapter;
 
+    private String authorization;
+    private SharedPreferences pref;
+    private SharedPreferences.Editor editor;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -76,6 +84,10 @@ public class Empresas extends AppCompatActivity implements EmpresasAdapter.OnVis
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         empresas = new ArrayList<>();
+
+        pref = getApplicationContext().getSharedPreferences("MyPref", 0);
+        editor = pref.edit();
+        authorization = pref.getString("token_type", null) + " " + pref.getString("access_token", null);
 
         manager = new LinearLayoutManager(this);
         recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
@@ -151,8 +163,33 @@ public class Empresas extends AppCompatActivity implements EmpresasAdapter.OnVis
                 Intent intent = new Intent(Empresas.this, NuevaEmpresa.class);
                 startActivityForResult(intent, REQUEST_CODE_NE);
                 return false;
+            case R.id.action_salir:
+                cerrarSesion();
+                Intent intentS = new Intent(Empresas.this, LoginActivity.class);
+                startActivity(intentS);
+                finish();
+                return false;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void cerrarSesion() {
+        Retrofit retrofit = NetworkClient.getRetrofitClient(this);
+        LogoutAPIs logoutAPIs = retrofit.create(LogoutAPIs.class);
+        Call<Void> call = logoutAPIs.logout(pref.getString("access_token", null));
+        call.enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call <Void> call, retrofit2.Response<Void> response) {
+                editor.putString("access_token", "");
+                editor.putString("token_type", "");
+                editor.apply();
+                Toast.makeText(getApplicationContext(), "Sesión finalizada", Toast.LENGTH_LONG).show();
+            }
+            @Override
+            public void onFailure(Call <Void> call, Throwable t) {
+                Log.d("msg4125","hola "+t.toString());
+            }
+        });
     }
 
     @Override
@@ -161,7 +198,6 @@ public class Empresas extends AppCompatActivity implements EmpresasAdapter.OnVis
         inflater.inflate(R.menu.menu_ne, menu);
         MenuItem searchItem = menu.findItem(R.id.action_search);
         searchView = (SearchView) searchItem.getActionView();
-
 
         // Solution
         int autoCompleteTextViewID = getResources().getIdentifier("search_src_text", "id", getPackageName());
@@ -227,7 +263,7 @@ public class Empresas extends AppCompatActivity implements EmpresasAdapter.OnVis
     private void fetchEmpresas() {
         Retrofit retrofit = NetworkClient.getRetrofitClient(this);
         ListaEmpresasAPIs listaEmpresasAPIs = retrofit.create(ListaEmpresasAPIs.class);
-        Call<ListaEmpresas> call = listaEmpresasAPIs.listaEmpresas(Integer.toString(nPag),"10");
+        Call<ListaEmpresas> call = listaEmpresasAPIs.listaEmpresas(Integer.toString(nPag),"10", authorization);
         call.enqueue(new Callback<ListaEmpresas>() {
             @Override
             public void onResponse(Call <ListaEmpresas> call, retrofit2.Response<ListaEmpresas> response) {
@@ -276,7 +312,7 @@ public class Empresas extends AppCompatActivity implements EmpresasAdapter.OnVis
     {
         Retrofit retrofit = NetworkClient.getRetrofitClient(this);
         ListaEmpresasAPIs listaEmpresasAPIs = retrofit.create(ListaEmpresasAPIs.class);
-        Call<ListaEmpresas> call = listaEmpresasAPIs.listaEmpresas(Integer.toString(nPag),"10");
+        Call<ListaEmpresas> call = listaEmpresasAPIs.listaEmpresas(Integer.toString(nPag),"10", authorization);
         call.enqueue(new Callback<ListaEmpresas>() {
             @Override
             public void onResponse(Call <ListaEmpresas> call, retrofit2.Response<ListaEmpresas> response) {
@@ -310,7 +346,7 @@ public class Empresas extends AppCompatActivity implements EmpresasAdapter.OnVis
     {
         Retrofit retrofit = NetworkClient.getRetrofitClient(this);
         ListaEmpresasAPIs listaEmpresasAPIs = retrofit.create(ListaEmpresasAPIs.class);
-        Call<ListaEmpresas> call = listaEmpresasAPIs.listaEmpresas(Integer.toString(nPag),"10");
+        Call<ListaEmpresas> call = listaEmpresasAPIs.listaEmpresas(Integer.toString(nPag),"10", authorization);
         call.enqueue(new Callback<ListaEmpresas>() {
             @Override
             public void onResponse(Call <ListaEmpresas> call, retrofit2.Response<ListaEmpresas> response) {
@@ -341,7 +377,7 @@ public class Empresas extends AppCompatActivity implements EmpresasAdapter.OnVis
     {
         Retrofit retrofit = NetworkClient.getRetrofitClient(this);
         ListaEmpresasXNombreAPIs listaEmpresasXNombreAPIs = retrofit.create(ListaEmpresasXNombreAPIs.class);
-        Call<ListaEmpresas> call = listaEmpresasXNombreAPIs.listaEmpresasXNombre(nombre, "0","10");
+        Call<ListaEmpresas> call = listaEmpresasXNombreAPIs.listaEmpresasXNombre(nombre, "0","10", authorization);
         call.enqueue(new Callback<ListaEmpresas>() {
             @Override
             public void onResponse(Call <ListaEmpresas> call, retrofit2.Response<ListaEmpresas> response) {

@@ -8,9 +8,10 @@ import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.http.GET;
+import retrofit2.http.Header;
 import retrofit2.http.Query;
 
 public interface ListaVisitantesAPIs {
     @GET("visitante/lista")
-    Call<ListaVisitantes> listaVisitantes(@Query("page") String page, @Query("size") String size);
+    Call<ListaVisitantes> listaVisitantes(@Query("page") String page, @Query("size") String size, @Header("Authorization") String authHeader);
 }

@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -48,6 +49,7 @@ import com.stbnlycan.fragments.LoadingFragment;
 import com.stbnlycan.interfaces.EmpresaAPIs;
 import com.stbnlycan.interfaces.EnviarCorreoIAPIs;
 import com.stbnlycan.interfaces.ListaEmpresasAPIs;
+import com.stbnlycan.interfaces.LogoutAPIs;
 import com.stbnlycan.interfaces.TipoVisitanteAPIs;
 import com.stbnlycan.interfaces.UploadAPIs;
 import com.stbnlycan.models.Empresa;
@@ -108,6 +110,10 @@ public class NuevoVisitanteActivity extends AppCompatActivity implements Validat
     private Button btnNE;
     private final static int REQUEST_CODE_NE = 1;
 
+    private String authorization;
+    private SharedPreferences pref;
+    private SharedPreferences.Editor editor;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -126,11 +132,11 @@ public class NuevoVisitanteActivity extends AppCompatActivity implements Validat
         empresaS = findViewById(R.id.empresa);
         tipoVisitanteS = findViewById(R.id.tipo_visitante);
         btnNE = findViewById(R.id.btnNE);
-
         btnNF = findViewById(R.id.btnNF);
 
-        /*ActionBar actionBar = getSupportActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);*/
+        pref = getApplicationContext().getSharedPreferences("MyPref", 0);
+        editor = pref.edit();
+        authorization = pref.getString("token_type", null) + " " + pref.getString("access_token", null);
 
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -295,6 +301,12 @@ public class NuevoVisitanteActivity extends AppCompatActivity implements Validat
             case R.id.action_nuevo_visitante:
                 validator.validate();
                 return false;
+            case R.id.action_salir:
+                cerrarSesion();
+                Intent intent = new Intent(NuevoVisitanteActivity.this, LoginActivity.class);
+                startActivity(intent);
+                finish();
+                return false;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -321,10 +333,29 @@ public class NuevoVisitanteActivity extends AppCompatActivity implements Validat
         return true;
     }
 
+    private void cerrarSesion() {
+        Retrofit retrofit = NetworkClient.getRetrofitClient(this);
+        LogoutAPIs logoutAPIs = retrofit.create(LogoutAPIs.class);
+        Call<Void> call = logoutAPIs.logout(pref.getString("access_token", null));
+        call.enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call <Void> call, retrofit2.Response<Void> response) {
+                editor.putString("access_token", "");
+                editor.putString("token_type", "");
+                editor.apply();
+                Toast.makeText(getApplicationContext(), "Sesión finalizada", Toast.LENGTH_LONG).show();
+            }
+            @Override
+            public void onFailure(Call <Void> call, Throwable t) {
+                Log.d("msg4125","hola "+t.toString());
+            }
+        });
+    }
+
     private void fetchDataEmpresa() {
         Retrofit retrofit = NetworkClient.getRetrofitClient(this);
         ListaEmpresasAPIs listaEmpresasAPIs = retrofit.create(ListaEmpresasAPIs.class);
-        Call<ListaEmpresas> call = listaEmpresasAPIs.listaEmpresas("0","10");
+        Call<ListaEmpresas> call = listaEmpresasAPIs.listaEmpresas("0","10", authorization);
         call.enqueue(new Callback<ListaEmpresas>() {
             @Override
             public void onResponse(Call <ListaEmpresas> call, retrofit2.Response<ListaEmpresas> response) {
@@ -346,7 +377,7 @@ public class NuevoVisitanteActivity extends AppCompatActivity implements Validat
     private void fetchDataTipoVisitante() {
         Retrofit retrofit = NetworkClient.getRetrofitClient(this);
         TipoVisitanteAPIs tipoVisitanteAPIs = retrofit.create(TipoVisitanteAPIs.class);
-        Call<List<TipoVisitante>> call = tipoVisitanteAPIs.listaTipoVisitante();
+        Call<List<TipoVisitante>> call = tipoVisitanteAPIs.listaTipoVisitante(authorization);
         call.enqueue(new Callback<List<TipoVisitante>>() {
             @Override
             public void onResponse(Call <List<TipoVisitante>> call, retrofit2.Response<List<TipoVisitante>> response) {
@@ -369,7 +400,7 @@ public class NuevoVisitanteActivity extends AppCompatActivity implements Validat
         RequestBody fileReqBody = RequestBody.create(MediaType.parse("image/*"), file);
         MultipartBody.Part part = MultipartBody.Part.createFormData("file", file.getName(), fileReqBody);
         RequestBody description = RequestBody.create(MediaType.parse("text/plain"), descripcion);
-        Call <Visitante> call = uploadAPIs.uploadImage(part, description);
+        Call <Visitante> call = uploadAPIs.uploadImage(part, description, authorization);
         call.enqueue(new Callback<Visitante>() {
             @Override
         public void onResponse(Call <Visitante> call, Response<Visitante> response) {
@@ -388,7 +419,7 @@ public class NuevoVisitanteActivity extends AppCompatActivity implements Validat
     private void enviarCorreoIngreso() {
         Retrofit retrofit = NetworkClient.getRetrofitClient(this);
         EnviarCorreoIAPIs enviarCorreoIAPIs = retrofit.create(EnviarCorreoIAPIs.class);
-        Call call = enviarCorreoIAPIs.enviarCorreo(emailET.getText().toString());
+        Call call = enviarCorreoIAPIs.enviarCorreo(emailET.getText().toString(), authorization);
         call.enqueue(new Callback() {
             @Override
             public void onResponse(Call call, retrofit2.Response response) {

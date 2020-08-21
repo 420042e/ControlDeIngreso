@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -30,6 +31,7 @@ import com.mobsandgeeks.saripaar.Validator;
 import com.mobsandgeeks.saripaar.annotation.Select;
 import com.stbnlycan.adapters.HorariosAdapter;
 import com.stbnlycan.interfaces.HorariosAPIs;
+import com.stbnlycan.interfaces.LogoutAPIs;
 import com.stbnlycan.interfaces.TipoVisitanteAPIs;
 import com.stbnlycan.models.Horario;
 import com.stbnlycan.models.Recinto;
@@ -65,6 +67,10 @@ public class Horarios extends AppCompatActivity implements HorariosAdapter.OnVis
     private TextView tvFallo;
     private TextView tvNoData;
 
+    private String authorization;
+    private SharedPreferences pref;
+    private SharedPreferences.Editor editor;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -83,8 +89,9 @@ public class Horarios extends AppCompatActivity implements HorariosAdapter.OnVis
         tvFallo = (TextView) findViewById(R.id.tvFallo);
         tvNoData = (TextView) findViewById(R.id.tvNoData);
 
-        /*ActionBar actionBar = getSupportActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);*/
+        pref = getApplicationContext().getSharedPreferences("MyPref", 0);
+        editor = pref.edit();
+        authorization = pref.getString("token_type", null) + " " + pref.getString("access_token", null);
 
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -141,8 +148,33 @@ public class Horarios extends AppCompatActivity implements HorariosAdapter.OnVis
                 intent.putExtra("recCod", getIntent().getStringExtra("recCod"));
                 startActivity(intent);*/
                 return false;
+            case R.id.action_salir:
+                cerrarSesion();
+                Intent intent = new Intent(Horarios.this, LoginActivity.class);
+                startActivity(intent);
+                finish();
+                return false;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void cerrarSesion() {
+        Retrofit retrofit = NetworkClient.getRetrofitClient(this);
+        LogoutAPIs logoutAPIs = retrofit.create(LogoutAPIs.class);
+        Call<Void> call = logoutAPIs.logout(pref.getString("access_token", null));
+        call.enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call <Void> call, retrofit2.Response<Void> response) {
+                editor.putString("access_token", "");
+                editor.putString("token_type", "");
+                editor.apply();
+                Toast.makeText(getApplicationContext(), "Sesión finalizada", Toast.LENGTH_LONG).show();
+            }
+            @Override
+            public void onFailure(Call <Void> call, Throwable t) {
+                Log.d("msg4125","hola "+t.toString());
+            }
+        });
     }
 
     @Override
@@ -170,7 +202,7 @@ public class Horarios extends AppCompatActivity implements HorariosAdapter.OnVis
     private void actualizarHorarios(String recCod, String tviCod, String horNombre, String dia) {
         Retrofit retrofit = NetworkClient.getRetrofitClient(this);
         HorariosAPIs horariosAPIs = retrofit.create(HorariosAPIs.class);
-        Call <List<Horario>> call = horariosAPIs.listaHorarios(recCod,tviCod,horNombre,dia);
+        Call <List<Horario>> call = horariosAPIs.listaHorarios(recCod,tviCod,horNombre,dia, authorization);
         call.enqueue(new Callback <List<Horario>> () {
             @Override
             public void onResponse(Call <List<Horario>> call, Response <List<Horario>> response) {
@@ -231,7 +263,7 @@ public class Horarios extends AppCompatActivity implements HorariosAdapter.OnVis
     private void fetchTipoVisitantes() {
         Retrofit retrofit = NetworkClient.getRetrofitClient(this);
         TipoVisitanteAPIs tipoVisitantesAPIs = retrofit.create(TipoVisitanteAPIs.class);
-        Call<List<TipoVisitante>> call = tipoVisitantesAPIs.listaTipoVisitante();
+        Call<List<TipoVisitante>> call = tipoVisitantesAPIs.listaTipoVisitante(authorization);
         call.enqueue(new Callback<List<TipoVisitante>>() {
             @Override
             public void onResponse(Call <List<TipoVisitante>> call, Response<List<TipoVisitante>> response) {

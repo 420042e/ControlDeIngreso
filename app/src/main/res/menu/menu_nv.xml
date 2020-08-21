@@ -6,4 +6,9 @@
         android:icon="@drawable/ic_save_white_24dp"
         android:title="Guardar"
         app:showAsAction="always|withText" />
+    <item
+        android:id="@+id/action_salir"
+        android:orderInCategory="100"
+        android:title="Cerrar sesión"
+        app:showAsAction="never" />
 </menu>

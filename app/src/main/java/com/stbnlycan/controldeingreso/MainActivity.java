@@ -3,6 +3,7 @@ package com.stbnlycan.controldeingreso;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -12,6 +13,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
@@ -19,9 +21,14 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.stbnlycan.adapters.RecintosAdapter;
+import com.stbnlycan.interfaces.LoginAPIs;
+import com.stbnlycan.interfaces.LogoutAPIs;
 import com.stbnlycan.interfaces.RecintosAPIs;
 import com.stbnlycan.models.Recinto;
+import com.stbnlycan.models.Token;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -29,7 +36,9 @@ import org.json.JSONObject;
 import org.w3c.dom.Text;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -44,7 +53,7 @@ public class MainActivity extends AppCompatActivity implements RecintosAdapter.O
     private SwipeRefreshLayout swipeRefreshLayout;
     private ProgressBar bar;
     private TextView tvFallo;
-    private String token;
+    private String authorization;
     private SharedPreferences pref;
     private SharedPreferences.Editor editor;
 
@@ -60,11 +69,7 @@ public class MainActivity extends AppCompatActivity implements RecintosAdapter.O
 
         pref = getApplicationContext().getSharedPreferences("MyPref", 0);
         editor = pref.edit();
-        Log.d("access_token",""+pref.getString("access_token", null));
-
-        //token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOlsiYWxib3Jlc291cmNlaWQiXSwiZXhwIjoxNTk3OTczNTY0LCJ1c2VyX25hbWUiOiJkYW5ueSIsImp0aSI6IjM0ZTgxMmUzLTc0NzctNDU2MS1hNTE3LWNmYjZlM2Q0N2Q2NyIsImNsaWVudF9pZCI6ImluZ3Jlc29WaXNpdGFudGVzIiwic2NvcGUiOlsicmVhZCIsIndyaXRlIl19.woKZUMFgTghufVEgi7p0PhoUel_mwBdW4pdvcPn-Is0";
-        token = pref.getString("access_token", null);
-        token = "bearer "+token;
+        authorization = pref.getString("token_type", null) + " " + pref.getString("access_token", null);
 
         /*recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
         adapter = new RecintosAdapter(recintos);
@@ -98,7 +103,7 @@ public class MainActivity extends AppCompatActivity implements RecintosAdapter.O
     private void fetchRecintos() {
         Retrofit retrofit = NetworkClient.getRetrofitClient(this);
         RecintosAPIs recintosAPIs = retrofit.create(RecintosAPIs.class);
-        Call<List<Recinto>> call = recintosAPIs.listaRecintos(token);
+        Call<List<Recinto>> call = recintosAPIs.listaRecintos(authorization);
         call.enqueue(new Callback<List<Recinto>>() {
             @Override
             public void onResponse(Call <List<Recinto>> call, retrofit2.Response<List<Recinto>> response) {
@@ -126,7 +131,7 @@ public class MainActivity extends AppCompatActivity implements RecintosAdapter.O
     private void actualizarRecintos() {
         Retrofit retrofit = NetworkClient.getRetrofitClient(this);
         RecintosAPIs recintosAPIs = retrofit.create(RecintosAPIs.class);
-        Call<List<Recinto>> call = recintosAPIs.listaRecintos(token);
+        Call<List<Recinto>> call = recintosAPIs.listaRecintos(authorization);
         call.enqueue(new Callback<List<Recinto>>() {
             @Override
             public void onResponse(Call <List<Recinto>> call, retrofit2.Response<List<Recinto>> response) {
@@ -181,5 +186,40 @@ public class MainActivity extends AppCompatActivity implements RecintosAdapter.O
             }
         });
         return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                return false;
+            case R.id.action_salir:
+                cerrarSesion();
+                Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                startActivity(intent);
+                finish();
+                return false;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void cerrarSesion() {
+        Retrofit retrofit = NetworkClient.getRetrofitClient(this);
+        LogoutAPIs logoutAPIs = retrofit.create(LogoutAPIs.class);
+        Call<Void> call = logoutAPIs.logout(pref.getString("access_token", null));
+        call.enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call <Void> call, retrofit2.Response<Void> response) {
+                editor.putString("access_token", "");
+                editor.putString("token_type", "");
+                editor.apply();
+                Toast.makeText(getApplicationContext(), "Sesión finalizada", Toast.LENGTH_LONG).show();
+            }
+            @Override
+            public void onFailure(Call <Void> call, Throwable t) {
+                Log.d("msg4125","hola "+t.toString());
+            }
+        });
     }
 }

@@ -1,6 +1,7 @@
 package com.stbnlycan.fragments;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.Editable;
@@ -42,6 +43,10 @@ public class BusquedaCiDialogFragment extends DialogFragment {
     private ACAdapter adapter;
     private Button btnNV;
 
+    private String authorization;
+    private SharedPreferences pref;
+    private SharedPreferences.Editor editor;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -54,6 +59,11 @@ public class BusquedaCiDialogFragment extends DialogFragment {
         btnNV =  (Button) rootView.findViewById(R.id.btnNV);
 
         visitantes = new ArrayList<>();
+
+        pref = getActivity().getSharedPreferences("MyPref", 0);
+        editor = pref.edit();
+        authorization = pref.getString("token_type", null) + " " + pref.getString("access_token", null);
+
         //adapter = new ArrayAdapter<String> (getActivity(), android.R.layout.select_dialog_item, nombres);
         actv.setThreshold(1);
         //actv.setAdapter(adapter);
@@ -133,7 +143,7 @@ public class BusquedaCiDialogFragment extends DialogFragment {
     private void buscarXCI(String ci) {
         Retrofit retrofit = NetworkClient.getRetrofitClient(getActivity());
         BuscarXCIAPIs buscarXCIAPIs = retrofit.create(BuscarXCIAPIs.class);
-        Call<List<Visitante>> call = buscarXCIAPIs.buscarXQR(ci);
+        Call<List<Visitante>> call = buscarXCIAPIs.buscarXQR(ci, authorization);
         call.enqueue(new Callback<List<Visitante>>() {
             @Override
             public void onResponse(Call <List<Visitante>> call, retrofit2.Response<List<Visitante>> response) {

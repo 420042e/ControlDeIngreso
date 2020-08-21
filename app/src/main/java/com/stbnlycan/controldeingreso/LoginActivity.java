@@ -16,9 +16,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
+import com.stbnlycan.adapters.RecintosAdapter;
 import com.stbnlycan.interfaces.LoginAPIs;
+import com.stbnlycan.interfaces.RecintosAPIs;
 import com.stbnlycan.models.Error;
 import com.stbnlycan.models.ErrorToken;
+import com.stbnlycan.models.Recinto;
 import com.stbnlycan.models.Token;
 import com.stbnlycan.models.Visita;
 
@@ -26,6 +29,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import retrofit2.Call;
@@ -71,8 +75,6 @@ public class LoginActivity extends AppCompatActivity {
         headers.put("Authorization", "Basic " + encodedAuthString);
         Map<String, String> fields = new HashMap<>();
         fields.put("grant_type", "password");
-        /*fields.put("username", "danny");
-        fields.put("password", "manager");*/
         fields.put("username", username.getText().toString());
         fields.put("password", password.getText().toString());
 
@@ -83,7 +85,6 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call <JsonObject> call, retrofit2.Response<JsonObject> response) {
                 if (response.code() == 400) {
-                    Log.d("msg1245", "Error code 400 "+response.errorBody().toString());
                     Toast.makeText(getApplicationContext(), "No existe el usuario", Toast.LENGTH_LONG).show();
                 }
                 else
@@ -91,25 +92,14 @@ public class LoginActivity extends AppCompatActivity {
                     String jsonString = response.body().toString();
                     if (jsonString.contains("access_token")) {
                         Token token = new Gson().fromJson(jsonString, Token.class);
-                        Toast.makeText(getApplicationContext(), "Bienvenido", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getApplicationContext(), "Acceso correcto", Toast.LENGTH_LONG).show();
                         editor.putString("access_token", token.getAccess_token());
+                        editor.putString("token_type", token.getToken_type());
                         editor.commit();
                         iniciarMainActivity();
 
                     }
                 }
-                /*String jsonString = response.body().toString();
-                if (jsonString.contains("access_token")) {
-                    Token token = new Gson().fromJson(jsonString, Token.class);
-                    //Toast.makeText(getApplicationContext(), visitaRecibida.getVisitante().getVteNombre()+ " " + visitaRecibida.getVisitante().getVteApellidos() + " ha salido de " + visitaRecibida.getAreaRecinto().getAreaNombre(), Toast.LENGTH_LONG).show();
-                    editor.putString("access_token", token.getAccess_token());
-                    editor.commit();
-                    iniciarMainActivity();
-
-                } else {
-                    ErrorToken errorToken = new Gson().fromJson(jsonString, ErrorToken.class);
-                    Toast.makeText(getApplicationContext(), "Error "+errorToken.getError_description(), Toast.LENGTH_LONG).show();
-                }*/
             }
             @Override
             public void onFailure(Call <JsonObject> call, Throwable t) {
@@ -124,4 +114,5 @@ public class LoginActivity extends AppCompatActivity {
         startActivity(intent);
         finish();
     }
+
 }

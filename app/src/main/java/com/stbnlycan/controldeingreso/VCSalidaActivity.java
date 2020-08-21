@@ -14,6 +14,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.app.SearchManager;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.MatrixCursor;
 import android.os.Bundle;
 import android.provider.BaseColumns;
@@ -97,6 +98,10 @@ public class VCSalidaActivity extends AppCompatActivity implements VisitasAdapte
     private List<Visita> suggestions;
     private CursorAdapter suggestionAdapter;
 
+    private String authorization;
+    private SharedPreferences pref;
+    private SharedPreferences.Editor editor;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -121,6 +126,10 @@ public class VCSalidaActivity extends AppCompatActivity implements VisitasAdapte
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
+
+        pref = getApplicationContext().getSharedPreferences("MyPref", 0);
+        editor = pref.edit();
+        authorization = pref.getString("token_type", null) + " " + pref.getString("access_token", null);
 
         areaRecintoS = findViewById(R.id.area_recinto);
 
@@ -259,7 +268,7 @@ public class VCSalidaActivity extends AppCompatActivity implements VisitasAdapte
     private void fetchAreaRecintos() {
         Retrofit retrofit = NetworkClient.getRetrofitClient(this);
         AreaRecintoAPIs areaRecintoAPIs = retrofit.create(AreaRecintoAPIs.class);
-        Call<List<AreaRecinto>> call = areaRecintoAPIs.listaPorRecinto(recintoRecibido.getRecCod());
+        Call<List<AreaRecinto>> call = areaRecintoAPIs.listaPorRecinto(recintoRecibido.getRecCod(), authorization);
         call.enqueue(new Callback<List<AreaRecinto>>() {
             @Override
             public void onResponse(Call <List<AreaRecinto>> call, retrofit2.Response<List<AreaRecinto>> response) {
@@ -301,7 +310,7 @@ public class VCSalidaActivity extends AppCompatActivity implements VisitasAdapte
     private void fetchVisitas() {
         Retrofit retrofit = NetworkClient.getRetrofitClient(this);
         ListaVSSalidaAPIs listaVSSalidaAPIs = retrofit.create(ListaVSSalidaAPIs.class);
-        Call<ListaVisitas> call = listaVSSalidaAPIs.listaVSSalida(fechaIni, fechaFin, recintoRecibido.getRecCod(), "1",Integer.toString(nPag),"10");
+        Call<ListaVisitas> call = listaVSSalidaAPIs.listaVSSalida(fechaIni, fechaFin, recintoRecibido.getRecCod(), "1",Integer.toString(nPag),"10", authorization);
         call.enqueue(new Callback<ListaVisitas>() {
             @Override
             public void onResponse(Call <ListaVisitas> call, retrofit2.Response<ListaVisitas> response) {
@@ -339,7 +348,7 @@ public class VCSalidaActivity extends AppCompatActivity implements VisitasAdapte
     private void mostrarMasVisitas() {
         Retrofit retrofit = NetworkClient.getRetrofitClient(this);
         ListaVSSalidaAPIs listaVSSalidaAPIs = retrofit.create(ListaVSSalidaAPIs.class);
-        Call<ListaVisitas> call = listaVSSalidaAPIs.listaVSSalida(fechaIni, fechaFin, recintoRecibido.getRecCod(), areaRecintoSel.getAreaCod(),Integer.toString(nPag),"10");
+        Call<ListaVisitas> call = listaVSSalidaAPIs.listaVSSalida(fechaIni, fechaFin, recintoRecibido.getRecCod(), areaRecintoSel.getAreaCod(),Integer.toString(nPag),"10", authorization);
         call.enqueue(new Callback<ListaVisitas>() {
             @Override
             public void onResponse(Call <ListaVisitas> call, retrofit2.Response<ListaVisitas> response) {
@@ -368,7 +377,7 @@ public class VCSalidaActivity extends AppCompatActivity implements VisitasAdapte
     private void actualizarVisitas() {
         Retrofit retrofit = NetworkClient.getRetrofitClient(this);
         ListaVSSalidaAPIs listaVSSalidaAPIs = retrofit.create(ListaVSSalidaAPIs.class);
-        Call<ListaVisitas> call = listaVSSalidaAPIs.listaVSSalida(fechaIni, fechaFin, recintoSel, areaRecintoSel.getAreaCod(),"0","10");
+        Call<ListaVisitas> call = listaVSSalidaAPIs.listaVSSalida(fechaIni, fechaFin, recintoSel, areaRecintoSel.getAreaCod(),"0","10", authorization);
         call.enqueue(new Callback<ListaVisitas>() {
             @Override
             public void onResponse(Call <ListaVisitas> call, retrofit2.Response<ListaVisitas> response) {
@@ -410,7 +419,7 @@ public class VCSalidaActivity extends AppCompatActivity implements VisitasAdapte
     private void buscarVisitaXCi() {
         Retrofit retrofit = NetworkClient.getRetrofitClient(this);
         ListaVisitaXCiAPIs listaVisitaXCiAPIs = retrofit.create(ListaVisitaXCiAPIs.class);
-        Call<ListaVisitas> call = listaVisitaXCiAPIs.listaVisitaXCi(ci, fechaIni, fechaFin, recintoRecibido.getRecCod(), areaRecintoSel.getAreaCod(), "true","0","10");
+        Call<ListaVisitas> call = listaVisitaXCiAPIs.listaVisitaXCi(ci, fechaIni, fechaFin, recintoRecibido.getRecCod(), areaRecintoSel.getAreaCod(), "true","0","10", authorization);
         call.enqueue(new Callback<ListaVisitas>() {
             @Override
             public void onResponse(Call <ListaVisitas> call, retrofit2.Response<ListaVisitas> response) {
@@ -452,7 +461,7 @@ public class VCSalidaActivity extends AppCompatActivity implements VisitasAdapte
     private void buscarVisitaXCi2() {
         Retrofit retrofit = NetworkClient.getRetrofitClient(this);
         ListaVisitaXCiAPIs listaVisitaXCiAPIs = retrofit.create(ListaVisitaXCiAPIs.class);
-        Call<ListaVisitas> call = listaVisitaXCiAPIs.listaVisitaXCi(ci, fechaIni, fechaFin, recintoRecibido.getRecCod(), areaRecintoSel.getAreaCod(), "true","0","10");
+        Call<ListaVisitas> call = listaVisitaXCiAPIs.listaVisitaXCi(ci, fechaIni, fechaFin, recintoRecibido.getRecCod(), areaRecintoSel.getAreaCod(), "true","0","10", authorization);
         call.enqueue(new Callback<ListaVisitas>() {
             @Override
             public void onResponse(Call <ListaVisitas> call, retrofit2.Response<ListaVisitas> response) {

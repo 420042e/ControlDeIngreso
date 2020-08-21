@@ -1,5 +1,6 @@
 package com.stbnlycan.adapters;
 
+import android.content.Context;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,12 +14,15 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.squareup.picasso.OkHttp3Downloader;
 import com.squareup.picasso.Picasso;
 import com.stbnlycan.controldeingreso.R;
 import com.stbnlycan.models.Visitante;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import okhttp3.OkHttpClient;
 
 public class VisitantesAdapter extends RecyclerView.Adapter<VisitantesAdapter.ARV> implements Filterable {
     private List<Visitante> eventosList;
@@ -27,10 +31,14 @@ public class VisitantesAdapter extends RecyclerView.Adapter<VisitantesAdapter.AR
     private OnVisitanteClickListener mListener;
     private OnVQRClickListener vqrListener;
     private OnEEClickListener eeListener;
+    private Context context;
+    private OkHttpClient client;
 
-    public VisitantesAdapter(List<Visitante> eventosList) {
+    public VisitantesAdapter(Context context, OkHttpClient client, List<Visitante> eventosList) {
         this.eventosList = eventosList;
         this.eventosListFull = new ArrayList<>(eventosList);
+        this.context = context;
+        this.client = client;
     }
 
     @NonNull
@@ -47,7 +55,10 @@ public class VisitantesAdapter extends RecyclerView.Adapter<VisitantesAdapter.AR
         holder.tipoVisitante.setText(visitante.getTipoVisitante().getTviNombre());
         holder.empresaNombre.setText(visitante.getEmpresa().getEmpNombre());
 
-        Picasso.get().load("http://190.129.90.115:8083/ingresoVisitantes/visitante/mostrarFoto?foto=" + visitante.getVteImagen()).centerCrop().resize(150, 150).into(holder.imgVisitante);
+        Picasso picasso = new Picasso.Builder(context)
+                .downloader(new OkHttp3Downloader(client))
+                .build();
+        picasso.load("http://190.129.90.115:8083/ingresoVisitantes/visitante/mostrarFoto?foto=" + visitante.getVteImagen()).resize(150, 150).into(holder.imgVisitante);
 
         holder.visitante = eventosList.get(position);
     }
@@ -140,17 +151,6 @@ public class VisitantesAdapter extends RecyclerView.Adapter<VisitantesAdapter.AR
         {
             Log.d("Click","clickeado");
 
-            /*FragmentManager fragmentManager = ((AppCompatActivity) context).getSupportFragmentManager();
-            FragmentTransaction transaction = fragmentManager.beginTransaction();
-
-            transaction.setCustomAnimations(R.anim.layout_fad_in, R.anim.layout_fad_out, R.anim.layout_fad_in, R.anim.layout_fad_out);
-
-            Fragment fragment = EventoDetailsFragment.newInstance(1, "Detalles", new Survey("","",""));
-
-            transaction.addToBackStack(null);
-            transaction.add(R.id.fragment_details, fragment, "BLANK_FRAGMENT").commit();
-
-            onNoteListener.onNoteClick(getAdapterPosition());*/
             mListener.onEventoClick(visitante, getAdapterPosition());
 
         }

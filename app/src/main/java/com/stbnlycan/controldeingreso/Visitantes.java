@@ -15,6 +15,7 @@ import android.app.Activity;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.MatrixCursor;
 import android.os.Bundle;
 import android.os.Handler;
@@ -34,12 +35,18 @@ import com.stbnlycan.adapters.VisitantesAdapter;
 import com.stbnlycan.interfaces.EnviarCorreoIAPIs;
 import com.stbnlycan.interfaces.ListaVisitantesXNombreAPIs;
 import com.stbnlycan.interfaces.ListaVisitantesAPIs;
+import com.stbnlycan.interfaces.LogoutAPIs;
 import com.stbnlycan.models.ListaVisitantes;
 import com.stbnlycan.models.Visitante;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import okhttp3.Interceptor;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Retrofit;
@@ -69,6 +76,10 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
     private List<Visitante> suggestions;
     private CursorAdapter suggestionAdapter;
 
+    private String authorization;
+    private SharedPreferences pref;
+    private SharedPreferences.Editor editor;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -90,8 +101,24 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
 
         manager = new LinearLayoutManager(this);
 
+        pref = getApplicationContext().getSharedPreferences("MyPref", 0);
+        editor = pref.edit();
+        authorization = pref.getString("token_type", null) + " " + pref.getString("access_token", null);
+
+        OkHttpClient client = new OkHttpClient.Builder()
+                .addInterceptor(new Interceptor() {
+                    @Override
+                    public Response intercept(Chain chain) throws IOException {
+                        Request newRequest = chain.request().newBuilder()
+                                .addHeader("Authorization", authorization)
+                                .build();
+                        return chain.proceed(newRequest);
+                    }
+                })
+                .build();
+
         visitantes = new ArrayList<>();
-        visitantesAdapter = new VisitantesAdapter(visitantes);
+        visitantesAdapter = new VisitantesAdapter(this, client, visitantes);
         visitantesAdapter.setOnVisitanteClickListener(Visitantes.this);
         visitantesAdapter.setOnVQRClickListener(Visitantes.this);
         visitantesAdapter.setOnEEClickListener(Visitantes.this);
@@ -155,8 +182,33 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
                 intent.putExtra("recCod", getIntent().getStringExtra("recCod"));
                 startActivityForResult(intent, REQUEST_CODE_NV);
                 return false;
+            case R.id.action_salir:
+                cerrarSesion();
+                Intent intentS = new Intent(Visitantes.this, LoginActivity.class);
+                startActivity(intentS);
+                finish();
+                return false;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void cerrarSesion() {
+        Retrofit retrofit = NetworkClient.getRetrofitClient(this);
+        LogoutAPIs logoutAPIs = retrofit.create(LogoutAPIs.class);
+        Call<Void> call = logoutAPIs.logout(pref.getString("access_token", null));
+        call.enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call <Void> call, retrofit2.Response<Void> response) {
+                editor.putString("access_token", "");
+                editor.putString("token_type", "");
+                editor.apply();
+                Toast.makeText(getApplicationContext(), "Sesión finalizada", Toast.LENGTH_LONG).show();
+            }
+            @Override
+            public void onFailure(Call <Void> call, Throwable t) {
+                Log.d("msg4125","hola "+t.toString());
+            }
+        });
     }
 
     @Override
@@ -188,7 +240,7 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
     private void mostrarMasVisitantes() {
         Retrofit retrofit = NetworkClient.getRetrofitClient(this);
         ListaVisitantesAPIs listaVisitantesAPIs = retrofit.create(ListaVisitantesAPIs.class);
-        Call<ListaVisitantes> call = listaVisitantesAPIs.listaVisitantes(Integer.toString(nPag),"10");
+        Call<ListaVisitantes> call = listaVisitantesAPIs.listaVisitantes(Integer.toString(nPag),"10", authorization);
         call.enqueue(new Callback<ListaVisitantes>() {
             @Override
             public void onResponse(Call <ListaVisitantes> call, retrofit2.Response<ListaVisitantes> response) {
@@ -213,7 +265,7 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
     private void actualizarVisitantes() {
         Retrofit retrofit = NetworkClient.getRetrofitClient(this);
         ListaVisitantesAPIs listaVisitantesAPIs = retrofit.create(ListaVisitantesAPIs.class);
-        Call<ListaVisitantes> call = listaVisitantesAPIs.listaVisitantes("0","5");
+        Call<ListaVisitantes> call = listaVisitantesAPIs.listaVisitantes("0","5", authorization);
         call.enqueue(new Callback<ListaVisitantes>() {
             @Override
             public void onResponse(Call <ListaVisitantes> call, retrofit2.Response<ListaVisitantes> response) {
@@ -254,7 +306,7 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
     private void buscarVisitanteXNombre() {
         Retrofit retrofit = NetworkClient.getRetrofitClient(this);
         ListaVisitantesXNombreAPIs listaVisitantesXNombreAPIs = retrofit.create(ListaVisitantesXNombreAPIs.class);
-        Call<ListaVisitantes> call = listaVisitantesXNombreAPIs.listaVisitanteXNombre(nombre,"0","5");
+        Call<ListaVisitantes> call = listaVisitantesXNombreAPIs.listaVisitanteXNombre(nombre,"0","5", authorization);
         call.enqueue(new Callback<ListaVisitantes>() {
             @Override
             public void onResponse(Call <ListaVisitantes> call, retrofit2.Response<ListaVisitantes> response) {
@@ -397,7 +449,7 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
     private void enviarCorreoIngreso(final Visitante visitante) {
         Retrofit retrofit = NetworkClient.getRetrofitClient(this);
         EnviarCorreoIAPIs enviarCorreoIAPIs = retrofit.create(EnviarCorreoIAPIs.class);
-        Call call = enviarCorreoIAPIs.enviarCorreo(visitante.getVteCorreo());
+        Call call = enviarCorreoIAPIs.enviarCorreo(visitante.getVteCorreo(), authorization);
         call.enqueue(new Callback() {
             @Override
             public void onResponse(Call call, retrofit2.Response response) {

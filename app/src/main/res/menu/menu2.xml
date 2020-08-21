@@ -13,4 +13,11 @@
         android:orderInCategory="100"
         android:title="Nuevo visitante"
         app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_salir"
+        android:orderInCategory="100"
+        android:title="Cerrar sesión"
+        app:showAsAction="never" />
+
 </menu>

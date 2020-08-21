@@ -7,7 +7,9 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -21,6 +23,7 @@ import com.mobsandgeeks.saripaar.ValidationError;
 import com.mobsandgeeks.saripaar.Validator;
 import com.mobsandgeeks.saripaar.annotation.NotEmpty;
 import com.stbnlycan.fragments.LoadingFragment;
+import com.stbnlycan.interfaces.LogoutAPIs;
 import com.stbnlycan.interfaces.RegistrarEmpresaAPIs;
 import com.stbnlycan.models.Empresa;
 
@@ -41,6 +44,10 @@ public class NuevaEmpresa extends AppCompatActivity implements Validator.Validat
     private Validator validator;
     private Empresa empresa;
 
+    private String authorization;
+    private SharedPreferences pref;
+    private SharedPreferences.Editor editor;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,6 +64,10 @@ public class NuevaEmpresa extends AppCompatActivity implements Validator.Validat
 
         nombreET = findViewById(R.id.nombre);
         observacionET = findViewById(R.id.observacion);
+
+        pref = getApplicationContext().getSharedPreferences("MyPref", 0);
+        editor = pref.edit();
+        authorization = pref.getString("token_type", null) + " " + pref.getString("access_token", null);
     }
 
     @Override
@@ -95,7 +106,7 @@ public class NuevaEmpresa extends AppCompatActivity implements Validator.Validat
     private void registrarEmpresa() {
         Retrofit retrofit = NetworkClient.getRetrofitClient(this);
         RegistrarEmpresaAPIs registrarEmpresaAPIs = retrofit.create(RegistrarEmpresaAPIs.class);
-        Call<Empresa> call = registrarEmpresaAPIs.registrarEmpresa(empresa);
+        Call<Empresa> call = registrarEmpresaAPIs.registrarEmpresa(empresa, authorization);
         call.enqueue(new Callback<Empresa>() {
             @Override
             public void onResponse(Call <Empresa> call, Response<Empresa> response) {
@@ -129,8 +140,33 @@ public class NuevaEmpresa extends AppCompatActivity implements Validator.Validat
             case R.id.action_guardar_empresa:
                 validator.validate();
                 return false;
+            case R.id.action_salir:
+                cerrarSesion();
+                Intent intent = new Intent(NuevaEmpresa.this, LoginActivity.class);
+                startActivity(intent);
+                finish();
+                return false;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void cerrarSesion() {
+        Retrofit retrofit = NetworkClient.getRetrofitClient(this);
+        LogoutAPIs logoutAPIs = retrofit.create(LogoutAPIs.class);
+        Call<Void> call = logoutAPIs.logout(pref.getString("access_token", null));
+        call.enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call <Void> call, retrofit2.Response<Void> response) {
+                editor.putString("access_token", "");
+                editor.putString("token_type", "");
+                editor.apply();
+                Toast.makeText(getApplicationContext(), "Sesión finalizada", Toast.LENGTH_LONG).show();
+            }
+            @Override
+            public void onFailure(Call <Void> call, Throwable t) {
+                Log.d("msg4125","hola "+t.toString());
+            }
+        });
     }
 
     void showLoadingwDialog() {
