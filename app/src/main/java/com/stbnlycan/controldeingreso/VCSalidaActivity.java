@@ -299,7 +299,6 @@ public class VCSalidaActivity extends AppCompatActivity implements VisitasAdapte
     }
 
     private void fetchVisitas() {
-        //String currentDate = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(new Date());
         Retrofit retrofit = NetworkClient.getRetrofitClient(this);
         ListaVSSalidaAPIs listaVSSalidaAPIs = retrofit.create(ListaVSSalidaAPIs.class);
         Call<ListaVisitas> call = listaVSSalidaAPIs.listaVSSalida(fechaIni, fechaFin, recintoRecibido.getRecCod(), "1",Integer.toString(nPag),"10");

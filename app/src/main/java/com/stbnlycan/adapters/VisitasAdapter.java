@@ -16,8 +16,12 @@ import com.squareup.picasso.Picasso;
 import com.stbnlycan.controldeingreso.R;
 import com.stbnlycan.models.Visita;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class VisitasAdapter extends RecyclerView.Adapter<VisitasAdapter.ARV> implements Filterable {
     private List<Visita> eventosList;
@@ -38,10 +42,22 @@ public class VisitasAdapter extends RecyclerView.Adapter<VisitasAdapter.ARV> imp
 
     @Override
     public void onBindViewHolder(@NonNull ARV holder, int position) {
-        Visita Visita = eventosList.get(position);
-        holder.artNaam.setText(Visita.getVisitante().getVteNombre()+" "+Visita.getVisitante().getVteApellidos());
-        holder.lugar.setText(Visita.getVisitante().getVteCi());
-        holder.empresaNombre.setText(Visita.getVisitante().getEmpresa().getEmpNombre());
+        Visita visita = eventosList.get(position);
+
+        String dtStart = visita.getVisIngreso();
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
+        SimpleDateFormat hh_mm_ss = new SimpleDateFormat("HH:mm:ss");
+        Date date = null;
+        try {
+            date = format.parse(dtStart);
+            Log.d("msg23",""+date.getTime()+" "+hh_mm_ss.format(date));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        holder.artNaam.setText(visita.getVisitante().getVteNombre()+" "+visita.getVisitante().getVteApellidos());
+        holder.lugar.setText(visita.getVisIngreso()+ " "+ visita.getVisSalida());
+        holder.empresaNombre.setText(visita.getVisitante().getEmpresa().getEmpNombre());
 
         holder.visita = eventosList.get(position);
     }
@@ -58,7 +74,6 @@ public class VisitasAdapter extends RecyclerView.Adapter<VisitasAdapter.ARV> imp
             if(constraint == null || constraint.length() == 0)
             {
                 filteredList.addAll(eventosListFull);
-                Log.d("msg1", "hola "+eventosListFull.size());
             }
             else
             {
@@ -112,19 +127,6 @@ public class VisitasAdapter extends RecyclerView.Adapter<VisitasAdapter.ARV> imp
         @Override
         public void onClick(View view)
         {
-            Log.d("Click","clickeado");
-
-            /*FragmentManager fragmentManager = ((AppCompatActivity) context).getSupportFragmentManager();
-            FragmentTransaction transaction = fragmentManager.beginTransaction();
-
-            transaction.setCustomAnimations(R.anim.layout_fad_in, R.anim.layout_fad_out, R.anim.layout_fad_in, R.anim.layout_fad_out);
-
-            Fragment fragment = EventoDetailsFragment.newInstance(1, "Detalles", new Survey("","",""));
-
-            transaction.addToBackStack(null);
-            transaction.add(R.id.fragment_details, fragment, "BLANK_FRAGMENT").commit();
-
-            onNoteListener.onNoteClick(getAdapterPosition());*/
             mListener.onEventoClick(visita, getAdapterPosition());
 
         }

@@ -249,10 +249,6 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
     protected void onResume() {
         super.onResume();
         //visitantes.clear();
-
-
-        //getDataVisitante();
-        //Toast.makeText(this, "Hola", Toast.LENGTH_LONG).show();
     }
 
     private void buscarVisitanteXNombre() {

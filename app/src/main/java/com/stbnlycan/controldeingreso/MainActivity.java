@@ -1,6 +1,7 @@
 package com.stbnlycan.controldeingreso;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -43,6 +44,9 @@ public class MainActivity extends AppCompatActivity implements RecintosAdapter.O
     private SwipeRefreshLayout swipeRefreshLayout;
     private ProgressBar bar;
     private TextView tvFallo;
+    private String token;
+    private SharedPreferences pref;
+    private SharedPreferences.Editor editor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +57,14 @@ public class MainActivity extends AppCompatActivity implements RecintosAdapter.O
         setSupportActionBar(toolbar);
 
         recintos = new ArrayList<>();
+
+        pref = getApplicationContext().getSharedPreferences("MyPref", 0);
+        editor = pref.edit();
+        Log.d("access_token",""+pref.getString("access_token", null));
+
+        //token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOlsiYWxib3Jlc291cmNlaWQiXSwiZXhwIjoxNTk3OTczNTY0LCJ1c2VyX25hbWUiOiJkYW5ueSIsImp0aSI6IjM0ZTgxMmUzLTc0NzctNDU2MS1hNTE3LWNmYjZlM2Q0N2Q2NyIsImNsaWVudF9pZCI6ImluZ3Jlc29WaXNpdGFudGVzIiwic2NvcGUiOlsicmVhZCIsIndyaXRlIl19.woKZUMFgTghufVEgi7p0PhoUel_mwBdW4pdvcPn-Is0";
+        token = pref.getString("access_token", null);
+        token = "bearer "+token;
 
         /*recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
         adapter = new RecintosAdapter(recintos);
@@ -86,7 +98,7 @@ public class MainActivity extends AppCompatActivity implements RecintosAdapter.O
     private void fetchRecintos() {
         Retrofit retrofit = NetworkClient.getRetrofitClient(this);
         RecintosAPIs recintosAPIs = retrofit.create(RecintosAPIs.class);
-        Call<List<Recinto>> call = recintosAPIs.listaRecintos();
+        Call<List<Recinto>> call = recintosAPIs.listaRecintos(token);
         call.enqueue(new Callback<List<Recinto>>() {
             @Override
             public void onResponse(Call <List<Recinto>> call, retrofit2.Response<List<Recinto>> response) {
@@ -114,7 +126,7 @@ public class MainActivity extends AppCompatActivity implements RecintosAdapter.O
     private void actualizarRecintos() {
         Retrofit retrofit = NetworkClient.getRetrofitClient(this);
         RecintosAPIs recintosAPIs = retrofit.create(RecintosAPIs.class);
-        Call<List<Recinto>> call = recintosAPIs.listaRecintos();
+        Call<List<Recinto>> call = recintosAPIs.listaRecintos(token);
         call.enqueue(new Callback<List<Recinto>>() {
             @Override
             public void onResponse(Call <List<Recinto>> call, retrofit2.Response<List<Recinto>> response) {

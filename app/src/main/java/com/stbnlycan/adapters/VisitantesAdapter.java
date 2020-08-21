@@ -64,7 +64,6 @@ public class VisitantesAdapter extends RecyclerView.Adapter<VisitantesAdapter.AR
             if(constraint == null || constraint.length() == 0)
             {
                 filteredList.addAll(eventosListFull);
-                Log.d("msg1", "hola "+eventosListFull.size());
             }
             else
             {
@@ -124,7 +123,6 @@ public class VisitantesAdapter extends RecyclerView.Adapter<VisitantesAdapter.AR
             btnVQR.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Log.d("msg435","hola");
                     vqrListener.OnVQRClick(visitante);
                 }
             });
@@ -132,7 +130,6 @@ public class VisitantesAdapter extends RecyclerView.Adapter<VisitantesAdapter.AR
             btnEE.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Log.d("msg45","hola");
                     eeListener.OnEEClick(visitante);
                 }
             });
