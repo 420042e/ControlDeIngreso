@@ -13,6 +13,8 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.auth0.android.jwt.Claim;
+import com.auth0.android.jwt.JWT;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
@@ -97,6 +99,12 @@ public class LoginActivity extends AppCompatActivity {
                         editor.putString("token_type", token.getToken_type());
                         editor.commit();
                         iniciarMainActivity();
+                        JWT jwt = new JWT(token.getAccess_token());
+                        Map<String, Claim> allClaims = jwt.getClaims();
+                        for (Map.Entry<String, Claim> entry : allClaims.entrySet()) {
+                            Log.d("msg8645",""+entry.getKey() + "/" + entry.getValue().asString());
+                        }
+
 
                     }
                 }

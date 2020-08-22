@@ -70,7 +70,8 @@
                 android:id="@+id/tipoVisita"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1" />
+                android:layout_weight="1"
+                style="@style/Widget.AppCompat.Spinner.DropDown" />
 
             <TextView
                 android:id="@+id/textView"
@@ -108,8 +109,9 @@
                 android:id="@+id/tvTotalVisitantes"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Total de visitantes:"
-                android:paddingLeft="5dp"/>
+                android:layout_marginTop="20dp"
+                android:paddingLeft="5dp"
+                android:text="Total de visitantes:" />
 
         </LinearLayout>
 

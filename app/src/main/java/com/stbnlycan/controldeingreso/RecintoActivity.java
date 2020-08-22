@@ -86,7 +86,7 @@ public class RecintoActivity extends AppCompatActivity implements RecintoAdapter
         RecintoAdapter adapter = new RecintoAdapter(cards);
         adapter.setOnEventoClickListener(RecintoActivity.this);
         recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(new GridLayoutManager(this, 3));
+        recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
         recyclerView.setAdapter(adapter);
     }
 

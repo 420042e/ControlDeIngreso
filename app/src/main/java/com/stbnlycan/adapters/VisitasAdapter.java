@@ -56,23 +56,24 @@ public class VisitasAdapter extends RecyclerView.Adapter<VisitasAdapter.ARV> imp
             date = format.parse(dtIngreso);
             if(dtSalida == null)
             {
-                hora_fecha = dd_MM_yyyy.format(date)+" "+hh_mm.format(date);
+                hora_fecha = "ING: "+dd_MM_yyyy.format(date)+" "+hh_mm.format(date);
+                holder.fIngreso.setText("ING: "+dd_MM_yyyy.format(date)+" "+hh_mm.format(date));
             }
             else
             {
                 date2 = format.parse(dtSalida);
-                hora_fecha = dd_MM_yyyy.format(date)+" "+hh_mm.format(date)+" - "+dd_MM_yyyy.format(date2)+" "+hh_mm.format(date2);
+                hora_fecha = "ING: "+dd_MM_yyyy.format(date)+" "+hh_mm.format(date)+" SAL: "+dd_MM_yyyy.format(date2)+" "+hh_mm.format(date2);
+                holder.fIngreso.setText("ING: "+dd_MM_yyyy.format(date)+" "+hh_mm.format(date));
+                holder.fSalida.setText("SAL: "+dd_MM_yyyy.format(date2)+" "+hh_mm.format(date2));
             }
             //hora_fecha = hh_mm.format(date)+" "+dd_MM_yyyy.format(date)+"-"+hh_mm.format(date2)+" "+dd_MM_yyyy.format(date2);
         } catch (ParseException e) {
             e.printStackTrace();
         }
 
-        holder.artNaam.setText(visita.getVisitante().getVteNombre()+" "+visita.getVisitante().getVteApellidos());
-        //holder.lugar.setText(visita.getVisIngreso()+ " "+ visita.getVisSalida());
-        holder.lugar.setText(hora_fecha);
-        holder.empresaNombre.setText(visita.getVisitante().getEmpresa().getEmpNombre());
 
+        holder.nombres.setText("NOMBRE: "+visita.getVisitante().getVteNombre()+" "+visita.getVisitante().getVteApellidos());
+        holder.empresaNombre.setText("EMPRESA: "+visita.getVisitante().getEmpresa().getEmpNombre());
         holder.visita = eventosList.get(position);
     }
 
@@ -122,17 +123,17 @@ public class VisitasAdapter extends RecyclerView.Adapter<VisitasAdapter.ARV> imp
 
     public class ARV extends RecyclerView.ViewHolder implements View.OnClickListener
     {
-
-        private TextView artNaam;
-        private TextView lugar;
+        private TextView fIngreso;
+        private TextView fSalida;
+        private TextView nombres;
         private TextView empresaNombre;
         Visita visita;
 
         public ARV(@NonNull View itemView) {
             super(itemView);
-
-            artNaam = itemView.findViewById(R.id.nombres);
-            lugar = itemView.findViewById(R.id.nroCi);
+            fIngreso = itemView.findViewById(R.id.fIngreso);
+            fSalida = itemView.findViewById(R.id.fSalida);
+            nombres = itemView.findViewById(R.id.nombres);
             empresaNombre = itemView.findViewById(R.id.empresaNombre);
             itemView.setOnClickListener(this);
             visita = new Visita();

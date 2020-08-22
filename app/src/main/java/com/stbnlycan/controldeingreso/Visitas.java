@@ -249,7 +249,7 @@ public class Visitas extends AppCompatActivity implements VisitasAdapter.OnVisit
 
         List<String> spinnerArray =  new ArrayList<String>();
         spinnerArray.add("SELECCIONA TIPO DE VISITA");
-        spinnerArray.add("VISITANTES SIN SALIDA");
+        spinnerArray.add("VISITANTES EN RECINTO");
         spinnerArray.add("VISITANTES CON SALIDA");
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, spinnerArray);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);

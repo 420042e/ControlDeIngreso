@@ -59,7 +59,7 @@ public class DFSalida extends DialogFragment {
 
         visitaRecibida = (Visita) getArguments().getSerializable("visita");
 
-        msg.setText(visitaRecibida.getVisitante().getVteNombre()+ " " + visitaRecibida.getVisitante().getVteApellidos() + " ha salido de " + visitaRecibida.getAreaRecinto().getAreaNombre());
+        msg.setText("Salida registrada:\r\n"+visitaRecibida.getVisitante().getVteNombre()+ " " + visitaRecibida.getVisitante().getVteApellidos());
 
         btnNF.setOnClickListener(new View.OnClickListener() {
             @Override

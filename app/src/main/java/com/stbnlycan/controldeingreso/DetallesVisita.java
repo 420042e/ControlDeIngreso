@@ -20,15 +20,11 @@ public class DetallesVisita extends AppCompatActivity {
 
     private ImageView visitanteIV;
     @NotEmpty
-    private EditText ciET;
-    @NotEmpty
     private EditText nombreET;
     @NotEmpty
     private EditText apellidosET;
     @NotEmpty
     private EditText telcelET;
-    @NotEmpty
-    private EditText emailET;
     @NotEmpty
     private EditText empresa;
     @NotEmpty
@@ -44,11 +40,9 @@ public class DetallesVisita extends AppCompatActivity {
         setTitle("Detalles visita");
         toolbar = findViewById(R.id.toolbar);
         visitanteIV = findViewById(R.id.visitanteIV);
-        ciET = findViewById(R.id.ci);
         nombreET = findViewById(R.id.nombre);
         apellidosET = findViewById(R.id.apellidos);
         telcelET = findViewById(R.id.telcel);
-        emailET = findViewById(R.id.email);
         empresa = findViewById(R.id.empresa);
         tipoVisitante = findViewById(R.id.tipoVisitante);
         observacion = findViewById(R.id.observacion);
@@ -62,11 +56,9 @@ public class DetallesVisita extends AppCompatActivity {
         Picasso.get().load("http://190.129.90.115:8083/ingresoVisitantes/visitante/mostrarFoto?foto=" + visitaRecibida.getVisitante().getVteImagen()).into(visitanteIV);
 
 
-        ciET.setText(visitaRecibida.getVisitante().getVteCi());
         nombreET.setText(visitaRecibida.getVisitante().getVteNombre());
         apellidosET.setText(visitaRecibida.getVisitante().getVteApellidos());
         telcelET.setText(visitaRecibida.getVisitante().getVteTelefono());
-        emailET.setText(visitaRecibida.getVisitante().getVteCorreo());
         empresa.setText(visitaRecibida.getVisitante().getEmpresa().getEmpNombre());
         tipoVisitante.setText(visitaRecibida.getVisitante().getTipoVisitante().getTviNombre());
         observacion.setText(visitaRecibida.getVisObs());

@@ -51,23 +51,6 @@
 
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp">
-
-                <EditText
-                    android:id="@+id/ci"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:ems="10"
-                    android:focusable="false"
-                    android:focusableInTouchMode="false"
-                    android:hint="Cédula de identidad"
-                    android:inputType="number" />
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
                 <EditText
@@ -120,22 +103,6 @@
                 android:layout_height="wrap_content">
 
                 <EditText
-                    android:id="@+id/email"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:ems="10"
-                    android:focusable="false"
-                    android:focusableInTouchMode="false"
-                    android:hint="Correo electrónico"
-                    android:inputType="textEmailAddress" />
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <EditText
                     android:id="@+id/empresa"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -175,8 +142,10 @@
                     android:ems="10"
                     android:focusable="false"
                     android:focusableInTouchMode="false"
+                    android:gravity="top"
                     android:hint="Observación"
-                    android:inputType="textEmailAddress" />
+                    android:inputType="textMultiLine"
+                    android:maxLines="4" />
             </com.google.android.material.textfield.TextInputLayout>
         </LinearLayout>
     </ScrollView>
