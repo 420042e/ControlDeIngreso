@@ -156,7 +156,7 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
         area.setAreaEstado("estado");
 
         areaRecinto.add(area);
-        adapterAreaR = new ArrayAdapter<AreaRecinto>(this, android.R.layout.simple_spinner_dropdown_item, areaRecinto);
+        adapterAreaR = new ArrayAdapter<AreaRecinto>(this, R.layout.style_spinner, areaRecinto);
         adapterAreaR.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         areaRecintoS.setAdapter(adapterAreaR);
         areaRecintoS.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {

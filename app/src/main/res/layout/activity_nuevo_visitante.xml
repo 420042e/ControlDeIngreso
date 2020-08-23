@@ -152,13 +152,16 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                android:gravity="center">
 
                 <Spinner
                     android:id="@+id/empresa"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1" />
+                    android:layout_margin="5dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/style_spinner1" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnNE"
@@ -168,7 +171,7 @@
 
                     android:gravity="center"
                     android:textAllCaps="true"
-                    app:backgroundTint="#FFFFFF"
+                    app:backgroundTint="#E8E8E8"
                     app:icon="@drawable/ic_add_black_24dp"
                     app:iconGravity="textStart"
                     app:iconPadding="0dp"
@@ -187,7 +190,9 @@
             <Spinner
                 android:id="@+id/tipo_visitante"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:background="@drawable/style_spinner1"
+                android:layout_margin="5dp"/>
 
             <TextView
                 android:id="@+id/textView6"

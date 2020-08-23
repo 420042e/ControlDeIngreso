@@ -1,5 +1,6 @@
 package com.stbnlycan.fragments;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -18,6 +19,7 @@ import android.widget.Button;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
 
 import com.stbnlycan.adapters.ACAdapter;
@@ -51,10 +53,9 @@ public class BusquedaCiDialogFragment extends DialogFragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_dialog_busqueda_ci, container, false);
-        getDialog().setTitle("Búsqueda de CI");
+        /*getDialog().setTitle("Búsqueda de CI");
         getDialog().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
 
-        //setCancelable(false);
         actv =  (AutoCompleteTextView) rootView.findViewById(R.id.ci2);
         btnNV =  (Button) rootView.findViewById(R.id.btnNV);
 
@@ -64,9 +65,76 @@ public class BusquedaCiDialogFragment extends DialogFragment {
         editor = pref.edit();
         authorization = pref.getString("token_type", null) + " " + pref.getString("access_token", null);
 
-        //adapter = new ArrayAdapter<String> (getActivity(), android.R.layout.select_dialog_item, nombres);
         actv.setThreshold(1);
-        //actv.setAdapter(adapter);
+
+        actv.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                buscarXCI(s.toString());
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+
+        actv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick (AdapterView<?> parent, View view, int position, long id) {
+                onBusquedaCiListener.onBusquedaCiListener(visitantes.get(position));
+                //dismiss();
+            }
+        });
+
+        btnNV.setVisibility(View.INVISIBLE);
+        btnNV.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(), NuevoVisitanteActivity.class);
+                intent.putExtra("ci", actv.getText().toString());
+                //startActivityForResult(intent, REQUEST_CODE_NV);
+                startActivity(intent);
+                dismiss();
+            }
+        });*/
+
+        return rootView;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        /*if (getArguments() != null && !TextUtils.isEmpty(getArguments().getString("email")))
+            editText.setText(getArguments().getString("ci"));*/
+    }
+
+    @NonNull
+    @Override
+    public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity()).setTitle("Búsqueda de CI");
+        LayoutInflater inflater = getActivity().getLayoutInflater();
+        View view = inflater.inflate(R.layout.fragment_dialog_busqueda_ci, null);
+        builder.setView(view);
+
+        /*getDialog().setTitle("Búsqueda de CI");
+        getDialog().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);*/
+
+        actv =  (AutoCompleteTextView) view.findViewById(R.id.ci2);
+        btnNV =  (Button) view.findViewById(R.id.btnNV);
+
+        visitantes = new ArrayList<>();
+
+        pref = getActivity().getSharedPreferences("MyPref", 0);
+        editor = pref.edit();
+        authorization = pref.getString("token_type", null) + " " + pref.getString("access_token", null);
+
+        actv.setThreshold(1);
 
         actv.addTextChangedListener(new TextWatcher() {
             @Override
@@ -104,22 +172,7 @@ public class BusquedaCiDialogFragment extends DialogFragment {
                 dismiss();
             }
         });
-
-        /*actv.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                actv.showDropDown();
-            }
-        });*/
-
-        return rootView;
-    }
-
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        /*if (getArguments() != null && !TextUtils.isEmpty(getArguments().getString("email")))
-            editText.setText(getArguments().getString("ci"));*/
+        return builder.create();
     }
 
     @Override

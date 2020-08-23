@@ -251,7 +251,7 @@ public class Visitas extends AppCompatActivity implements VisitasAdapter.OnVisit
         spinnerArray.add("SELECCIONA TIPO DE VISITA");
         spinnerArray.add("VISITANTES EN RECINTO");
         spinnerArray.add("VISITANTES CON SALIDA");
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, spinnerArray);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.style_spinner, spinnerArray);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         tipoVisitaS.setAdapter(adapter);
         tipoVisitaS.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -314,7 +314,7 @@ public class Visitas extends AppCompatActivity implements VisitasAdapter.OnVisit
 
         areaRecinto.add(area);
         areaRecinto.add(area2);
-        adapterAreaR = new ArrayAdapter<AreaRecinto>(this, android.R.layout.simple_spinner_dropdown_item, areaRecinto);
+        adapterAreaR = new ArrayAdapter<AreaRecinto>(this, R.layout.style_spinner, areaRecinto);
         adapterAreaR.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         areaRecintoS.setAdapter(adapterAreaR);
         areaRecintoS.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {

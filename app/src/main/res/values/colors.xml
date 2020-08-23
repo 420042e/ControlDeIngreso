@@ -10,4 +10,5 @@
     <color name="disabled_color">#000000</color>
     <color name="normal_color">#000000</color>
     <color name="hint_color">#666666</color>
+    <color name="spinner_color">#E8E8E8</color>
 </resources>

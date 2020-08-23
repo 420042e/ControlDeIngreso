@@ -185,7 +185,7 @@ public class NuevoVisitanteActivity extends AppCompatActivity implements Validat
         empresa.setEmpNombre("Selecciona una empresa");
         empresa.setEmpObs("obs");
         empresas.add(empresa);
-        adapterEmpresa = new ArrayAdapter<Empresa>(this, android.R.layout.simple_spinner_dropdown_item, empresas);
+        adapterEmpresa = new ArrayAdapter<Empresa>(this, R.layout.style_spinner, empresas);
         adapterEmpresa.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         empresaS.setAdapter(adapterEmpresa);
         empresaS.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -208,7 +208,7 @@ public class NuevoVisitanteActivity extends AppCompatActivity implements Validat
         tipoVisitante.setTviDescripcion("obs");
         tipoVisitante.setHorEstado("estado");
         tiposVisitante.add(tipoVisitante);
-        adapterTipoVisitante = new ArrayAdapter<TipoVisitante>(this, android.R.layout.simple_spinner_dropdown_item, tiposVisitante);
+        adapterTipoVisitante = new ArrayAdapter<TipoVisitante>(this, R.layout.style_spinner, tiposVisitante);
         adapterTipoVisitante.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         tipoVisitanteS.setAdapter(adapterTipoVisitante);
         tipoVisitanteS.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {

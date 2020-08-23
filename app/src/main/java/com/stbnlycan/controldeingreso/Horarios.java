@@ -244,7 +244,7 @@ public class Horarios extends AppCompatActivity implements HorariosAdapter.OnVis
         tipoVisitante.setTviDescripcion("obs");
         tipoVisitante.setHorEstado("estado");
         tipoVisitantes.add(tipoVisitante);
-        adapterTipoVisitante = new ArrayAdapter<TipoVisitante>(this, android.R.layout.simple_spinner_dropdown_item, tipoVisitantes);
+        adapterTipoVisitante = new ArrayAdapter<TipoVisitante>(this, R.layout.style_spinner, tipoVisitantes);
         adapterTipoVisitante.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         tipoVisitanteS.setAdapter(adapterTipoVisitante);
     }
