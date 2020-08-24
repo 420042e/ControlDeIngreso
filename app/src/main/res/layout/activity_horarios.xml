@@ -63,8 +63,8 @@
             android:id="@+id/tipoVisitante"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/style_spinner1"
-            android:layout_margin="5dp" />
+            android:layout_margin="5dp"
+            android:background="@drawable/style_spinner1" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerView"

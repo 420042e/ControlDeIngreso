@@ -88,6 +88,11 @@ public class MainActivity extends AppCompatActivity implements RecintosAdapter.O
         recyclerView.setVisibility(View.GONE);
         tvFallo.setVisibility(View.GONE);
 
+        adapter = new RecintosAdapter(recintos);
+        adapter.setOnEventoClickListener(MainActivity.this);
+
+        recyclerView.setAdapter(adapter);
+
         fetchRecintos();
 
         swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout);
@@ -113,10 +118,10 @@ public class MainActivity extends AppCompatActivity implements RecintosAdapter.O
                 {
                     recintos.add(response.body().get(i));
                 }
-                adapter = new RecintosAdapter(recintos);
+                /*adapter = new RecintosAdapter(recintos);
                 adapter.setOnEventoClickListener(MainActivity.this);
 
-                recyclerView.setAdapter(adapter);
+                recyclerView.setAdapter(adapter);*/
 
                 adapter.notifyDataSetChanged();
             }
