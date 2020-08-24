@@ -4,6 +4,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -55,6 +56,7 @@ public class RecintoActivity extends AppCompatActivity implements RecintoAdapter
     private String authorization;
     private SharedPreferences pref;
     private SharedPreferences.Editor editor;
+    private boolean doubleBackToExitPressedOnce;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,8 +69,9 @@ public class RecintoActivity extends AppCompatActivity implements RecintoAdapter
 
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        /*getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);*/
+        doubleBackToExitPressedOnce = false;
 
         pref = getApplicationContext().getSharedPreferences("MyPref", 0);
         editor = pref.edit();
@@ -145,9 +148,9 @@ public class RecintoActivity extends AppCompatActivity implements RecintoAdapter
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
-            case android.R.id.home:
+            /*case android.R.id.home:
                 finish();
-                return false;
+                return false;*/
             case R.id.action_salir:
                 cerrarSesion();
                 Intent intent = new Intent(RecintoActivity.this, LoginActivity.class);
@@ -334,6 +337,26 @@ public class RecintoActivity extends AppCompatActivity implements RecintoAdapter
         intent.putExtra("visitante", visitanteRecibido);
         intent.putExtra("recinto", recintoRecibido);
         startActivity(intent);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if(doubleBackToExitPressedOnce)
+        {
+            this.finishAffinity();
+        }
+        else
+        {
+            Toast.makeText(this, "Presiona el botón Atrás nuevamente para salir de la aplicación", Toast.LENGTH_LONG).show();
+        }
+        doubleBackToExitPressedOnce = true;
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                doubleBackToExitPressedOnce = false;
+            }
+        }, 2000);
+
     }
 
 }

@@ -234,6 +234,14 @@ public class Horarios extends AppCompatActivity implements HorariosAdapter.OnVis
     @Override
     public void onEventoClick(Horario horario) {
         Log.d("msg",""+horario.getHorNombre());
+        iniciarHDetallesActivity(horario);
+    }
+
+    public void iniciarHDetallesActivity(Horario horario)
+    {
+        Intent intent = new Intent(Horarios.this, DetallesHorario.class);
+        intent.putExtra("horario", horario);
+        startActivity(intent);
     }
 
     public void iniciarSpinnerTipoVisitante() {

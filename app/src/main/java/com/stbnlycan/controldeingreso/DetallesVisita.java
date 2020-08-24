@@ -4,18 +4,27 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 
+import com.google.android.material.textfield.TextInputLayout;
 import com.mobsandgeeks.saripaar.annotation.NotEmpty;
+import com.squareup.picasso.OkHttp3Downloader;
 import com.squareup.picasso.Picasso;
 import com.stbnlycan.models.Visita;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import okhttp3.Interceptor;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
 
 public class DetallesVisita extends AppCompatActivity {
 
@@ -40,12 +49,18 @@ public class DetallesVisita extends AppCompatActivity {
     @NotEmpty
     private EditText fSalida;
 
+    private TextInputLayout tilfSalida;
+
+    private String authorization;
+    private SharedPreferences pref;
+    private SharedPreferences.Editor editor;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detalles_visita);
 
-        setTitle("Detalles visita");
+        setTitle("Detalles");
         toolbar = findViewById(R.id.toolbar);
         visitanteIV = findViewById(R.id.visitanteIV);
         nombreET = findViewById(R.id.nombre);
@@ -56,6 +71,7 @@ public class DetallesVisita extends AppCompatActivity {
         fIngreso = findViewById(R.id.fIngreso);
         fSalida = findViewById(R.id.fSalida);
         observacion = findViewById(R.id.observacion);
+        tilfSalida = findViewById(R.id.tilfSalida);
 
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -63,7 +79,25 @@ public class DetallesVisita extends AppCompatActivity {
 
         visitaRecibida = (Visita) getIntent().getSerializableExtra("visita");
 
-        Picasso.get().load("http://190.129.90.115:8083/ingresoVisitantes/visitante/mostrarFoto?foto=" + visitaRecibida.getVisitante().getVteImagen()).into(visitanteIV);
+        pref = getApplicationContext().getSharedPreferences("MyPref", 0);
+        editor = pref.edit();
+        authorization = pref.getString("token_type", null) + " " + pref.getString("access_token", null);
+
+        /*OkHttpClient client = new OkHttpClient.Builder()
+                .addInterceptor(new Interceptor() {
+                    @Override
+                    public okhttp3.Response intercept(Chain chain) throws IOException {
+                        Request newRequest = chain.request().newBuilder()
+                                .addHeader("Authorization", authorization)
+                                .build();
+                        return chain.proceed(newRequest);
+                    }
+                })
+                .build();
+        Picasso picasso = new Picasso.Builder(this)
+                .downloader(new OkHttp3Downloader(client))
+                .build();
+        picasso.load("http://190.129.90.115:8083/ingresoVisitantes/visitante/mostrarFoto?foto=" + visitaRecibida.getVisitante().getVteImagen()).into(visitanteIV);*/
 
         String dtIngreso = visitaRecibida.getVisIngreso();
         String dtSalida = visitaRecibida.getVisSalida();
@@ -77,7 +111,8 @@ public class DetallesVisita extends AppCompatActivity {
             if(dtSalida == null)
             {
                 fIngreso.setText(dd_MM_yyyy.format(date)+" "+hh_mm.format(date));
-                fSalida.setText("Con salida");
+                //fSalida.setText("Con salida");
+                tilfSalida.setVisibility(View.GONE);
             }
             else
             {

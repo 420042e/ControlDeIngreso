@@ -58,6 +58,7 @@ public class VisitasAdapter extends RecyclerView.Adapter<VisitasAdapter.ARV> imp
             {
                 hora_fecha = "ING: "+dd_MM_yyyy.format(date)+" "+hh_mm.format(date);
                 holder.fIngreso.setText("ING: "+dd_MM_yyyy.format(date)+" "+hh_mm.format(date));
+                holder.fSalida.setText("");
             }
             else
             {

@@ -21,11 +21,13 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.stbnlycan.adapters.RecintosAdapter;
 import com.stbnlycan.interfaces.LoginAPIs;
+import com.stbnlycan.interfaces.RecintoXUsuarioAPIs;
 import com.stbnlycan.interfaces.RecintosAPIs;
 import com.stbnlycan.models.Error;
 import com.stbnlycan.models.ErrorToken;
 import com.stbnlycan.models.Recinto;
 import com.stbnlycan.models.Token;
+import com.stbnlycan.models.Usuario;
 import com.stbnlycan.models.Visita;
 
 import org.json.JSONObject;
@@ -46,6 +48,7 @@ public class LoginActivity extends AppCompatActivity {
     private SharedPreferences pref;
     private SharedPreferences.Editor editor;
     private FrameLayout progressBarHolder;
+    private String authorization;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,14 +106,17 @@ public class LoginActivity extends AppCompatActivity {
                         editor.putString("access_token", token.getAccess_token());
                         editor.putString("token_type", token.getToken_type());
                         editor.commit();
-                        iniciarMainActivity();
+
+                        authorization = token.getToken_type() + " " + token.getAccess_token();
+
                         JWT jwt = new JWT(token.getAccess_token());
                         Map<String, Claim> allClaims = jwt.getClaims();
                         for (Map.Entry<String, Claim> entry : allClaims.entrySet()) {
                             Log.d("msg8645",""+entry.getKey() + "/" + entry.getValue().asString());
                         }
 
-
+                        //iniciarMainActivity(jwt.getClaim("user_name").asString());
+                        buscaRecintosXUsuario(jwt.getClaim("user_name").asString());
                     }
                 }
             }
@@ -121,9 +127,34 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
-    public void iniciarMainActivity()
+    private void buscaRecintosXUsuario(String user_name) {
+        Retrofit retrofit = NetworkClient.getRetrofitClient(this);
+        RecintoXUsuarioAPIs recintoXUsuarioAPIs = retrofit.create(RecintoXUsuarioAPIs.class);
+        Call<Usuario> call = recintoXUsuarioAPIs.recintoXUsuario(user_name, authorization);
+        call.enqueue(new Callback<Usuario>() {
+            @Override
+            public void onResponse(Call <Usuario> call, retrofit2.Response<Usuario> response) {
+                iniciarRecintoActivity(response.body().getRecinto());
+            }
+            @Override
+            public void onFailure(Call <Usuario> call, Throwable t) {
+
+            }
+        });
+    }
+
+    public void iniciarRecintoActivity(Recinto recinto)
+    {
+        Intent intent = new Intent(LoginActivity.this, RecintoActivity.class);
+        intent.putExtra("recinto", recinto);
+        startActivity(intent);
+        finish();
+    }
+
+    public void iniciarMainActivity(String user_name)
     {
         Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+        intent.putExtra("user_name", user_name);
         startActivity(intent);
         finish();
     }

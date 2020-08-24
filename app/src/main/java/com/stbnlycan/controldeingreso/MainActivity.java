@@ -26,9 +26,11 @@ import com.google.gson.JsonObject;
 import com.stbnlycan.adapters.RecintosAdapter;
 import com.stbnlycan.interfaces.LoginAPIs;
 import com.stbnlycan.interfaces.LogoutAPIs;
+import com.stbnlycan.interfaces.RecintoXUsuarioAPIs;
 import com.stbnlycan.interfaces.RecintosAPIs;
 import com.stbnlycan.models.Recinto;
 import com.stbnlycan.models.Token;
+import com.stbnlycan.models.Usuario;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -56,6 +58,7 @@ public class MainActivity extends AppCompatActivity implements RecintosAdapter.O
     private String authorization;
     private SharedPreferences pref;
     private SharedPreferences.Editor editor;
+    private String user_name;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,6 +73,8 @@ public class MainActivity extends AppCompatActivity implements RecintosAdapter.O
         pref = getApplicationContext().getSharedPreferences("MyPref", 0);
         editor = pref.edit();
         authorization = pref.getString("token_type", null) + " " + pref.getString("access_token", null);
+
+        user_name = getIntent().getStringExtra("user_name");
 
         /*recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
         adapter = new RecintosAdapter(recintos);
@@ -93,7 +98,7 @@ public class MainActivity extends AppCompatActivity implements RecintosAdapter.O
 
         recyclerView.setAdapter(adapter);
 
-        fetchRecintos();
+        actualizarRecintos();
 
         swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout);
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -105,53 +110,22 @@ public class MainActivity extends AppCompatActivity implements RecintosAdapter.O
         });
     }
 
-    private void fetchRecintos() {
-        Retrofit retrofit = NetworkClient.getRetrofitClient(this);
-        RecintosAPIs recintosAPIs = retrofit.create(RecintosAPIs.class);
-        Call<List<Recinto>> call = recintosAPIs.listaRecintos(authorization);
-        call.enqueue(new Callback<List<Recinto>>() {
-            @Override
-            public void onResponse(Call <List<Recinto>> call, retrofit2.Response<List<Recinto>> response) {
-                bar.setVisibility(View.GONE);
-                recyclerView.setVisibility(View.VISIBLE);
-                for(int i = 0 ; i < response.body().size() ; i++)
-                {
-                    recintos.add(response.body().get(i));
-                }
-                /*adapter = new RecintosAdapter(recintos);
-                adapter.setOnEventoClickListener(MainActivity.this);
-
-                recyclerView.setAdapter(adapter);*/
-
-                adapter.notifyDataSetChanged();
-            }
-            @Override
-            public void onFailure(Call <List<Recinto>> call, Throwable t) {
-                bar.setVisibility(View.GONE);
-                tvFallo.setVisibility(View.VISIBLE);
-            }
-        });
-    }
-
     private void actualizarRecintos() {
         Retrofit retrofit = NetworkClient.getRetrofitClient(this);
-        RecintosAPIs recintosAPIs = retrofit.create(RecintosAPIs.class);
-        Call<List<Recinto>> call = recintosAPIs.listaRecintos(authorization);
-        call.enqueue(new Callback<List<Recinto>>() {
+        RecintoXUsuarioAPIs recintoXUsuarioAPIs = retrofit.create(RecintoXUsuarioAPIs.class);
+        Call<Usuario> call = recintoXUsuarioAPIs.recintoXUsuario(user_name, authorization);
+        call.enqueue(new Callback<Usuario>() {
             @Override
-            public void onResponse(Call <List<Recinto>> call, retrofit2.Response<List<Recinto>> response) {
-
-                //recintos = response.body();
+            public void onResponse(Call <Usuario> call, retrofit2.Response<Usuario> response) {
+                bar.setVisibility(View.GONE);
+                recyclerView.setVisibility(View.VISIBLE);
                 recintos.clear();
-                for(int i = 0 ; i < response.body().size() ; i++)
-                {
-                    recintos.add(response.body().get(i));
-                }
+                recintos.add(response.body().getRecinto());
                 adapter.notifyDataSetChanged();
                 swipeRefreshLayout.setRefreshing(false);
             }
             @Override
-            public void onFailure(Call <List<Recinto>> call, Throwable t) {
+            public void onFailure(Call <Usuario> call, Throwable t) {
                 tvFallo.setVisibility(View.VISIBLE);
                 swipeRefreshLayout.setRefreshing(false);
             }
