@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -44,6 +45,7 @@ public class LoginActivity extends AppCompatActivity {
     private EditText password;
     private SharedPreferences pref;
     private SharedPreferences.Editor editor;
+    private FrameLayout progressBarHolder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +54,7 @@ public class LoginActivity extends AppCompatActivity {
 
         username = (EditText) findViewById(R.id.username);
         password = (EditText) findViewById(R.id.password);
+        progressBarHolder = (FrameLayout) findViewById(R.id.progressBarHolder);
 
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
 
@@ -71,6 +74,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void iniciarSesion() {
+        progressBarHolder.setVisibility(View.VISIBLE);
         String authString = "ingresoVisitantes:albosalpz01codex";
         String encodedAuthString = Base64.encodeToString(authString.getBytes(), Base64.NO_WRAP);
         Map<String, String> headers = new HashMap<>();
@@ -86,6 +90,7 @@ public class LoginActivity extends AppCompatActivity {
         call.enqueue(new Callback<JsonObject>() {
             @Override
             public void onResponse(Call <JsonObject> call, retrofit2.Response<JsonObject> response) {
+                progressBarHolder.setVisibility(View.GONE);
                 if (response.code() == 400) {
                     Toast.makeText(getApplicationContext(), "No existe el usuario", Toast.LENGTH_LONG).show();
                 }
