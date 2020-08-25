@@ -377,6 +377,10 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
 
             @Override
             public boolean onSuggestionClick(int position) {
+                String[] columns = { BaseColumns._ID, SearchManager.SUGGEST_COLUMN_TEXT_1, SearchManager.SUGGEST_COLUMN_INTENT_DATA};
+                MatrixCursor cursor = new MatrixCursor(columns);
+                suggestionAdapter.swapCursor(cursor);
+
                 searchView.setQuery(suggestions.get(position).getVteNombre(), true);
                 searchView.clearFocus();
 
