@@ -16,6 +16,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.FileUtils;
 import android.provider.MediaStore;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -256,7 +257,12 @@ public class NuevoVisitanteActivity extends AppCompatActivity implements Validat
 
             imagenObtenida = finalFile.toString();
 
-            Picasso.get().load(finalFile).into(visitanteIV);
+            DisplayMetrics displayMetrics = new DisplayMetrics();
+            getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+            int height = displayMetrics.heightPixels;
+            int width = displayMetrics.widthPixels;
+
+            Picasso.get().load(finalFile).resize(width, width).into(visitanteIV);
 
         }
         if (resultCode == Activity.RESULT_OK) {

@@ -295,7 +295,12 @@ public class EditarVisitanteActivity extends AppCompatActivity implements Valida
 
             imagenObtenida = finalFile.toString();
 
-            Picasso.get().load(finalFile).into(visitanteIV);
+            DisplayMetrics displayMetrics = new DisplayMetrics();
+            getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+            int height = displayMetrics.heightPixels;
+            int width = displayMetrics.widthPixels;
+
+            Picasso.get().load(finalFile).resize(width, width).into(visitanteIV);
             //imagenObtenida = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/prueba.jpg";
 
             subirImagen(descripcion);

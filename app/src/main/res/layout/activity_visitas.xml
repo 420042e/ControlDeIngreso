@@ -103,23 +103,31 @@
                     android:layout_weight="1"
                     android:background="@drawable/style_spinner1" />
 
-                <com.google.android.material.textfield.TextInputLayout
+                <TextView
+                    android:id="@+id/textView3"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="5dp"
+                    android:text="Mostrar resultados desde:"
+                    android:textSize="12sp" />
 
-                    <EditText
-                        android:id="@+id/fechaRango"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:cursorVisible="false"
-                        android:ems="10"
-                        android:focusable="false"
-                        android:focusableInTouchMode="false"
-                        android:hint="Mostrar resultados desde:"
-                        android:inputType="date"
-                        tools:text="Fecha" />
-                </com.google.android.material.textfield.TextInputLayout>
+                <EditText
+                    android:id="@+id/fechaRango"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/style_rango_fechas"
+                    android:cursorVisible="false"
+                    android:ems="10"
+                    android:focusable="false"
+                    android:focusableInTouchMode="false"
+                    android:hint="Mostrar resultados desde:"
+                    android:inputType="date"
+                    android:paddingLeft="10dp"
+                    android:paddingTop="5dp"
+                    android:paddingBottom="5dp"
+                    tools:text="Fecha" />
 
             </LinearLayout>
 

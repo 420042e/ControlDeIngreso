@@ -8,6 +8,7 @@ import androidx.appcompat.widget.Toolbar;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -113,6 +114,11 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
         visitanteRecibido = (Visitante) getIntent().getSerializableExtra("visitante");
         recintoRecibido = (Recinto) getIntent().getSerializableExtra("recinto");
 
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        int height = displayMetrics.heightPixels;
+        int width = displayMetrics.widthPixels;
+
         OkHttpClient client = new OkHttpClient.Builder()
                 .addInterceptor(new Interceptor() {
                     @Override
@@ -127,7 +133,7 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
         Picasso picasso = new Picasso.Builder(this)
                 .downloader(new OkHttp3Downloader(client))
                 .build();
-        picasso.load("http://190.129.90.115:8083/ingresoVisitantes/visitante/mostrarFoto?foto=" + visitanteRecibido.getVteImagen()).into(visitanteIV);
+        picasso.load("http://190.129.90.115:8083/ingresoVisitantes/visitante/mostrarFoto?foto=" + visitanteRecibido.getVteImagen()).resize(width, width).into(visitanteIV);
 
         ciET.setText(visitanteRecibido.getVteCi());
         nombreET.setText(visitanteRecibido.getVteNombre());
