@@ -427,7 +427,11 @@ public class Visitas extends AppCompatActivity implements VisitasAdapter.OnVisit
 
             @Override
             public boolean onSuggestionClick(int position) {
-                searchView.setQuery(suggestions.get(position).getVteNombre()+" "+suggestions.get(position).getVteApellidos(), true);
+                String[] columns = { BaseColumns._ID, SearchManager.SUGGEST_COLUMN_TEXT_1, SearchManager.SUGGEST_COLUMN_INTENT_DATA};
+                MatrixCursor cursor = new MatrixCursor(columns);
+                suggestionAdapter.swapCursor(cursor);
+
+                searchView.setQuery(suggestions.get(position).getVteNombre(), true);
                 searchView.clearFocus();
                 ci = suggestions.get(position).getVteCi();
                 buscarVisitaXCi();
@@ -447,7 +451,7 @@ public class Visitas extends AppCompatActivity implements VisitasAdapter.OnVisit
             }
 
             @Override
-            public boolean onQueryTextChange(String newText) {
+            public boolean onQueryTextChange(final String newText) {
                 nombre = newText.toUpperCase();
                 if(newText.equals("")){
                     nPag = 0;
@@ -513,10 +517,7 @@ public class Visitas extends AppCompatActivity implements VisitasAdapter.OnVisit
                     for(int i = 0 ; i < listaVisitantes.getlVisitante().size() ; i++)
                     {
                         suggestions.add(listaVisitantes.getlVisitante().get(i));
-                        String[] columns = { BaseColumns._ID,
-                                SearchManager.SUGGEST_COLUMN_TEXT_1,
-                                SearchManager.SUGGEST_COLUMN_INTENT_DATA,
-                        };
+                        String[] columns = { BaseColumns._ID, SearchManager.SUGGEST_COLUMN_TEXT_1, SearchManager.SUGGEST_COLUMN_INTENT_DATA};
                         MatrixCursor cursor = new MatrixCursor(columns);
                         for (int j = 0; j < suggestions.size(); j++) {
                             String[] tmp = {Integer.toString(j), suggestions.get(j).getVteNombre() + " " + suggestions.get(j).getVteApellidos(), suggestions.get(j).getVteNombre()};
@@ -545,6 +546,11 @@ public class Visitas extends AppCompatActivity implements VisitasAdapter.OnVisit
                 recyclerView.setVisibility(View.VISIBLE);
                 visitas.clear();
                 ListaVisitas listaVisitas = response.body();
+
+                Gson gson = new Gson();
+                String descripcion = gson.toJson(listaVisitas);
+                Log.d("msg961",""+tipoVisitaSel);
+                Log.d("msg123", ""+descripcion);
 
                 if(listaVisitas.getlVisita().size() == 0)
                 {

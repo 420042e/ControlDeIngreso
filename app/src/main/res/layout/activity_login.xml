@@ -3,10 +3,11 @@
     android:id="@+id/fragmentradio"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@drawable/loginimg2"
+        android:background="@drawable/loginimg1"
         android:gravity="center"
         android:orientation="vertical"
         android:padding="20dp">

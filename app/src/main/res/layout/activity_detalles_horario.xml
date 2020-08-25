@@ -40,6 +40,20 @@
                 android:layout_height="wrap_content">
 
                 <EditText
+                    android:id="@+id/tipoVisitante"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:ems="10"
+                    android:hint="Tipo de visitante"
+                    android:inputType="textPersonName" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <EditText
                     android:id="@+id/horNombre"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

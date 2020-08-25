@@ -14,6 +14,7 @@ import com.stbnlycan.models.Visita;
 public class DetallesHorario extends AppCompatActivity {
     private Toolbar toolbar;
     private Horario horarioRecibido;
+    EditText tipoVisitante;
     EditText horNombre;
     EditText horDescripcion;
     EditText horDias;
@@ -31,6 +32,7 @@ public class DetallesHorario extends AppCompatActivity {
         horDias = findViewById(R.id.horDias);
         horaEntrada = findViewById(R.id.horaEntrada);
         horaSalida = findViewById(R.id.horaSalida);
+        tipoVisitante = findViewById(R.id.tipoVisitante);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
@@ -44,6 +46,7 @@ public class DetallesHorario extends AppCompatActivity {
         new_days = new_days.replace("THURSDAY","Jueves");
         new_days = new_days.replace("FRIDAY","Viernes");
 
+        tipoVisitante.setText(horarioRecibido.getTipoVisitante().getTviNombre());
         horNombre.setText(horarioRecibido.getHorNombre());
         horDescripcion.setText(horarioRecibido.getHorDescripcion());
         horDias.setText(new_days);
