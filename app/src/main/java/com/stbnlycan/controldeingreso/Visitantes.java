@@ -381,7 +381,7 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
                 MatrixCursor cursor = new MatrixCursor(columns);
                 suggestionAdapter.swapCursor(cursor);
 
-                searchView.setQuery(suggestions.get(position).getVteNombre(), true);
+                searchView.setQuery(suggestions.get(position).getVteNombre()+" "+suggestions.get(position).getVteApellidos(), true);
                 searchView.clearFocus();
 
                 visitantes.clear();
