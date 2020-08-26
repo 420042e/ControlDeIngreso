@@ -93,8 +93,9 @@ public class LoginActivity extends AppCompatActivity {
         call.enqueue(new Callback<JsonObject>() {
             @Override
             public void onResponse(Call <JsonObject> call, retrofit2.Response<JsonObject> response) {
-                progressBarHolder.setVisibility(View.GONE);
+                //progressBarHolder.setVisibility(View.GONE);
                 if (response.code() == 400) {
+                    progressBarHolder.setVisibility(View.GONE);
                     Toast.makeText(getApplicationContext(), "No existe el usuario", Toast.LENGTH_LONG).show();
                 }
                 else

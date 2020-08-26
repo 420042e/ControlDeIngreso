@@ -4,6 +4,8 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -31,6 +33,7 @@ import com.mobsandgeeks.saripaar.annotation.NotEmpty;
 import com.mobsandgeeks.saripaar.annotation.Select;
 import com.squareup.picasso.OkHttp3Downloader;
 import com.squareup.picasso.Picasso;
+import com.stbnlycan.fragments.DFIngreso;
 import com.stbnlycan.interfaces.AreaRecintoAPIs;
 import com.stbnlycan.interfaces.LogoutAPIs;
 import com.stbnlycan.interfaces.RegistrarIngresoAPIs;
@@ -244,7 +247,10 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
                 String jsonString = response.body().toString();
                 if (jsonString.contains("visCod")) {
                     Visita visitaRecibida = new Gson().fromJson(jsonString, Visita.class);
-                    Toast.makeText(getApplicationContext(), visitaRecibida.getVisitante().getVteNombre()+ " " + visitaRecibida.getVisitante().getVteApellidos() + " ha ingresado a " + visitaRecibida.getAreaRecinto().getAreaNombre(), Toast.LENGTH_LONG).show();
+                    //Toast.makeText(getApplicationContext(), visitaRecibida.getVisitante().getVteNombre()+ " " + visitaRecibida.getVisitante().getVteApellidos() + " ha ingresado a " + visitaRecibida.getAreaRecinto().getAreaNombre(), Toast.LENGTH_LONG).show();
+                    Intent intent = new Intent();
+                    intent.putExtra("visitaResult", visitaRecibida);
+                    setResult(RESULT_OK, intent);
                     finish();
                 } else {
                     Error error = new Gson().fromJson(jsonString, Error.class);

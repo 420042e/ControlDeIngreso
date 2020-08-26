@@ -134,8 +134,7 @@ public class Visitas extends AppCompatActivity implements VisitasAdapter.OnVisit
 
         fechaIni = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(new Date());
         fechaFin = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault()).format(new Date());
-        /*fechaIni = "14-07-2020";
-        fechaFin = "14-08-2020";*/
+
         fechaRango.setText(fechaIni.replace("-","/") + " - " + fechaFin.replace("-","/"));
 
         pref = getApplicationContext().getSharedPreferences("MyPref", 0);
@@ -154,7 +153,6 @@ public class Visitas extends AppCompatActivity implements VisitasAdapter.OnVisit
         recyclerView.setAdapter(visitasAdapter);
         //recyclerView.setLayoutManager(new GridLayoutManager(this, 1));
         recyclerView.setLayoutManager(manager);
-
 
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
@@ -295,6 +293,29 @@ public class Visitas extends AppCompatActivity implements VisitasAdapter.OnVisit
             }
         });
         tipoVisitaS.setSelection(1);
+
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                bar.setVisibility(View.VISIBLE);
+                recyclerView.setVisibility(View.GONE);
+                //tvNoData.setVisibility(View.GONE);
+                //actualizarVisitantes();
+
+                AreaRecinto areaRecinto = (AreaRecinto) areaRecintoS.getSelectedItem();
+                if(!(areaRecinto.getAreaCod().equals("cod")))
+                {
+                    if(tipoVisitaSel == 1)
+                    {
+                        actualizarVCS();
+                    }
+                    else if(tipoVisitaSel == 2)
+                    {
+                        actualizarVSS();
+                    }
+                }
+            }
+        });
     }
 
     public void iniciarSpinnerArea() {

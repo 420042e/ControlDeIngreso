@@ -1,5 +1,6 @@
 package com.stbnlycan.controldeingreso;
 
+import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -13,6 +14,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
@@ -28,6 +30,7 @@ import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 import com.stbnlycan.adapters.RecintoAdapter;
 import com.stbnlycan.fragments.BusquedaCiDialogFragment;
+import com.stbnlycan.fragments.DFIngreso;
 import com.stbnlycan.fragments.DFSalida;
 import com.stbnlycan.interfaces.BuscarXQRAPIs;
 import com.stbnlycan.interfaces.LogoutAPIs;
@@ -57,6 +60,7 @@ public class RecintoActivity extends AppCompatActivity implements RecintoAdapter
     private SharedPreferences pref;
     private SharedPreferences.Editor editor;
     private boolean doubleBackToExitPressedOnce;
+    private final static int REQUEST_CODE_RV = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -195,6 +199,7 @@ public class RecintoActivity extends AppCompatActivity implements RecintoAdapter
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data)
     {
+        super.onActivityResult(requestCode, resultCode, data);
         IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
         if(result != null)
         {
@@ -208,10 +213,21 @@ public class RecintoActivity extends AppCompatActivity implements RecintoAdapter
                 registrarSalida(result.getContents());
             }
         }
-        else
+        /*else
         {
             super.onActivityResult(requestCode, resultCode, data);
+        }*/
+
+        if (resultCode == Activity.RESULT_OK) {
+            if (requestCode == REQUEST_CODE_RV) {
+                Bundle b = data.getExtras();
+                if (data != null) {
+                    Visita visitaResult = (Visita) b.getSerializable("visitaResult");
+                    showDFIngreso(visitaResult);
+                }
+            }
         }
+        //super.onActivityResult(requestCode, resultCode, data);
     }
 
     public void showCiDialog() {
@@ -229,6 +245,23 @@ public class RecintoActivity extends AppCompatActivity implements RecintoAdapter
         }
         ft.addToBackStack(null);
         dialogFragment.show(ft, "dialog");
+    }
+
+    public void showDFIngreso(Visita visita) {
+        DFIngreso dfIngreso = new DFIngreso();
+        FragmentTransaction ft;
+        Bundle bundle = new Bundle();
+        bundle.putBoolean("notAlertDialog", true);
+        bundle.putSerializable("visita", visita);
+        dfIngreso.setArguments(bundle);
+        //dialogFragment.setOnEventoClickListener(RecintoActivity.this);
+        ft = getSupportFragmentManager().beginTransaction();
+        Fragment prev = getSupportFragmentManager().findFragmentByTag("dialogAdvertenciaI");
+        if (prev != null) {
+            ft.remove(prev);
+        }
+        ft.addToBackStack(null);
+        dfIngreso.show(ft, "dialogAdvertenciaI");
     }
 
     public void showDFSalida(Visita visita) {
@@ -336,7 +369,8 @@ public class RecintoActivity extends AppCompatActivity implements RecintoAdapter
         Intent intent = new Intent(RecintoActivity.this, RegistraVisitaActivity.class);
         intent.putExtra("visitante", visitanteRecibido);
         intent.putExtra("recinto", recintoRecibido);
-        startActivity(intent);
+        //startActivity(intent);
+        startActivityForResult(intent, REQUEST_CODE_RV);
     }
 
     @Override
