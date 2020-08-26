@@ -201,6 +201,7 @@ public class Visitas extends AppCompatActivity implements VisitasAdapter.OnVisit
         picker.addOnPositiveButtonClickListener(new MaterialPickerOnPositiveButtonClickListener<Pair<Long, Long>>() {
             @Override
             public void onPositiveButtonClick(Pair<Long, Long> selection) {
+                toolbar.collapseActionView();
                 Long startDate = selection.first;
                 Long endDate = selection.second;
 
@@ -255,6 +256,7 @@ public class Visitas extends AppCompatActivity implements VisitasAdapter.OnVisit
         tipoVisitaS.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                toolbar.collapseActionView();
                 AreaRecinto areaRecinto = (AreaRecinto) areaRecintoS.getSelectedItem();
                 if(!(areaRecinto.getAreaCod().equals("cod")))
                 {
@@ -341,6 +343,7 @@ public class Visitas extends AppCompatActivity implements VisitasAdapter.OnVisit
         areaRecintoS.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                toolbar.collapseActionView();
                 areaRecintoSel = (AreaRecinto) areaRecintoS.getSelectedItem();
                 if(!(areaRecintoSel.getAreaCod().equals("cod")))
                 {
