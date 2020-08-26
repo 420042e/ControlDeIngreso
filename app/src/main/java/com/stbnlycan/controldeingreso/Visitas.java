@@ -1,6 +1,7 @@
 package com.stbnlycan.controldeingreso;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
@@ -17,6 +18,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.MatrixCursor;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Parcel;
@@ -27,6 +29,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -194,7 +197,7 @@ public class Visitas extends AppCompatActivity implements VisitasAdapter.OnVisit
 
         MaterialDatePicker.Builder<Pair<Long, Long>> builder = MaterialDatePicker.Builder.dateRangePicker();
         CalendarConstraints.Builder constraintsBuilder = new CalendarConstraints.Builder();
-        builder.setTitleText("Selecciona un rango de fechas");
+        builder.setTitleText("SELECCIONE UN RANGO DE FECHAS");
         builder.setCalendarConstraints(constraintsBuilder.build());
 
         picker = builder.build();
@@ -247,10 +250,32 @@ public class Visitas extends AppCompatActivity implements VisitasAdapter.OnVisit
         fetchAreaRecintos();
 
         List<String> spinnerArray =  new ArrayList<String>();
-        spinnerArray.add("SELECCIONA TIPO DE VISITA");
+        spinnerArray.add("SELECCIONE TIPO DE VISITA");
         spinnerArray.add("VISITANTES EN RECINTO");
         spinnerArray.add("VISITANTES CON SALIDA");
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.style_spinner, spinnerArray);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.style_spinner, spinnerArray)
+        {
+            @Override
+            public boolean isEnabled(int position) {
+                if (position == 0) {
+                    return false;
+                } else {
+                    return true;
+                }
+            }
+
+            @Override
+            public View getDropDownView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+                View view = super.getDropDownView(position, convertView, parent);
+                TextView textview = (TextView) view;
+                if (position == 0) {
+                    textview.setTextColor(Color.GRAY);
+                } else {
+                    textview.setTextColor(Color.BLACK);
+                }
+                return view;
+            }
+        };
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         tipoVisitaS.setAdapter(adapter);
         tipoVisitaS.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -325,7 +350,7 @@ public class Visitas extends AppCompatActivity implements VisitasAdapter.OnVisit
 
         AreaRecinto area = new AreaRecinto();
         area.setAreaCod("cod");
-        area.setAreaNombre("Selecciona area del recinto");
+        area.setAreaNombre("SELECCIONE ÁREA DEL RECINTO");
         area.setAreaDescripcion("descripcion");
         area.setAreaEstado("estado");
 
@@ -337,7 +362,29 @@ public class Visitas extends AppCompatActivity implements VisitasAdapter.OnVisit
 
         areaRecinto.add(area);
         areaRecinto.add(area2);
-        adapterAreaR = new ArrayAdapter<AreaRecinto>(this, R.layout.style_spinner, areaRecinto);
+        adapterAreaR = new ArrayAdapter<AreaRecinto>(this, R.layout.style_spinner, areaRecinto)
+        {
+            @Override
+            public boolean isEnabled(int position) {
+                if (position == 0) {
+                    return false;
+                } else {
+                    return true;
+                }
+            }
+
+            @Override
+            public View getDropDownView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+                View view = super.getDropDownView(position, convertView, parent);
+                TextView textview = (TextView) view;
+                if (position == 0) {
+                    textview.setTextColor(Color.GRAY);
+                } else {
+                    textview.setTextColor(Color.BLACK);
+                }
+                return view;
+            }
+        };
         adapterAreaR.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         areaRecintoS.setAdapter(adapterAreaR);
         areaRecintoS.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -458,6 +505,11 @@ public class Visitas extends AppCompatActivity implements VisitasAdapter.OnVisit
                 searchView.setQuery(suggestions.get(position).getVteNombre()+" "+suggestions.get(position).getVteApellidos(), true);
                 searchView.clearFocus();
                 ci = suggestions.get(position).getVteCi();
+
+                /*if(!areaRecintoSel.getAreaCod().equals("cod"))
+                {
+                    buscarVisitaXCi();
+                }*/
                 buscarVisitaXCi();
                 return true;
             }

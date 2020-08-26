@@ -12,12 +12,14 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
@@ -248,12 +250,33 @@ public class Horarios extends AppCompatActivity implements HorariosAdapter.OnVis
         tipoVisitantes = new ArrayList<>();
         TipoVisitante tipoVisitante = new TipoVisitante();
         tipoVisitante.setTviCod("cod");
-        tipoVisitante.setTviNombre("Selecciona tipo de visitante");
+        tipoVisitante.setTviNombre("SELECCIONE TIPO DE VISITANTE");
         tipoVisitante.setTviDescripcion("obs");
         tipoVisitante.setHorEstado("estado");
 
         tipoVisitantes.add(tipoVisitante);
-        adapterTipoVisitante = new ArrayAdapter<TipoVisitante>(this, R.layout.style_spinner, tipoVisitantes);
+        adapterTipoVisitante = new ArrayAdapter<TipoVisitante>(this, R.layout.style_spinner, tipoVisitantes){
+            @Override
+            public boolean isEnabled(int position) {
+                if (position == 0) {
+                    return false;
+                } else {
+                    return true;
+                }
+            }
+
+            @Override
+            public View getDropDownView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+                View view = super.getDropDownView(position, convertView, parent);
+                TextView textview = (TextView) view;
+                if (position == 0) {
+                    textview.setTextColor(Color.GRAY);
+                } else {
+                    textview.setTextColor(Color.BLACK);
+                }
+                return view;
+            }
+        };
         adapterTipoVisitante.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         tipoVisitanteS.setAdapter(adapterTipoVisitante);
     }

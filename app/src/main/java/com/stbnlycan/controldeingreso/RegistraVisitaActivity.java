@@ -1,6 +1,7 @@
 package com.stbnlycan.controldeingreso;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -9,6 +10,7 @@ import androidx.fragment.app.FragmentTransaction;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -16,6 +18,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -160,12 +163,34 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
 
         AreaRecinto area = new AreaRecinto();
         area.setAreaCod("cod");
-        area.setAreaNombre("Selecciona area del recinto");
+        area.setAreaNombre("SELECCIONE ÁREA DEL RECINTO");
         area.setAreaDescripcion("descripcion");
         area.setAreaEstado("estado");
 
         areaRecinto.add(area);
-        adapterAreaR = new ArrayAdapter<AreaRecinto>(this, R.layout.style_spinner, areaRecinto);
+        adapterAreaR = new ArrayAdapter<AreaRecinto>(this, R.layout.style_spinner, areaRecinto)
+        {
+            @Override
+            public boolean isEnabled(int position) {
+                if (position == 0) {
+                    return false;
+                } else {
+                    return true;
+                }
+            }
+
+            @Override
+            public View getDropDownView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+                View view = super.getDropDownView(position, convertView, parent);
+                TextView textview = (TextView) view;
+                if (position == 0) {
+                    textview.setTextColor(Color.GRAY);
+                } else {
+                    textview.setTextColor(Color.BLACK);
+                }
+                return view;
+            }
+        };
         adapterAreaR.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         areaRecintoS.setAdapter(adapterAreaR);
         areaRecintoS.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {

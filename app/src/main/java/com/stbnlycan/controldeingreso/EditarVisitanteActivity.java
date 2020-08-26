@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -17,6 +18,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -207,10 +209,31 @@ public class EditarVisitanteActivity extends AppCompatActivity implements Valida
         empresas = new ArrayList<>();
         Empresa empresa = new Empresa();
         empresa.setEmpCod("cod");
-        empresa.setEmpNombre("Selecciona una empresa");
+        empresa.setEmpNombre("SELECCIONE UNA EMPRESA");
         empresa.setEmpObs("obs");
         empresas.add(empresa);
-        adapterEmpresa = new ArrayAdapter<Empresa>(this, R.layout.style_spinner, empresas);
+        adapterEmpresa = new ArrayAdapter<Empresa>(this, R.layout.style_spinner, empresas){
+            @Override
+            public boolean isEnabled(int position) {
+                if (position == 0) {
+                    return false;
+                } else {
+                    return true;
+                }
+            }
+
+            @Override
+            public View getDropDownView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+                View view = super.getDropDownView(position, convertView, parent);
+                TextView textview = (TextView) view;
+                if (position == 0) {
+                    textview.setTextColor(Color.GRAY);
+                } else {
+                    textview.setTextColor(Color.BLACK);
+                }
+                return view;
+            }
+        };
         adapterEmpresa.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         empresaS.setAdapter(adapterEmpresa);
         empresaS.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -229,11 +252,32 @@ public class EditarVisitanteActivity extends AppCompatActivity implements Valida
         tiposVisitante = new ArrayList<>();
         TipoVisitante tipoVisitante = new TipoVisitante();
         tipoVisitante.setTviCod("cod");
-        tipoVisitante.setTviNombre("Selecciona tipo de visitante");
+        tipoVisitante.setTviNombre("SELECCIONE TIPO DE VISITANTE");
         tipoVisitante.setTviDescripcion("obs");
         tipoVisitante.setHorEstado("estado");
         tiposVisitante.add(tipoVisitante);
-        adapterTipoVisitante = new ArrayAdapter<TipoVisitante>(this, R.layout.style_spinner, tiposVisitante);
+        adapterTipoVisitante = new ArrayAdapter<TipoVisitante>(this, R.layout.style_spinner, tiposVisitante){
+            @Override
+            public boolean isEnabled(int position) {
+                if (position == 0) {
+                    return false;
+                } else {
+                    return true;
+                }
+            }
+
+            @Override
+            public View getDropDownView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+                View view = super.getDropDownView(position, convertView, parent);
+                TextView textview = (TextView) view;
+                if (position == 0) {
+                    textview.setTextColor(Color.GRAY);
+                } else {
+                    textview.setTextColor(Color.BLACK);
+                }
+                return view;
+            }
+        };
         adapterTipoVisitante.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         tipoVisitanteS.setAdapter(adapterTipoVisitante);
         tipoVisitanteS.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
