@@ -564,7 +564,7 @@ public class Visitas extends AppCompatActivity implements VisitasAdapter.OnVisit
             @Override
             public void onResponse(Call <ListaVisitas> call, retrofit2.Response<ListaVisitas> response) {
                 bar.setVisibility(View.GONE);
-                recyclerView.setVisibility(View.VISIBLE);
+                //recyclerView.setVisibility(View.VISIBLE);
                 visitas.clear();
                 ListaVisitas listaVisitas = response.body();
 
@@ -576,10 +576,12 @@ public class Visitas extends AppCompatActivity implements VisitasAdapter.OnVisit
                 if(listaVisitas.getlVisita().size() == 0)
                 {
                     tvNoData.setVisibility(View.VISIBLE);
+                    recyclerView.setVisibility(View.GONE);
                     tvTotalVisitantes.setText("Total de visitas: 0");
                 }
                 else {
                     tvNoData.setVisibility(View.GONE);
+                    recyclerView.setVisibility(View.VISIBLE);
                     tvTotalVisitantes.setText("Total de visitas: " + listaVisitas.getTotalElements());
 
                     for(int i = 0 ; i < listaVisitas.getlVisita().size() ; i++)
