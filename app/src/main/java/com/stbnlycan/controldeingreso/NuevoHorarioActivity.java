@@ -150,6 +150,7 @@ public class NuevoHorarioActivity extends AppCompatActivity implements Validator
             public void onResponse(Call <Void> call, retrofit2.Response<Void> response) {
                 editor.putString("access_token", "");
                 editor.putString("token_type", "");
+                editor.putString("rol", "");
                 editor.apply();
                 Toast.makeText(getApplicationContext(), "Sesión finalizada", Toast.LENGTH_LONG).show();
             }

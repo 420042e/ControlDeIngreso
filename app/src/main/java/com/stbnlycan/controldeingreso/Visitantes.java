@@ -201,6 +201,7 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
             public void onResponse(Call <Void> call, retrofit2.Response<Void> response) {
                 editor.putString("access_token", "");
                 editor.putString("token_type", "");
+                editor.putString("rol", "");
                 editor.apply();
                 Toast.makeText(getApplicationContext(), "Sesión finalizada", Toast.LENGTH_LONG).show();
             }
@@ -265,7 +266,7 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
     private void actualizarVisitantes() {
         Retrofit retrofit = NetworkClient.getRetrofitClient(this);
         ListaVisitantesAPIs listaVisitantesAPIs = retrofit.create(ListaVisitantesAPIs.class);
-        Call<ListaVisitantes> call = listaVisitantesAPIs.listaVisitantes("0","5", authorization);
+        Call<ListaVisitantes> call = listaVisitantesAPIs.listaVisitantes("0","10", authorization);
         call.enqueue(new Callback<ListaVisitantes>() {
             @Override
             public void onResponse(Call <ListaVisitantes> call, retrofit2.Response<ListaVisitantes> response) {
@@ -306,7 +307,7 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
     private void buscarVisitanteXNombre() {
         Retrofit retrofit = NetworkClient.getRetrofitClient(this);
         ListaVisitantesXNombreAPIs listaVisitantesXNombreAPIs = retrofit.create(ListaVisitantesXNombreAPIs.class);
-        Call<ListaVisitantes> call = listaVisitantesXNombreAPIs.listaVisitanteXNombre(nombre,"0","5", authorization);
+        Call<ListaVisitantes> call = listaVisitantesXNombreAPIs.listaVisitanteXNombre(nombre,"0","10", authorization);
         call.enqueue(new Callback<ListaVisitantes>() {
             @Override
             public void onResponse(Call <ListaVisitantes> call, retrofit2.Response<ListaVisitantes> response) {
@@ -314,11 +315,11 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
                 ListaVisitantes listaVisitantes = response.body();
                 if(listaVisitantes.getlVisitante().size() == 0)
                 {
-                    tvNoData.setVisibility(View.VISIBLE);
+                    //tvNoData.setVisibility(View.VISIBLE);
                 }
                 else
                 {
-                    tvNoData.setVisibility(View.GONE);
+                    //tvNoData.setVisibility(View.GONE);
                     for(int i = 0 ; i < listaVisitantes.getlVisitante().size() ; i++)
                     {
                         suggestions.add(listaVisitantes.getlVisitante().get(i));
@@ -383,6 +384,10 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
 
                 searchView.setQuery(suggestions.get(position).getVteNombre()+" "+suggestions.get(position).getVteApellidos(), true);
                 searchView.clearFocus();
+
+                bar.setVisibility(View.GONE);
+                recyclerView.setVisibility(View.VISIBLE);
+                tvNoData.setVisibility(View.GONE);
 
                 visitantes.clear();
                 visitantes.add(suggestions.get(position));

@@ -69,6 +69,7 @@ public class Horarios extends AppCompatActivity implements HorariosAdapter.OnVis
     private TextView tvFallo;
     private TextView tvNoData;
 
+    private String rol;
     private String authorization;
     private SharedPreferences pref;
     private SharedPreferences.Editor editor;
@@ -94,6 +95,7 @@ public class Horarios extends AppCompatActivity implements HorariosAdapter.OnVis
         pref = getApplicationContext().getSharedPreferences("MyPref", 0);
         editor = pref.edit();
         authorization = pref.getString("token_type", null) + " " + pref.getString("access_token", null);
+        rol = pref.getString("rol", null);
 
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -169,6 +171,7 @@ public class Horarios extends AppCompatActivity implements HorariosAdapter.OnVis
             public void onResponse(Call <Void> call, retrofit2.Response<Void> response) {
                 editor.putString("access_token", "");
                 editor.putString("token_type", "");
+                editor.putString("rol", "");
                 editor.apply();
                 Toast.makeText(getApplicationContext(), "Sesión finalizada", Toast.LENGTH_LONG).show();
             }
@@ -183,6 +186,11 @@ public class Horarios extends AppCompatActivity implements HorariosAdapter.OnVis
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu3, menu);
+
+        if(rol.equals("ADMIN") || rol.equals("")) {
+            menu.getItem(0).setEnabled(false);
+            menu.getItem(0).setVisible(false);
+        }
         /*MenuItem searchItem = menu.findItem(R.id.action_search);
         SearchView searchView = (SearchView) searchItem.getActionView();
         searchView.setMaxWidth(Integer.MAX_VALUE);

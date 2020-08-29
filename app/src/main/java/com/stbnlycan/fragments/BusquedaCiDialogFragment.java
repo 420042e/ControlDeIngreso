@@ -161,7 +161,9 @@ public class BusquedaCiDialogFragment extends DialogFragment {
             }
         });
 
-        btnNV.setVisibility(View.INVISIBLE);
+        btnNV.setEnabled(false);
+        //btnNV.setVisibility(View.INVISIBLE);
+        btnNV.setAlpha(0.5f);
         btnNV.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -208,13 +210,15 @@ public class BusquedaCiDialogFragment extends DialogFragment {
                 }*/
                 if(visitantesRecibidos.size()==0)
                 {
-                    //btnNV.setEnabled(false);
-                    btnNV.setVisibility(View.VISIBLE);
+                    btnNV.setEnabled(false);
+                    //btnNV.setVisibility(View.VISIBLE);
+                    btnNV.setAlpha(1.0f);
                 }
                 else
                 {
-                    //btnNV.setEnabled(true);
-                    btnNV.setVisibility(View.INVISIBLE);
+                    btnNV.setEnabled(true);
+                    //btnNV.setVisibility(View.INVISIBLE);
+                    btnNV.setAlpha(0.5f);
                     for(int i=0;i<visitantesRecibidos.size();i++)
                     {
                         visitantes.add(visitantesRecibidos.get(i));

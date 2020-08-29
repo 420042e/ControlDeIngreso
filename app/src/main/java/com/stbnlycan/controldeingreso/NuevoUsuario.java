@@ -53,12 +53,15 @@ import com.stbnlycan.interfaces.EmpresaAPIs;
 import com.stbnlycan.interfaces.EnviarCorreoIAPIs;
 import com.stbnlycan.interfaces.ListaEmpresasAPIs;
 import com.stbnlycan.interfaces.LogoutAPIs;
+import com.stbnlycan.interfaces.NuevoUsuarioAPIs;
 import com.stbnlycan.interfaces.TipoVisitanteAPIs;
 import com.stbnlycan.interfaces.UploadAPIs;
 import com.stbnlycan.models.Empresa;
 import com.stbnlycan.models.ListaEmpresas;
 import com.stbnlycan.models.Recinto;
+import com.stbnlycan.models.Rol;
 import com.stbnlycan.models.TipoVisitante;
+import com.stbnlycan.models.Usuario;
 import com.stbnlycan.models.Visitante;
 
 import org.json.JSONArray;
@@ -79,16 +82,15 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 
-public class NuevoVisitanteActivity extends AppCompatActivity implements Validator.ValidationListener{
+public class NuevoUsuario extends AppCompatActivity implements Validator.ValidationListener{
 
     private ImageView visitanteIV;
     private static final int REQUEST_IMAGE_CAPTURE = 101;
     private List<Recinto> areas;
-    private ArrayList<Empresa> empresas;
+    private ArrayList<Rol> empresas;
     private ArrayList<TipoVisitante> tiposVisitante;
 
-    private ArrayAdapter<Empresa> adapterEmpresa;
-    private ArrayAdapter<TipoVisitante> adapterTipoVisitante;
+    private ArrayAdapter<Rol> adapterRol;
     private Visitante visitante;
 
     @NotEmpty
@@ -102,39 +104,39 @@ public class NuevoVisitanteActivity extends AppCompatActivity implements Validat
     @NotEmpty
     private EditText emailET;
     @Select
-    private Spinner empresaS;
-    @Select
-    private Spinner tipoVisitanteS;
+    private Spinner rolS;
 
     private Validator validator;
     private Toolbar toolbar;
     private Button btnNF;
     private String imagenObtenida;
-    private Button btnNE;
     private final static int REQUEST_CODE_NE = 1;
 
     private String authorization;
     private SharedPreferences pref;
     private SharedPreferences.Editor editor;
 
+    private Recinto recintoRecibido;
+    private Usuario usuario;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_nuevo_visitante);
+        setContentView(R.layout.activity_nuevo_usuario);
+
+        recintoRecibido = (Recinto) getIntent().getSerializableExtra("recinto");
 
         validator = new Validator(this);
         validator.setValidationListener(this);
 
-        setTitle("Nuevo visitante");
+        setTitle("Nuevo usuario");
         visitanteIV = findViewById(R.id.visitanteIV);
         ciET = findViewById(R.id.ci);
         nombreET = findViewById(R.id.nombre);
         apellidosET = findViewById(R.id.apellidos);
         telcelET = findViewById(R.id.telcel);
         emailET = findViewById(R.id.email);
-        empresaS = findViewById(R.id.empresa);
-        tipoVisitanteS = findViewById(R.id.tipo_visitante);
-        btnNE = findViewById(R.id.btnNE);
+        rolS = findViewById(R.id.rol);
         btnNF = findViewById(R.id.btnNF);
 
         pref = getApplicationContext().getSharedPreferences("MyPref", 0);
@@ -146,11 +148,12 @@ public class NuevoVisitanteActivity extends AppCompatActivity implements Validat
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-        iniciarSpinnerEmpresa();
-        iniciarSpinnerTipoVisitante();
 
-        fetchDataEmpresa();
-        fetchDataTipoVisitante();
+        iniciarSpinnerEmpresa();
+
+
+
+
         //getDataEmpresa();
         //getDataTipoVisitante();
 
@@ -165,14 +168,6 @@ public class NuevoVisitanteActivity extends AppCompatActivity implements Validat
             }
         });
 
-        btnNE.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(NuevoVisitanteActivity.this, NuevaEmpresa.class);
-                startActivityForResult(intent, REQUEST_CODE_NE);
-            }
-        });
-
         Bundle b=getIntent().getExtras();
         if (b != null)
         {
@@ -183,12 +178,19 @@ public class NuevoVisitanteActivity extends AppCompatActivity implements Validat
 
     public void iniciarSpinnerEmpresa() {
         empresas = new ArrayList<>();
-        Empresa empresa = new Empresa();
-        empresa.setEmpCod("cod");
-        empresa.setEmpNombre("SELECCIONE UNA EMPRESA");
-        empresa.setEmpObs("obs");
-        empresas.add(empresa);
-        adapterEmpresa = new ArrayAdapter<Empresa>(this, R.layout.style_spinner, empresas){
+        Rol rol = new Rol();
+        rol.setNombre("SELECCIONE UN ROL");
+        rol.setDescripcion("SELECCIONE UN ROL");
+        Rol rol1 = new Rol();
+        rol1.setNombre("ADMIN");
+        rol1.setDescripcion("ADMINISTRADOR");
+        Rol rol2 = new Rol();
+        rol2.setNombre("USER");
+        rol2.setDescripcion("USUARIO");
+        empresas.add(rol);
+        empresas.add(rol1);
+        empresas.add(rol2);
+        adapterRol = new ArrayAdapter<Rol>(this, R.layout.style_spinner, empresas){
             @Override
             public boolean isEnabled(int position) {
                 if (position == 0) {
@@ -210,13 +212,13 @@ public class NuevoVisitanteActivity extends AppCompatActivity implements Validat
                 return view;
             }
         };
-        adapterEmpresa.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        empresaS.setAdapter(adapterEmpresa);
-        empresaS.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        adapterRol.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        rolS.setAdapter(adapterRol);
+        rolS.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                Empresa empresa = (Empresa) parent.getSelectedItem();
-                displayEmpresaData(empresa);
+                Rol rol = (Rol) parent.getSelectedItem();
+                displayRolData(rol);
             }
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
@@ -224,64 +226,10 @@ public class NuevoVisitanteActivity extends AppCompatActivity implements Validat
         });
     }
 
-    public void iniciarSpinnerTipoVisitante() {
-        tiposVisitante = new ArrayList<>();
-        TipoVisitante tipoVisitante = new TipoVisitante();
-        tipoVisitante.setTviCod("cod");
-        tipoVisitante.setTviNombre("SELECCIONE TIPO DE VISITANTE");
-        tipoVisitante.setTviDescripcion("obs");
-        tipoVisitante.setHorEstado("estado");
-        tiposVisitante.add(tipoVisitante);
-        adapterTipoVisitante = new ArrayAdapter<TipoVisitante>(this, R.layout.style_spinner, tiposVisitante){
-            @Override
-            public boolean isEnabled(int position) {
-                if (position == 0) {
-                    return false;
-                } else {
-                    return true;
-                }
-            }
-
-            @Override
-            public View getDropDownView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-                View view = super.getDropDownView(position, convertView, parent);
-                TextView textview = (TextView) view;
-                if (position == 0) {
-                    textview.setTextColor(Color.GRAY);
-                } else {
-                    textview.setTextColor(Color.BLACK);
-                }
-                return view;
-            }
-        };
-        adapterTipoVisitante.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        tipoVisitanteS.setAdapter(adapterTipoVisitante);
-        tipoVisitanteS.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                TipoVisitante tipoVisitante = (TipoVisitante) parent.getSelectedItem();
-                displayTipoVisitanteData(tipoVisitante);
-            }
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-            }
-        });
-    }
-
-    private void displayEmpresaData(Empresa empresa) {
-        String cod = empresa.getEmpCod();
-        String nombre = empresa.getEmpNombre();
-        String obs = empresa.getEmpObs();
-        String userData = "Cod: " + cod + "\nNombre: " + nombre + "\nObs: " + obs;
-        //Toast.makeText(this, userData, Toast.LENGTH_LONG).show();
-    }
-
-    private void displayTipoVisitanteData(TipoVisitante tipoVisitante) {
-        String cod = tipoVisitante.getTviCod();
-        String nombre = tipoVisitante.getTviNombre();
-        String descripcion = tipoVisitante.getTviDescripcion();
-        String estado = tipoVisitante.getHorEstado();
-        String userData = "Cod: " + cod + "\nNombre: " + nombre + "\nObs: " + descripcion + "\nEstado: " + estado;
+    private void displayRolData(Rol rol) {
+        String nombre = rol.getNombre();
+        String desc = rol.getDescripcion();
+        String userData = "Nombre: " + nombre + "\nDesc: " + desc;
         //Toast.makeText(this, userData, Toast.LENGTH_LONG).show();
     }
 
@@ -313,9 +261,9 @@ public class NuevoVisitanteActivity extends AppCompatActivity implements Validat
             if (requestCode == REQUEST_CODE_NE) {
                 Bundle b = data.getExtras();
                 if (data != null) {
-                    Empresa empresaResult = (Empresa) b.getSerializable("empresaResult");
-                    empresas.add(1, empresaResult);
-                    empresaS.setSelection(1, true);
+                    Rol rolResult = (Rol) b.getSerializable("rolResult");
+                    empresas.add(1, rolResult);
+                    rolS.setSelection(1, true);
                 }
             }
         }
@@ -353,7 +301,7 @@ public class NuevoVisitanteActivity extends AppCompatActivity implements Validat
                 return false;
             case R.id.action_salir:
                 cerrarSesion();
-                Intent intent = new Intent(NuevoVisitanteActivity.this, LoginActivity.class);
+                Intent intent = new Intent(NuevoUsuario.this, LoginActivity.class);
                 startActivity(intent);
                 finish();
                 return false;
@@ -403,65 +351,31 @@ public class NuevoVisitanteActivity extends AppCompatActivity implements Validat
         });
     }
 
-    private void fetchDataEmpresa() {
-        Retrofit retrofit = NetworkClient.getRetrofitClient(this);
-        ListaEmpresasAPIs listaEmpresasAPIs = retrofit.create(ListaEmpresasAPIs.class);
-        Call<ListaEmpresas> call = listaEmpresasAPIs.listaEmpresas("0","10", authorization);
-        call.enqueue(new Callback<ListaEmpresas>() {
-            @Override
-            public void onResponse(Call <ListaEmpresas> call, retrofit2.Response<ListaEmpresas> response) {
-                //recintos = response.body();
-
-                for(int i = 0 ; i < response.body().getlEmpresa().size() ; i++)
-                {
-                    empresas.add(response.body().getlEmpresa().get(i));
-                }
-                //adapter.notifyDataSetChanged();
-            }
-            @Override
-            public void onFailure(Call <ListaEmpresas> call, Throwable t) {
-
-            }
-        });
-    }
-
-    private void fetchDataTipoVisitante() {
-        Retrofit retrofit = NetworkClient.getRetrofitClient(this);
-        TipoVisitanteAPIs tipoVisitanteAPIs = retrofit.create(TipoVisitanteAPIs.class);
-        Call<List<TipoVisitante>> call = tipoVisitanteAPIs.listaTipoVisitante(authorization);
-        call.enqueue(new Callback<List<TipoVisitante>>() {
-            @Override
-            public void onResponse(Call <List<TipoVisitante>> call, retrofit2.Response<List<TipoVisitante>> response) {
-                for(int i = 0 ; i < response.body().size() ; i++)
-                {
-                    tiposVisitante.add(response.body().get(i));
-                }
-            }
-            @Override
-            public void onFailure(Call <List<TipoVisitante>> call, Throwable t) {
-
-            }
-        });
-    }
-
     private void uploadToServer(String filePath, String descripcion) {
         Retrofit retrofit = NetworkClient.getRetrofitClient(this);
-        UploadAPIs uploadAPIs = retrofit.create(UploadAPIs.class);
+        NuevoUsuarioAPIs nuevoUsuarioAPIs = retrofit.create(NuevoUsuarioAPIs.class);
         File file = new File(filePath);
         RequestBody fileReqBody = RequestBody.create(MediaType.parse("image/*"), file);
         MultipartBody.Part part = MultipartBody.Part.createFormData("file", file.getName(), fileReqBody);
         RequestBody description = RequestBody.create(MediaType.parse("text/plain"), descripcion);
-        Call <Visitante> call = uploadAPIs.uploadImage(part, description, authorization);
-        call.enqueue(new Callback<Visitante>() {
+        Call <Usuario> call = nuevoUsuarioAPIs.nuevoUsuario(part, description, authorization);
+        call.enqueue(new Callback<Usuario>() {
             @Override
-        public void onResponse(Call <Visitante> call, Response<Visitante> response) {
-                visitante.setVteImagen(response.body().getVteImagen());
-                Toast.makeText(getApplicationContext(), "Se guardó el nuevo asistente", Toast.LENGTH_LONG).show();
-                enviarCorreoIngreso();
+            public void onResponse(Call <Usuario> call, Response<Usuario> response) {
+                Gson gson = new Gson();
+                String descripcion = gson.toJson(usuario);
+                Log.d("msg1255",""+response.body());
+
+                usuario.setPic(response.body().getPic());
+                Toast.makeText(getApplicationContext(), "Se guardó el nuevo usuario", Toast.LENGTH_LONG).show();
+                Intent intent = new Intent();
+                intent.putExtra("usuarioResult", usuario);
+                setResult(RESULT_OK, intent);
+                finish();
             }
 
             @Override
-            public void onFailure(Call <Visitante>call, Throwable t) {
+            public void onFailure(Call <Usuario>call, Throwable t) {
                 Log.d("msg2",""+t);
             }
         });
@@ -500,7 +414,7 @@ public class NuevoVisitanteActivity extends AppCompatActivity implements Validat
         }
         else
         {
-            visitante = new Visitante();
+            /*visitante = new Visitante();
             visitante.setVteCi(ciET.getText().toString());
             visitante.setVteCorreo(emailET.getText().toString());
 
@@ -510,23 +424,34 @@ public class NuevoVisitanteActivity extends AppCompatActivity implements Validat
             visitante.setVteApellidos(apellidosET.getText().toString().toUpperCase());
             visitante.setVteTelefono(telcelET.getText().toString());
             visitante.setVteDireccion("");
-            TipoVisitante tipoVisitante = (TipoVisitante) tipoVisitanteS.getSelectedItem();
-            Empresa empresa = (Empresa) empresaS.getSelectedItem();
-            visitante.setTipoVisitante(tipoVisitante);
-            visitante.setEmpresa(empresa);
+            Empresa empresa = (Empresa) rolS.getSelectedItem();
+            visitante.setEmpresa(empresa);*/
+
+            /*showLoadingwDialog();
+            Gson gson = new Gson();
+            String descripcion = gson.toJson(visitante);*/
+
+
+            usuario = new Usuario();
+            usuario.setUsername("esteban");
+            usuario.setPassword("123456");
+            usuario.setEmail("420042E@GMAIL.COM");
+            usuario.setPic("");
+            usuario.setFullname("ESTEBAN CHOQUE VILLALOBOS");
+            usuario.setOccupation("ADMINISTRACION");
+            usuario.setPhone("76248796");
+            usuario.setAddress("15 DE ABRIL");
+            usuario.setState("");
+            usuario.setRecinto(recintoRecibido);
+            usuario.setRol((Rol) rolS.getSelectedItem());
 
             showLoadingwDialog();
             Gson gson = new Gson();
-            String descripcion = gson.toJson(visitante);
+            String descripcion = gson.toJson(usuario);
+            Log.d("msg9128",""+descripcion);
 
 
-            //uploadToServer(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/windows.png", descripcion);
             uploadToServer(imagenObtenida, descripcion);
-            /*visitante.setVteEstado("0");
-            Intent intent = new Intent();
-            intent.putExtra("visitanteResult", visitante);
-            setResult(RESULT_OK, intent);
-            finish();*/
         }
     }
 

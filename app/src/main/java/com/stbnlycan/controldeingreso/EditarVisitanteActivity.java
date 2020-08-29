@@ -107,6 +107,7 @@ public class EditarVisitanteActivity extends AppCompatActivity implements Valida
     private Button btnNE;
     private final static int REQUEST_CODE_NE = 1;
 
+    private String rol;
     private String authorization;
     private SharedPreferences pref;
     private SharedPreferences.Editor editor;
@@ -134,6 +135,7 @@ public class EditarVisitanteActivity extends AppCompatActivity implements Valida
         pref = getApplicationContext().getSharedPreferences("MyPref", 0);
         editor = pref.edit();
         authorization = pref.getString("token_type", null) + " " + pref.getString("access_token", null);
+        rol = pref.getString("rol", null);
 
         /*ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);*/
@@ -182,6 +184,7 @@ public class EditarVisitanteActivity extends AppCompatActivity implements Valida
         apellidosET.setText(visitanteRecibido.getVteApellidos());
         telcelET.setText(visitanteRecibido.getVteTelefono());
         emailET.setText(visitanteRecibido.getVteCorreo());
+
         /*empresaS.setSelection(0);
         tipoVisitanteS.setSelection(0);*/
 
@@ -405,6 +408,26 @@ public class EditarVisitanteActivity extends AppCompatActivity implements Valida
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_ev, menu);
+
+        if(rol.equals("USER") || rol.equals(""))
+        {
+            menu.getItem(0).setEnabled(false);
+            menu.getItem(0).setVisible(false);
+            btnNF.setEnabled(false);
+            ciET.setFocusable(false);
+            ciET.setFocusableInTouchMode(false);
+            nombreET.setFocusable(false);
+            nombreET.setFocusableInTouchMode(false);
+            apellidosET.setFocusable(false);
+            apellidosET.setFocusableInTouchMode(false);
+            telcelET.setFocusable(false);
+            telcelET.setFocusableInTouchMode(false);
+            emailET.setFocusable(false);
+            emailET.setFocusableInTouchMode(false);
+            empresaS.setEnabled(false);
+            btnNE.setEnabled(false);
+            tipoVisitanteS.setEnabled(false);
+        }
         /*MenuItem searchItem = menu.findItem(R.id.action_search);
         SearchView searchView = (SearchView) searchItem.getActionView();
         searchView.setMaxWidth(Integer.MAX_VALUE);
@@ -432,6 +455,7 @@ public class EditarVisitanteActivity extends AppCompatActivity implements Valida
             public void onResponse(Call <Void> call, retrofit2.Response<Void> response) {
                 editor.putString("access_token", "");
                 editor.putString("token_type", "");
+                editor.putString("rol", "");
                 editor.apply();
                 Toast.makeText(getApplicationContext(), "Sesión finalizada", Toast.LENGTH_LONG).show();
             }

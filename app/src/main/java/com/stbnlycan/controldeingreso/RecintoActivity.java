@@ -40,6 +40,7 @@ import com.stbnlycan.models.Accion;
 import com.stbnlycan.models.Empresa;
 import com.stbnlycan.models.Error;
 import com.stbnlycan.models.Recinto;
+import com.stbnlycan.models.Rol;
 import com.stbnlycan.models.Visita;
 import com.stbnlycan.models.Visitante;
 
@@ -88,6 +89,7 @@ public class RecintoActivity extends AppCompatActivity implements RecintoAdapter
         cards.add(new Accion(3, "VISITANTES", R.drawable.icono_visitantes));
         cards.add(new Accion(4, "HORARIOS", R.drawable.icono_horario));
         cards.add(new Accion(5, "EMPRESAS", R.drawable.icono_empresa));
+        cards.add(new Accion(6, "USUARIOS", R.drawable.icono_usuarios));
 
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
         RecintoAdapter adapter = new RecintoAdapter(cards);
@@ -127,6 +129,10 @@ public class RecintoActivity extends AppCompatActivity implements RecintoAdapter
         {
             iniciarAEmpresas();
         }
+        else if(position == 6)
+        {
+            iniciarAUsuarios();
+        }
     }
 
     public void iniciarAVisitas()
@@ -139,6 +145,13 @@ public class RecintoActivity extends AppCompatActivity implements RecintoAdapter
     public void iniciarAEmpresas()
     {
         Intent intent = new Intent(RecintoActivity.this, Empresas.class);
+        startActivity(intent);
+    }
+
+    public void iniciarAUsuarios()
+    {
+        Intent intent = new Intent(RecintoActivity.this, Usuarios.class);
+        intent.putExtra("recinto", recintoRecibido);
         startActivity(intent);
     }
 
@@ -174,6 +187,7 @@ public class RecintoActivity extends AppCompatActivity implements RecintoAdapter
             public void onResponse(Call <Void> call, retrofit2.Response<Void> response) {
                 editor.putString("access_token", "");
                 editor.putString("token_type", "");
+                editor.putString("rol", "");
                 editor.apply();
                 Toast.makeText(getApplicationContext(), "Sesión finalizada", Toast.LENGTH_LONG).show();
             }

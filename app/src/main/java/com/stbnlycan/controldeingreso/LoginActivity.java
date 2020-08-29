@@ -26,6 +26,7 @@ import com.stbnlycan.interfaces.RecintosAPIs;
 import com.stbnlycan.models.Error;
 import com.stbnlycan.models.ErrorToken;
 import com.stbnlycan.models.Recinto;
+import com.stbnlycan.models.Rol;
 import com.stbnlycan.models.Token;
 import com.stbnlycan.models.Usuario;
 import com.stbnlycan.models.Visita;
@@ -106,7 +107,8 @@ public class LoginActivity extends AppCompatActivity {
                         Toast.makeText(getApplicationContext(), "Acceso correcto", Toast.LENGTH_LONG).show();
                         editor.putString("access_token", token.getAccess_token());
                         editor.putString("token_type", token.getToken_type());
-                        editor.commit();
+                        editor.apply();
+                        //editor.commit();
 
                         authorization = token.getToken_type() + " " + token.getAccess_token();
 
@@ -135,6 +137,8 @@ public class LoginActivity extends AppCompatActivity {
         call.enqueue(new Callback<Usuario>() {
             @Override
             public void onResponse(Call <Usuario> call, retrofit2.Response<Usuario> response) {
+                editor.putString("rol", response.body().getRol().getNombre());
+                editor.apply();
                 iniciarRecintoActivity(response.body().getRecinto());
             }
             @Override
