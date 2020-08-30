@@ -25,145 +25,167 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <ProgressBar
-        android:id="@+id/progressBar"
-        style="?android:attr/progressBarStyle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:visibility="gone" />
-
-    <TextView
-        android:id="@+id/tvFallo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:text="Fallo de conexión" />
-
-    <TextView
-        android:id="@+id/tvNoData"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:text="No hay datos" />
-
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
-
-        <androidx.cardview.widget.CardView
-            android:id="@+id/card"
-            android:layout_width="match_parent"
+        android:paddingTop="?actionBarSize">
+        <ProgressBar
+            android:id="@+id/progressBar"
+            style="?android:attr/progressBarStyle"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:cardElevation="6dp"
-            app:cardPreventCornerOverlap="false"
-            app:cardBackgroundColor="@color/cardview_light_background"
-            app:cardCornerRadius="@dimen/cardview_default_radius"
-            app:cardUseCompatPadding="true"
-            app:elevation="0dp">
+            android:layout_gravity="center"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:visibility="gone" />
 
-            <LinearLayout
-                android:id="@+id/filtro"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
+        <TextView
+            android:id="@+id/tvFallo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:text="Fallo de conexión" />
 
-                <TextView
-                    android:id="@+id/textView9"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingLeft="5dp"
-                    android:text="Tipo de visita"
-                    android:textSize="12sp" />
+        <TextView
+            android:id="@+id/tvNoData"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:text="No hay datos" />
 
-                <Spinner
-                    android:id="@+id/tipoVisita"
-                    style="@style/Widget.AppCompat.Spinner.DropDown"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="5dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/style_spinner1" />
-
-                <TextView
-                    android:id="@+id/textView"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingLeft="5dp"
-                    android:text="Area Recinto"
-                    android:textSize="12sp" />
-
-                <Spinner
-                    android:id="@+id/area_recinto"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="5dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/style_spinner1" />
-
-                <TextView
-                    android:id="@+id/textView3"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingLeft="5dp"
-                    android:text="Mostrar resultados desde:"
-                    android:textSize="12sp" />
-
-                <EditText
-                    android:id="@+id/fechaRango"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="5dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/style_rango_fechas"
-                    android:cursorVisible="false"
-                    android:ems="10"
-                    android:focusable="false"
-                    android:focusableInTouchMode="false"
-                    android:hint="Mostrar resultados desde:"
-                    android:inputType="date"
-                    android:paddingLeft="10dp"
-                    android:paddingTop="5dp"
-                    android:paddingBottom="5dp"
-                    tools:text="Fecha" />
-
-            </LinearLayout>
-
-        </androidx.cardview.widget.CardView>
-
-        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-            android:id="@+id/swipeRefreshLayout"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_marginBottom="20sp"
+            android:orientation="vertical"
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-            <LinearLayout
+            <androidx.cardview.widget.CardView
+                android:id="@+id/card"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical">
+                android:layout_height="wrap_content"
+                app:cardBackgroundColor="@color/cardview_light_background"
+                app:cardCornerRadius="@dimen/cardview_default_radius"
+                app:cardElevation="6dp"
+                app:cardPreventCornerOverlap="false"
+                app:cardUseCompatPadding="true"
+                app:elevation="0dp">
 
-                <TextView
-                    android:id="@+id/tvTotalVisitantes"
+                <LinearLayout
+                    android:id="@+id/filtro"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="10dp"
-                    android:paddingLeft="5dp"
-                    android:text="Total de visitantes:" />
+                    android:orientation="vertical">
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/recyclerView"
+                    <TextView
+                        android:id="@+id/textView9"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingLeft="5dp"
+                        android:text="Tipo de visita"
+                        android:textSize="12sp" />
+
+                    <Spinner
+                        android:id="@+id/tipoVisita"
+                        style="@style/Widget.AppCompat.Spinner.DropDown"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="5dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/style_spinner1" />
+
+                    <TextView
+                        android:id="@+id/textView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingLeft="5dp"
+                        android:text="Area Recinto"
+                        android:textSize="12sp" />
+
+                    <Spinner
+                        android:id="@+id/area_recinto"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="5dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/style_spinner1" />
+
+                    <TextView
+                        android:id="@+id/textView3"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingLeft="5dp"
+                        android:text="Mostrar resultados desde:"
+                        android:textSize="12sp" />
+
+                    <EditText
+                        android:id="@+id/fechaRango"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="5dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/style_rango_fechas"
+                        android:cursorVisible="false"
+                        android:ems="10"
+                        android:focusable="false"
+                        android:focusableInTouchMode="false"
+                        android:hint="Mostrar resultados desde:"
+                        android:inputType="date"
+                        android:paddingLeft="10dp"
+                        android:paddingTop="5dp"
+                        android:paddingBottom="5dp"
+                        tools:text="Fecha" />
+
+                </LinearLayout>
+
+            </androidx.cardview.widget.CardView>
+
+            <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+                android:id="@+id/swipeRefreshLayout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:scrollbarSize="5dp"
-                    android:scrollbarThumbVertical="@android:color/darker_gray"
-                    android:scrollbars="vertical"
-                    app:layout_behavior="@string/appbar_scrolling_view_behavior" />
-            </LinearLayout>
+                    android:orientation="vertical">
 
-        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
-    </LinearLayout>
+                    <TextView
+                        android:id="@+id/tvTotalVisitantes"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="10dp"
+                        android:paddingLeft="5dp"
+                        android:text="Total de visitantes:" />
 
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/recyclerView"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scrollbarSize="5dp"
+                        android:scrollbarThumbVertical="@android:color/darker_gray"
+                        android:scrollbars="vertical"
+                        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+                </LinearLayout>
+
+            </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/creditos"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:background="#000000"
+            android:gravity="center"
+            android:text="Elaborado por departamento de sistemas ALBO"
+            android:textColor="@color/zxing_status_text" />
+    </RelativeLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

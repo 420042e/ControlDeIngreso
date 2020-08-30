@@ -23,12 +23,32 @@
             app:popupTheme="@style/Theme.AppCompat.Light"/>
 
     </com.google.android.material.appbar.AppBarLayout>
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerView"
+
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scrollbarSize="5dp"
-        android:scrollbarThumbVertical="@android:color/darker_gray"
-        android:scrollbars="vertical"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+        android:paddingTop="?actionBarSize">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="20sp"
+            android:scrollbarSize="5dp"
+            android:scrollbarThumbVertical="@android:color/darker_gray"
+            android:scrollbars="vertical"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+
+        <TextView
+            android:id="@+id/creditos"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:background="#000000"
+            android:gravity="center"
+            android:text="Elaborado por departamento de sistemas ALBO"
+            android:textColor="@color/zxing_status_text" />
+
+    </RelativeLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

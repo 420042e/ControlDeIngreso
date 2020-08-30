@@ -57,6 +57,7 @@ public class RecintoActivity extends AppCompatActivity implements RecintoAdapter
     private Recinto recintoRecibido;
     private BusquedaCiDialogFragment dialogFragment;
 
+    private String rol;
     private String authorization;
     private SharedPreferences pref;
     private SharedPreferences.Editor editor;
@@ -81,6 +82,7 @@ public class RecintoActivity extends AppCompatActivity implements RecintoAdapter
         pref = getApplicationContext().getSharedPreferences("MyPref", 0);
         editor = pref.edit();
         authorization = pref.getString("token_type", null) + " " + pref.getString("access_token", null);
+        rol = pref.getString("rol", null);
 
         List<Accion> cards = new ArrayList<>();
         cards.add(new Accion(0, "ESCANEAR QR", R.drawable.icono_scan_qr));
@@ -89,7 +91,11 @@ public class RecintoActivity extends AppCompatActivity implements RecintoAdapter
         cards.add(new Accion(3, "VISITANTES", R.drawable.icono_visitantes));
         cards.add(new Accion(4, "HORARIOS", R.drawable.icono_horario));
         cards.add(new Accion(5, "EMPRESAS", R.drawable.icono_empresa));
-        cards.add(new Accion(6, "USUARIOS", R.drawable.icono_usuarios));
+        if(rol.equals("ADMIN"))
+        {
+            cards.add(new Accion(6, "USUARIOS", R.drawable.icono_usuarios));
+        }
+        //cards.add(new Accion(6, "USUARIOS", R.drawable.icono_usuarios));
 
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
         RecintoAdapter adapter = new RecintoAdapter(cards);

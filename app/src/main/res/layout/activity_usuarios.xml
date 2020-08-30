@@ -25,39 +25,65 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <ProgressBar
-        android:id="@+id/progressBar"
-        style="?android:attr/progressBarStyle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center" />
-
-    <TextView
-        android:id="@+id/tvFallo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:text="Fallo de conexión" />
-
-    <TextView
-        android:id="@+id/tvNoData"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:text="No hay datos" />
-
-    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-        android:id="@+id/swipeRefreshLayout"
-        android:layout_height="match_parent"
+    <RelativeLayout
         android:layout_width="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerView"
-            android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingTop="?actionBarSize">
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            style="?android:attr/progressBarStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:layout_gravity="center" />
+
+        <TextView
+            android:id="@+id/tvFallo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:text="Fallo de conexión" />
+
+        <TextView
+            android:id="@+id/tvNoData"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:text="No hay datos" />
+
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/swipeRefreshLayout"
             android:layout_height="match_parent"
-            android:scrollbarSize="5dp"
-            android:scrollbarThumbVertical="@android:color/darker_gray"
-            android:scrollbars="vertical"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior" />
-    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+            android:layout_width="match_parent"
+            android:layout_marginBottom="20sp"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scrollbarSize="5dp"
+                android:scrollbarThumbVertical="@android:color/darker_gray"
+                android:scrollbars="vertical"
+                app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+        <TextView
+            android:id="@+id/creditos"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:background="#000000"
+            android:gravity="center"
+            android:text="Elaborado por departamento de sistemas ALBO"
+            android:textColor="@color/zxing_status_text" />
+
+    </RelativeLayout>
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

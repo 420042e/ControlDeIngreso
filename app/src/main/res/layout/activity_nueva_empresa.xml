@@ -24,46 +24,67 @@
             app:popupTheme="@style/Theme.AppCompat.Light"/>
 
     </com.google.android.material.appbar.AppBarLayout>
-    <ScrollView
+
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        tools:context=".NuevoVisitanteActivity"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+        android:paddingTop="?actionBarSize">
 
-        <LinearLayout
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            tools:context=".NuevoVisitanteActivity"
+            android:layout_marginBottom="20sp"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" >
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <EditText
+                        android:id="@+id/nombre"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:ems="10"
+                        android:hint="Nombre"
+                        android:inputType="textPersonName" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <EditText
+                        android:id="@+id/observacion"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:ems="10"
+                        android:hint="Observación"
+                        android:inputType="textPersonName" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+            </LinearLayout>
+        </ScrollView>
+
+        <TextView
+            android:id="@+id/creditos"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical" >
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:background="#000000"
+            android:gravity="center"
+            android:text="Elaborado por departamento de sistemas ALBO"
+            android:textColor="@color/zxing_status_text" />
 
-            <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+    </RelativeLayout>
 
-                <EditText
-                    android:id="@+id/nombre"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:ems="10"
-                    android:hint="Nombre"
-                    android:inputType="textPersonName" />
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <EditText
-                    android:id="@+id/observacion"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:ems="10"
-                    android:hint="Observación"
-                    android:inputType="textPersonName" />
-
-            </com.google.android.material.textfield.TextInputLayout>
-
-        </LinearLayout>
-    </ScrollView>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

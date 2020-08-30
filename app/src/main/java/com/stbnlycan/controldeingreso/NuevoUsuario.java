@@ -94,15 +94,19 @@ public class NuevoUsuario extends AppCompatActivity implements Validator.Validat
     private Visitante visitante;
 
     @NotEmpty
-    private EditText ciET;
+    private EditText usernameET;
     @NotEmpty
-    private EditText nombreET;
-    @NotEmpty
-    private EditText apellidosET;
-    @NotEmpty
-    private EditText telcelET;
+    private EditText passwordET;
     @NotEmpty
     private EditText emailET;
+    @NotEmpty
+    private EditText fullnameET;
+    @NotEmpty
+    private EditText occupationET;
+    @NotEmpty
+    private EditText phoneET;
+    @NotEmpty
+    private EditText addressET;
     @Select
     private Spinner rolS;
 
@@ -112,6 +116,7 @@ public class NuevoUsuario extends AppCompatActivity implements Validator.Validat
     private String imagenObtenida;
     private final static int REQUEST_CODE_NE = 1;
 
+    private String rol;
     private String authorization;
     private SharedPreferences pref;
     private SharedPreferences.Editor editor;
@@ -131,17 +136,20 @@ public class NuevoUsuario extends AppCompatActivity implements Validator.Validat
 
         setTitle("Nuevo usuario");
         visitanteIV = findViewById(R.id.visitanteIV);
-        ciET = findViewById(R.id.ci);
-        nombreET = findViewById(R.id.nombre);
-        apellidosET = findViewById(R.id.apellidos);
-        telcelET = findViewById(R.id.telcel);
-        emailET = findViewById(R.id.email);
-        rolS = findViewById(R.id.rol);
         btnNF = findViewById(R.id.btnNF);
+        usernameET = findViewById(R.id.username);
+        passwordET = findViewById(R.id.password);
+        emailET = findViewById(R.id.email);
+        fullnameET = findViewById(R.id.fullname);
+        occupationET = findViewById(R.id.occupation);
+        phoneET = findViewById(R.id.phone);
+        addressET = findViewById(R.id.address);
+        rolS = findViewById(R.id.rol);
 
         pref = getApplicationContext().getSharedPreferences("MyPref", 0);
         editor = pref.edit();
         authorization = pref.getString("token_type", null) + " " + pref.getString("access_token", null);
+        rol = pref.getString("rol", null);
 
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -168,12 +176,6 @@ public class NuevoUsuario extends AppCompatActivity implements Validator.Validat
             }
         });
 
-        Bundle b=getIntent().getExtras();
-        if (b != null)
-        {
-            ciET.setText(getIntent().getStringExtra("ci"));
-
-        }
     }
 
     public void iniciarSpinnerEmpresa() {
@@ -313,6 +315,27 @@ public class NuevoUsuario extends AppCompatActivity implements Validator.Validat
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_nv, menu);
+
+        if(rol.equals("USER") || rol.equals(""))
+        {
+            btnNF.setEnabled(false);
+            usernameET.setFocusable(false);
+            usernameET.setFocusableInTouchMode(false);
+            passwordET.setFocusable(false);
+            passwordET.setFocusableInTouchMode(false);
+            emailET.setFocusable(false);
+            emailET.setFocusableInTouchMode(false);
+            fullnameET.setFocusable(false);
+            fullnameET.setFocusableInTouchMode(false);
+            occupationET.setFocusable(false);
+            occupationET.setFocusableInTouchMode(false);
+            phoneET.setFocusable(false);
+            phoneET.setFocusableInTouchMode(false);
+            addressET.setFocusable(false);
+            addressET.setFocusableInTouchMode(false);
+            rolS.setFocusable(false);
+            rolS.setFocusableInTouchMode(false);
+        }
         /*MenuItem searchItem = menu.findItem(R.id.action_search);
         SearchView searchView = (SearchView) searchItem.getActionView();
         searchView.setMaxWidth(Integer.MAX_VALUE);
