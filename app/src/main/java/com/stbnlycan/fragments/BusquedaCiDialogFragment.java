@@ -53,57 +53,6 @@ public class BusquedaCiDialogFragment extends DialogFragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_dialog_busqueda_ci, container, false);
-        /*getDialog().setTitle("Búsqueda de CI");
-        getDialog().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
-
-        actv =  (AutoCompleteTextView) rootView.findViewById(R.id.ci2);
-        btnNV =  (Button) rootView.findViewById(R.id.btnNV);
-
-        visitantes = new ArrayList<>();
-
-        pref = getActivity().getSharedPreferences("MyPref", 0);
-        editor = pref.edit();
-        authorization = pref.getString("token_type", null) + " " + pref.getString("access_token", null);
-
-        actv.setThreshold(1);
-
-        actv.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                buscarXCI(s.toString());
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-
-            }
-        });
-
-        actv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick (AdapterView<?> parent, View view, int position, long id) {
-                onBusquedaCiListener.onBusquedaCiListener(visitantes.get(position));
-                //dismiss();
-            }
-        });
-
-        btnNV.setVisibility(View.INVISIBLE);
-        btnNV.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getActivity(), NuevoVisitanteActivity.class);
-                intent.putExtra("ci", actv.getText().toString());
-                //startActivityForResult(intent, REQUEST_CODE_NV);
-                startActivity(intent);
-                dismiss();
-            }
-        });*/
-
         return rootView;
     }
 
@@ -121,9 +70,6 @@ public class BusquedaCiDialogFragment extends DialogFragment {
         LayoutInflater inflater = getActivity().getLayoutInflater();
         View view = inflater.inflate(R.layout.fragment_dialog_busqueda_ci, null);
         builder.setView(view);
-
-        /*getDialog().setTitle("Búsqueda de CI");
-        getDialog().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);*/
 
         actv =  (AutoCompleteTextView) view.findViewById(R.id.ci2);
         btnNV =  (Button) view.findViewById(R.id.btnNV);

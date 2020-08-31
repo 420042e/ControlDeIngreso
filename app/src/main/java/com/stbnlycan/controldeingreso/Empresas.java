@@ -61,7 +61,6 @@ public class Empresas extends AppCompatActivity implements EmpresasAdapter.OnVis
     private ProgressBar bar;
     private TextView tvFallo;
     private String nombre;
-    private final static int REQUEST_CODE_NE = 1;
 
     private SearchView searchView;
     private List<Empresa> suggestions;
@@ -70,6 +69,9 @@ public class Empresas extends AppCompatActivity implements EmpresasAdapter.OnVis
     private String authorization;
     private SharedPreferences pref;
     private SharedPreferences.Editor editor;
+
+    private final static int REQUEST_CODE_NE = 1;
+    private final static int REQUEST_CODE_EE = 2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -148,6 +150,16 @@ public class Empresas extends AppCompatActivity implements EmpresasAdapter.OnVis
                     empresas.add(0, empresaResult);
                     empresasAdapter.notifyItemInserted(0);
                     recyclerView.scrollToPosition(0);
+                }
+            }
+            else if (requestCode == REQUEST_CODE_EE) {
+                Bundle b = data.getExtras();
+                if (data != null) {
+                    Empresa empresaResult = (Empresa) b.getSerializable("empresaResult");
+                    int position = b.getInt("position", -1);
+                    empresas.set(position, empresaResult);
+                    empresasAdapter.notifyItemChanged(position);
+                    recyclerView.scrollToPosition(position);
                 }
             }
         }
@@ -422,6 +434,10 @@ public class Empresas extends AppCompatActivity implements EmpresasAdapter.OnVis
 
     @Override
     public void onEventoClick(Empresa empresa, int position) {
-
+        Intent intent = new Intent(Empresas.this, EditarEmpresa.class);
+        intent.putExtra("empresa", empresa);
+        intent.putExtra("position", position);
+        //startActivity(intent);
+        startActivityForResult(intent, REQUEST_CODE_EE);
     }
 }

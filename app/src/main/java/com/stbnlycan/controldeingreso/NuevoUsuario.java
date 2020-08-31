@@ -387,7 +387,7 @@ public class NuevoUsuario extends AppCompatActivity implements Validator.Validat
             public void onResponse(Call <Usuario> call, Response<Usuario> response) {
                 Gson gson = new Gson();
                 String descripcion = gson.toJson(usuario);
-                Log.d("msg1255",""+response.body());
+                //Log.d("msg1255",""+response.body());
 
                 usuario.setPic(response.body().getPic());
                 Toast.makeText(getApplicationContext(), "Se guardó el nuevo usuario", Toast.LENGTH_LONG).show();
@@ -437,33 +437,15 @@ public class NuevoUsuario extends AppCompatActivity implements Validator.Validat
         }
         else
         {
-            /*visitante = new Visitante();
-            visitante.setVteCi(ciET.getText().toString());
-            visitante.setVteCorreo(emailET.getText().toString());
-
-            visitante.setVteImagen("");
-
-            visitante.setVteNombre(nombreET.getText().toString().toUpperCase());
-            visitante.setVteApellidos(apellidosET.getText().toString().toUpperCase());
-            visitante.setVteTelefono(telcelET.getText().toString());
-            visitante.setVteDireccion("");
-            Empresa empresa = (Empresa) rolS.getSelectedItem();
-            visitante.setEmpresa(empresa);*/
-
-            /*showLoadingwDialog();
-            Gson gson = new Gson();
-            String descripcion = gson.toJson(visitante);*/
-
-
             usuario = new Usuario();
-            usuario.setUsername("esteban");
-            usuario.setPassword("123456");
-            usuario.setEmail("420042E@GMAIL.COM");
+            usuario.setUsername(usernameET.getText().toString());
+            usuario.setPassword(passwordET.getText().toString());
+            usuario.setEmail(emailET.getText().toString().toUpperCase());
             usuario.setPic("");
-            usuario.setFullname("ESTEBAN CHOQUE VILLALOBOS");
-            usuario.setOccupation("ADMINISTRACION");
-            usuario.setPhone("76248796");
-            usuario.setAddress("15 DE ABRIL");
+            usuario.setFullname(fullnameET.getText().toString().toUpperCase());
+            usuario.setOccupation(occupationET.getText().toString().toUpperCase());
+            usuario.setPhone(phoneET.getText().toString());
+            usuario.setAddress(addressET.getText().toString().toUpperCase());
             usuario.setState("");
             usuario.setRecinto(recintoRecibido);
             usuario.setRol((Rol) rolS.getSelectedItem());
@@ -471,8 +453,7 @@ public class NuevoUsuario extends AppCompatActivity implements Validator.Validat
             showLoadingwDialog();
             Gson gson = new Gson();
             String descripcion = gson.toJson(usuario);
-            Log.d("msg9128",""+descripcion);
-
+            //Log.d("msg9128",""+descripcion);
 
             uploadToServer(imagenObtenida, descripcion);
         }

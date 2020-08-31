@@ -47,8 +47,9 @@
             android:layout_centerHorizontal="true"
             android:background="#000000"
             android:gravity="center"
-            android:text="Elaborado por departamento de sistemas ALBO"
-            android:textColor="@color/zxing_status_text" />
+            android:text="@string/creditos"
+            android:textColor="@color/zxing_status_text"
+            android:textSize="12sp" />
 
     </RelativeLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

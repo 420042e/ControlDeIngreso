@@ -14,11 +14,18 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
+        android:usesCleartextTraffic="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".NuevoUsuario"></activity>
-        <activity android:name=".Usuarios" />
-        <activity android:name=".DetallesHorario" />
-        <activity android:name=".DetallesVisita" />
+        <activity android:name=".EditarEmpresa"
+            android:screenOrientation="portrait" ></activity>
+        <activity android:name=".NuevoUsuario"
+            android:screenOrientation="portrait" />
+        <activity android:name=".Usuarios"
+            android:screenOrientation="portrait" />
+        <activity android:name=".DetallesHorario"
+            android:screenOrientation="portrait" />
+        <activity android:name=".DetallesVisita"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".Visitas"
             android:screenOrientation="portrait" />

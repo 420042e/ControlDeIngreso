@@ -29,33 +29,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:paddingTop="?actionBarSize">
-        <ProgressBar
-            android:id="@+id/progressBar"
-            style="?android:attr/progressBarStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_centerHorizontal="true"
-            android:layout_centerVertical="true"
-            android:visibility="gone" />
-
-        <TextView
-            android:id="@+id/tvFallo"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_centerHorizontal="true"
-            android:layout_centerVertical="true"
-            android:text="Fallo de conexión" />
-
-        <TextView
-            android:id="@+id/tvNoData"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_centerHorizontal="true"
-            android:layout_centerVertical="true"
-            android:text="No hay datos" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -68,6 +41,7 @@
                 android:id="@+id/card"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_weight="0"
                 app:cardBackgroundColor="@color/cardview_light_background"
                 app:cardCornerRadius="@dimen/cardview_default_radius"
                 app:cardElevation="6dp"
@@ -95,7 +69,6 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_margin="5dp"
-                        android:layout_weight="1"
                         android:background="@drawable/style_spinner1" />
 
                     <TextView
@@ -111,7 +84,6 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_margin="5dp"
-                        android:layout_weight="1"
                         android:background="@drawable/style_spinner1" />
 
                     <TextView
@@ -127,7 +99,6 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_margin="5dp"
-                        android:layout_weight="1"
                         android:background="@drawable/style_rango_fechas"
                         android:cursorVisible="false"
                         android:ems="10"
@@ -148,6 +119,7 @@
                 android:id="@+id/swipeRefreshLayout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:layout_weight="0"
                 app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
                 <LinearLayout
@@ -162,6 +134,32 @@
                         android:layout_marginBottom="10dp"
                         android:paddingLeft="5dp"
                         android:text="Total de visitantes:" />
+
+                    <ProgressBar
+                        android:id="@+id/progressBar"
+                        style="?android:attr/progressBarStyle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true"
+                        android:layout_centerVertical="true"
+                        android:layout_gravity="center"
+                        tools:visibility="gone" />
+
+                    <TextView
+                        android:id="@+id/tvFallo"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:text="Fallo de conexión"
+                        tools:visibility="gone" />
+
+                    <TextView
+                        android:id="@+id/tvNoData"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:text="No hay datos"
+                        tools:visibility="gone" />
 
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/recyclerView"
@@ -184,8 +182,9 @@
             android:layout_centerHorizontal="true"
             android:background="#000000"
             android:gravity="center"
-            android:text="Elaborado por departamento de sistemas ALBO"
-            android:textColor="@color/zxing_status_text" />
+            android:text="@string/creditos"
+            android:textColor="@color/zxing_status_text"
+            android:textSize="12sp" />
     </RelativeLayout>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

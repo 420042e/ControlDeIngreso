@@ -113,10 +113,10 @@ public class LoginActivity extends AppCompatActivity {
                         authorization = token.getToken_type() + " " + token.getAccess_token();
 
                         JWT jwt = new JWT(token.getAccess_token());
-                        Map<String, Claim> allClaims = jwt.getClaims();
+                        /*Map<String, Claim> allClaims = jwt.getClaims();
                         for (Map.Entry<String, Claim> entry : allClaims.entrySet()) {
                             Log.d("msg8645",""+entry.getKey() + "/" + entry.getValue().asString());
-                        }
+                        }*/
 
                         //iniciarMainActivity(jwt.getClaim("user_name").asString());
                         buscaRecintosXUsuario(jwt.getClaim("user_name").asString());
@@ -125,7 +125,7 @@ public class LoginActivity extends AppCompatActivity {
             }
             @Override
             public void onFailure(Call <JsonObject> call, Throwable t) {
-                Log.d("msg4125","hola "+t.toString());
+                Log.d("msg435","hola "+t.toString());
             }
         });
     }
@@ -143,7 +143,7 @@ public class LoginActivity extends AppCompatActivity {
             }
             @Override
             public void onFailure(Call <Usuario> call, Throwable t) {
-
+                Log.d("msg4335","hola "+t.toString());
             }
         });
     }

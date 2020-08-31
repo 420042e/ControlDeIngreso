@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Filter;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -41,7 +42,13 @@ public class ACAdapter extends ArrayAdapter<Visitante> {
             }
             Visitante visitante = getItem(position);
             TextView name = (TextView) view.findViewById(R.id.textView);
+            LinearLayout fila = (LinearLayout) view.findViewById(R.id.fila);
             name.setText(visitante.getVteNombre()+" "+visitante.getVteApellidos());
+
+            /*if(position % 2 == 0)
+                fila.setBackgroundColor(0xFFF0F0F0);
+            else
+                fila.setBackgroundColor(0xFFE8E8E8);*/
         } catch (Exception e) {
             e.printStackTrace();
         }
