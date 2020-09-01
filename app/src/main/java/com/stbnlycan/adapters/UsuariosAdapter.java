@@ -44,7 +44,7 @@ public class UsuariosAdapter extends RecyclerView.Adapter<UsuariosAdapter.ARV> i
     @NonNull
     @Override
     public ARV onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return new ARV(LayoutInflater.from(parent.getContext()).inflate(R.layout.visitantes_list, parent, false));
+        return new ARV(LayoutInflater.from(parent.getContext()).inflate(R.layout.usuarios_list, parent, false));
     }
 
     @Override
@@ -115,8 +115,6 @@ public class UsuariosAdapter extends RecyclerView.Adapter<UsuariosAdapter.ARV> i
         private TextView lugar;
         private TextView tipoVisitante;
         private TextView empresaNombre;
-        private Button btnVQR;
-        private Button btnEE;
         Usuario visitante;
 
         public ARV(@NonNull View itemView) {
@@ -127,23 +125,7 @@ public class UsuariosAdapter extends RecyclerView.Adapter<UsuariosAdapter.ARV> i
             lugar = itemView.findViewById(R.id.nroCi);
             tipoVisitante = itemView.findViewById(R.id.tipoVisitante);
             empresaNombre = itemView.findViewById(R.id.empresaNombre);
-            btnVQR = itemView.findViewById(R.id.btnVQR);
-            btnEE = itemView.findViewById(R.id.btnEE);
             itemView.setOnClickListener(this);
-
-            btnVQR.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    vqrListener.OnVQRClick(visitante);
-                }
-            });
-
-            btnEE.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    eeListener.OnEEClick(visitante);
-                }
-            });
         }
 
         @Override

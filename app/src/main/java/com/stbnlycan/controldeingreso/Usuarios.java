@@ -5,26 +5,39 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.cursoradapter.widget.CursorAdapter;
+import androidx.cursoradapter.widget.SimpleCursorAdapter;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import android.app.SearchManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.MatrixCursor;
 import android.os.Bundle;
+import android.os.Handler;
+import android.provider.BaseColumns;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AbsListView;
+import android.widget.AutoCompleteTextView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.stbnlycan.adapters.UsuariosAdapter;
 import com.stbnlycan.adapters.VisitantesAdapter;
+import com.stbnlycan.interfaces.ListaUsuariosAPIs;
+import com.stbnlycan.interfaces.ListaUsuariosXUsrNameAPIs;
+import com.stbnlycan.interfaces.ListaVisitantesAPIs;
+import com.stbnlycan.interfaces.ListaVisitantesXNombreAPIs;
 import com.stbnlycan.interfaces.LogoutAPIs;
+import com.stbnlycan.models.ListaUsuarios;
+import com.stbnlycan.models.ListaVisitantes;
 import com.stbnlycan.models.Recinto;
 import com.stbnlycan.models.Usuario;
 import com.stbnlycan.models.Visitante;
@@ -58,8 +71,10 @@ public class Usuarios extends AppCompatActivity implements UsuariosAdapter.OnUsu
     private TextView tvNoData;
 
     private SearchView searchView;
-    private List<Visitante> suggestions;
+    private List<Usuario> suggestions;
     private CursorAdapter suggestionAdapter;
+
+    private String nombre;
 
     private String authorization;
     private SharedPreferences pref;
@@ -135,7 +150,7 @@ public class Usuarios extends AppCompatActivity implements UsuariosAdapter.OnUsu
                 {
                     isScrolling = false;
                     nPag++;
-                    //mostrarMasUsuarios();
+                    mostrarMasUsuarios();
                 }
             }
         });
@@ -145,7 +160,7 @@ public class Usuarios extends AppCompatActivity implements UsuariosAdapter.OnUsu
         tvFallo.setVisibility(View.GONE);
         tvNoData.setVisibility(View.GONE);
 
-        //actualizarUsuarios();
+        actualizarUsuarios();
 
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -153,20 +168,102 @@ public class Usuarios extends AppCompatActivity implements UsuariosAdapter.OnUsu
                 bar.setVisibility(View.VISIBLE);
                 recyclerView.setVisibility(View.GONE);
                 //tvNoData.setVisibility(View.GONE);
-                //actualizarUsuarios();
+                actualizarUsuarios();
             }
         });
     }
 
     @Override
-    public void onEventoClick(Usuario visitante, int position) {
-
+    public void onEventoClick(Usuario usuario, int position) {
+        Intent intent = new Intent(Usuarios.this, DetallesUsuario.class);
+        intent.putExtra("usuario", usuario);
+        intent.putExtra("position", position);
+        startActivity(intent);
+        //startActivityForResult(intent, REQUEST_CODE_EV);
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_usuarios, menu);
+        MenuItem searchItem = menu.findItem(R.id.action_search);
+        searchView = (SearchView) searchItem.getActionView();
+
+        // Solution
+        int autoCompleteTextViewID = getResources().getIdentifier("search_src_text", "id", getPackageName());
+        AutoCompleteTextView searchAutoCompleteTextView = (AutoCompleteTextView) searchView.findViewById(autoCompleteTextViewID);
+        searchAutoCompleteTextView.setThreshold(0);
+
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+
+        suggestions = new ArrayList<>();
+
+        suggestionAdapter = new SimpleCursorAdapter(this,
+                android.R.layout.simple_list_item_1,
+                null,
+                new String[]{SearchManager.SUGGEST_COLUMN_TEXT_1},
+                new int[]{android.R.id.text1},
+                0);
+
+        searchView.setSuggestionsAdapter(suggestionAdapter);
+
+        searchView.setOnSuggestionListener(new SearchView.OnSuggestionListener() {
+            @Override
+            public boolean onSuggestionSelect(int position) {
+                return false;
+            }
+
+            @Override
+            public boolean onSuggestionClick(int position) {
+                String[] columns = { BaseColumns._ID, SearchManager.SUGGEST_COLUMN_TEXT_1, SearchManager.SUGGEST_COLUMN_INTENT_DATA};
+                MatrixCursor cursor = new MatrixCursor(columns);
+                suggestionAdapter.swapCursor(cursor);
+
+                searchView.setQuery(suggestions.get(position).getUsername(), true);
+                searchView.clearFocus();
+
+                bar.setVisibility(View.GONE);
+                recyclerView.setVisibility(View.VISIBLE);
+                tvNoData.setVisibility(View.GONE);
+
+                usuarios.clear();
+                usuarios.add(suggestions.get(position));
+                usuariosAdapter.notifyDataSetChanged();
+                return true;
+            }
+        });
+
+        searchView.setMaxWidth(Integer.MAX_VALUE);
+        searchView.setQueryHint("Ingresa nombre del visitante");
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                nombre = query;
+                //buscarUsuarioXUsrName();
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                nombre = newText;
+                if(newText.equals("")){
+                    nPag = 0;
+                    actualizarUsuarios();
+                }
+                else
+                {
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            buscarUsuarioXUsrName();
+                        }
+                    }, 300);
+                    return false;
+                }
+                return false;
+            }
+        });
         return true;
     }
 
@@ -208,6 +305,106 @@ public class Usuarios extends AppCompatActivity implements UsuariosAdapter.OnUsu
             @Override
             public void onFailure(Call <Void> call, Throwable t) {
                 Log.d("msg4125","hola "+t.toString());
+            }
+        });
+    }
+
+    private void actualizarUsuarios() {
+        Retrofit retrofit = NetworkClient.getRetrofitClient(this);
+        ListaUsuariosAPIs listaUsuariosAPIs = retrofit.create(ListaUsuariosAPIs.class);
+        Call<ListaUsuarios> call = listaUsuariosAPIs.listaUsuarios("0","10", authorization);
+        call.enqueue(new Callback<ListaUsuarios>() {
+            @Override
+            public void onResponse(Call <ListaUsuarios> call, retrofit2.Response<ListaUsuarios> response) {
+                usuarios.clear();
+                ListaUsuarios listaUsuarios = response.body();
+                if(listaUsuarios.getlUsuario().size() == 0)
+                {
+                    tvNoData.setVisibility(View.VISIBLE);
+                }
+                else
+                {
+                    bar.setVisibility(View.GONE);
+                    recyclerView.setVisibility(View.VISIBLE);
+                    tvNoData.setVisibility(View.GONE);
+                    for(int i = 0 ; i < listaUsuarios.getlUsuario().size() ; i++)
+                    {
+                        usuarios.add(listaUsuarios.getlUsuario().get(i));
+                    }
+                    usuariosAdapter.notifyDataSetChanged();
+                    swipeRefreshLayout.setRefreshing(false);
+                }
+                nPag = 0;
+            }
+            @Override
+            public void onFailure(Call <ListaUsuarios> call, Throwable t) {
+                tvFallo.setVisibility(View.VISIBLE);
+                swipeRefreshLayout.setRefreshing(false);
+            }
+        });
+    }
+
+    private void mostrarMasUsuarios() {
+        Retrofit retrofit = NetworkClient.getRetrofitClient(this);
+        ListaUsuariosAPIs listaUsuariosAPIs = retrofit.create(ListaUsuariosAPIs.class);
+        Call<ListaUsuarios> call = listaUsuariosAPIs.listaUsuarios("0","10", authorization);
+        call.enqueue(new Callback<ListaUsuarios>() {
+            @Override
+            public void onResponse(Call <ListaUsuarios> call, retrofit2.Response<ListaUsuarios> response) {
+                bar.setVisibility(View.GONE);
+                recyclerView.setVisibility(View.VISIBLE);
+                ListaUsuarios listaUsuarios = response.body();
+                for(int i = 0 ; i < listaUsuarios.getlUsuario().size() ; i++)
+                {
+                    usuarios.add(listaUsuarios.getlUsuario().get(i));
+                }
+                usuariosAdapter.notifyDataSetChanged();
+            }
+            @Override
+            public void onFailure(Call <ListaUsuarios> call, Throwable t) {
+                bar.setVisibility(View.GONE);
+                tvFallo.setVisibility(View.VISIBLE);
+            }
+        });
+
+    }
+
+    private void buscarUsuarioXUsrName() {
+        Retrofit retrofit = NetworkClient.getRetrofitClient(this);
+        ListaUsuariosXUsrNameAPIs listaUsuariosXUsrNameAPIs = retrofit.create(ListaUsuariosXUsrNameAPIs.class);
+        Call<ListaUsuarios> call = listaUsuariosXUsrNameAPIs.listaVisitantesXUsrName(nombre,"0","10", authorization);
+        call.enqueue(new Callback<ListaUsuarios>() {
+            @Override
+            public void onResponse(Call <ListaUsuarios> call, retrofit2.Response<ListaUsuarios> response) {
+                suggestions.clear();
+                ListaUsuarios listaUsuarios = response.body();
+                if(listaUsuarios.getlUsuario().size() == 0)
+                {
+                    //tvNoData.setVisibility(View.VISIBLE);
+                }
+                else
+                {
+                    //tvNoData.setVisibility(View.GONE);
+                    for(int i = 0 ; i < listaUsuarios.getlUsuario().size() ; i++)
+                    {
+                        suggestions.add(listaUsuarios.getlUsuario().get(i));
+                        String[] columns = { BaseColumns._ID,
+                                SearchManager.SUGGEST_COLUMN_TEXT_1,
+                                SearchManager.SUGGEST_COLUMN_INTENT_DATA,
+                        };
+                        MatrixCursor cursor = new MatrixCursor(columns);
+                        for (int j = 0; j < suggestions.size(); j++) {
+                            String[] tmp = {Integer.toString(j), suggestions.get(j).getUsername(), suggestions.get(j).getUsername()};
+                            cursor.addRow(tmp);
+                        }
+                        suggestionAdapter.swapCursor(cursor);
+                    }
+                }
+            }
+            @Override
+            public void onFailure(Call <ListaUsuarios> call, Throwable t) {
+                tvFallo.setVisibility(View.VISIBLE);
+                swipeRefreshLayout.setRefreshing(false);
             }
         });
     }
