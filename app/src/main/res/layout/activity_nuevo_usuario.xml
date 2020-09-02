@@ -52,7 +52,8 @@
                         android:id="@+id/visitanteIV"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:layout_gravity="center_horizontal" />
+                        android:layout_gravity="center_horizontal"
+                        android:background="#9E9E9E" />
 
                 </LinearLayout>
 
@@ -155,7 +156,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:ems="10"
-                        android:hint="Teléfono *"
+                        android:hint="Teléfono/Celular *"
                         android:inputType="numberDecimal" />
                 </com.google.android.material.textfield.TextInputLayout>
 

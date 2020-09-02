@@ -45,6 +45,7 @@ import androidx.fragment.app.FragmentTransaction;
 import com.google.gson.Gson;
 import com.mobsandgeeks.saripaar.ValidationError;
 import com.mobsandgeeks.saripaar.Validator;
+import com.mobsandgeeks.saripaar.annotation.Email;
 import com.mobsandgeeks.saripaar.annotation.NotEmpty;
 import com.mobsandgeeks.saripaar.annotation.Select;
 import com.squareup.picasso.Picasso;
@@ -98,6 +99,7 @@ public class NuevoUsuario extends AppCompatActivity implements Validator.Validat
     @NotEmpty
     private EditText passwordET;
     @NotEmpty
+    @Email
     private EditText emailET;
     @NotEmpty
     private EditText fullnameET;
@@ -256,7 +258,14 @@ public class NuevoUsuario extends AppCompatActivity implements Validator.Validat
             int height = displayMetrics.heightPixels;
             int width = displayMetrics.widthPixels;
 
-            Picasso.get().load(finalFile).resize(width, width).into(visitanteIV);
+            Log.d("msg2134",""+finalFile);
+
+            //Picasso.get().load(finalFile).resize(width, width).into(visitanteIV);
+
+            visitanteIV.setImageBitmap(imageBitmap);
+            visitanteIV.getLayoutParams().width = width;
+            visitanteIV.getLayoutParams().height = width;
+            visitanteIV.setScaleType(ImageView.ScaleType.CENTER_CROP);
 
         }
         if (resultCode == Activity.RESULT_OK) {

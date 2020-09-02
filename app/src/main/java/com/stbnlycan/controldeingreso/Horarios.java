@@ -187,7 +187,7 @@ public class Horarios extends AppCompatActivity implements HorariosAdapter.OnVis
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu3, menu);
 
-        if(rol.equals("ADMIN") || rol.equals("")) {
+        if(rol.equals("USER") || rol.equals("")) {
             menu.getItem(0).setEnabled(false);
             menu.getItem(0).setVisible(false);
         }

@@ -45,6 +45,7 @@ import androidx.fragment.app.FragmentTransaction;
 import com.google.gson.Gson;
 import com.mobsandgeeks.saripaar.ValidationError;
 import com.mobsandgeeks.saripaar.Validator;
+import com.mobsandgeeks.saripaar.annotation.Email;
 import com.mobsandgeeks.saripaar.annotation.NotEmpty;
 import com.mobsandgeeks.saripaar.annotation.Select;
 import com.squareup.picasso.Picasso;
@@ -100,6 +101,7 @@ public class NuevoVisitanteActivity extends AppCompatActivity implements Validat
     @NotEmpty
     private EditText telcelET;
     @NotEmpty
+    @Email
     private EditText emailET;
     @Select
     private Spinner empresaS;
@@ -179,6 +181,8 @@ public class NuevoVisitanteActivity extends AppCompatActivity implements Validat
             ciET.setText(getIntent().getStringExtra("ci"));
 
         }
+
+        ciET.setHintTextColor(Color.BLUE);
     }
 
     public void iniciarSpinnerEmpresa() {

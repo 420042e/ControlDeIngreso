@@ -80,6 +80,8 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
     private SharedPreferences pref;
     private SharedPreferences.Editor editor;
 
+    private String totalElements;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -144,7 +146,7 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
                 currentItems = manager.getChildCount();
                 totalItems = manager.getItemCount();
                 scrollOutItems = manager.findFirstVisibleItemPosition();
-                if(isScrolling && (currentItems + scrollOutItems == totalItems))
+                if(isScrolling && (currentItems + scrollOutItems == totalItems)  && totalItems != Integer.parseInt(totalElements))
                 {
                     isScrolling = false;
                     nPag++;
@@ -285,6 +287,7 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
                     {
                         visitantes.add(listaVisitantes.getlVisitante().get(i));
                     }
+                    totalElements = listaVisitantes.getTotalElements();
                     visitantesAdapter.notifyDataSetChanged();
                     swipeRefreshLayout.setRefreshing(false);
                 }

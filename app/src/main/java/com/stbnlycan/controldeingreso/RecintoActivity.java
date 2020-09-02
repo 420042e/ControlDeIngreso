@@ -91,7 +91,7 @@ public class RecintoActivity extends AppCompatActivity implements RecintoAdapter
         cards.add(new Accion(3, "VISITANTES", R.drawable.icono_visitantes));
         cards.add(new Accion(4, "HORARIOS", R.drawable.icono_horario));
         cards.add(new Accion(5, "EMPRESAS", R.drawable.icono_empresa));
-        if(rol.equals("ADMIN"))
+        if(!rol.equals("USER"))
         {
             cards.add(new Accion(6, "USUARIOS", R.drawable.icono_usuarios));
         }

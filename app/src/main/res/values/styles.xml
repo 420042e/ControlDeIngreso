@@ -14,7 +14,13 @@
         <item name="materialCalendarFullscreenTheme">@style/ThemeOverlay.MaterialComponents.MaterialCalendar.Fullscreen</item>
         <item name="materialCalendarTheme">@style/ThemeOverlay.MaterialComponents.MaterialCalendar</item>
 
+        <item name="hintTextColor">@style/TextAppearance.App.TextInputLayout</item>
+        <item name="hintTextAppearance">@style/TextAppearance.App.TextInputLayout</item>
         <item name="textInputStyle">@style/Widget.MyApp.TextInputLayout</item>
+
+        <item name="colorControlNormal">#c5c5c5</item>
+        <item name="colorControlActivated">@color/color_negro</item>
+        <item name="colorControlHighlight">@color/color_negro</item>
 
         <item name="autoCompleteTextViewStyle">@style/myAutoCompleteTextViewStyle</item>
         <item name="textAppearanceSearchResultTitle">@style/mySearchResult</item>
@@ -41,5 +47,34 @@
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+
+    <style name="hintText" parent="android:TextAppearance">
+        <item name="android:textColor">#000000</item>
+    </style>
+
+
+    <style name="mytext">
+        <item name="android:textColor">@color/color_negro</item>
+        <item name="android:textColorHint">@color/color_negro</item>
+        <item name="colorAccent">@color/color_negro</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="TextInputCustonColor"
+        parent="Widget.MaterialComponents.TextInputLayout.FilledBox">
+        <!-- The color of the label  -->
+        <item name="android:textColorHint">@color/color_negro</item>
+        <!--the color of text-->
+        <item name="android:textColor">@color/color_negro</item>
+        <!--the color of background-->
+        <item name="boxBackgroundColor">@android:color/transparent</item>
+
+    </style>
+
+    <style name="TextAppearance.App.TextInputLayout" parent="@android:style/TextAppearance">
+        <item name="android:textColor">@color/color_negro</item>
+        <item name="android:textSize">14sp</item>
+    </style>
 
 </resources>

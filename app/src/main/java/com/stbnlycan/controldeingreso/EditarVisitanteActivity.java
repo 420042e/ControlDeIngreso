@@ -38,6 +38,7 @@ import androidx.fragment.app.FragmentTransaction;
 import com.google.gson.Gson;
 import com.mobsandgeeks.saripaar.ValidationError;
 import com.mobsandgeeks.saripaar.Validator;
+import com.mobsandgeeks.saripaar.annotation.Email;
 import com.mobsandgeeks.saripaar.annotation.NotEmpty;
 import com.mobsandgeeks.saripaar.annotation.Select;
 import com.squareup.picasso.OkHttp3Downloader;
@@ -92,6 +93,7 @@ public class EditarVisitanteActivity extends AppCompatActivity implements Valida
     @NotEmpty
     private EditText telcelET;
     @NotEmpty
+    @Email
     private EditText emailET;
     @Select
     private Spinner empresaS;

@@ -10,11 +10,23 @@ public class ListaUsuarios {
     @Expose
     private List<Usuario> lUsuario;
 
+    @SerializedName("totalElements")
+    @Expose
+    private String totalElements;
+
     public List<Usuario> getlUsuario() {
         return lUsuario;
     }
 
     public void setlUsuario(List<Usuario> lUsuario) {
         this.lUsuario = lUsuario;
+    }
+
+    public String getTotalElements() {
+        return totalElements;
+    }
+
+    public void setTotalElements(String totalElements) {
+        this.totalElements = totalElements;
     }
 }

@@ -1,6 +1,7 @@
 package com.stbnlycan.controldeingreso;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
@@ -10,6 +11,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import android.app.Activity;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
@@ -82,6 +84,10 @@ public class Usuarios extends AppCompatActivity implements UsuariosAdapter.OnUsu
 
     private Recinto recintoRecibido;
 
+    private String totalElements;
+
+    private final static int REQUEST_CODE_NU = 1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -146,7 +152,7 @@ public class Usuarios extends AppCompatActivity implements UsuariosAdapter.OnUsu
                 currentItems = manager.getChildCount();
                 totalItems = manager.getItemCount();
                 scrollOutItems = manager.findFirstVisibleItemPosition();
-                if(isScrolling && (currentItems + scrollOutItems == totalItems))
+                if(isScrolling && (currentItems + scrollOutItems == totalItems) && totalItems != Integer.parseInt(totalElements))
                 {
                     isScrolling = false;
                     nPag++;
@@ -276,8 +282,8 @@ public class Usuarios extends AppCompatActivity implements UsuariosAdapter.OnUsu
             case R.id.action_nuevo_usuario:
                 Intent intent = new Intent(Usuarios.this, NuevoUsuario.class);
                 intent.putExtra("recinto", recintoRecibido);
-                startActivity(intent);
-                //startActivityForResult(intent, REQUEST_CODE_NV);
+                //startActivity(intent);
+                startActivityForResult(intent, REQUEST_CODE_NU);
                 return false;
             case R.id.action_salir:
                 cerrarSesion();
@@ -331,6 +337,7 @@ public class Usuarios extends AppCompatActivity implements UsuariosAdapter.OnUsu
                     {
                         usuarios.add(listaUsuarios.getlUsuario().get(i));
                     }
+                    totalElements = listaUsuarios.getTotalElements();
                     usuariosAdapter.notifyDataSetChanged();
                     swipeRefreshLayout.setRefreshing(false);
                 }
@@ -407,5 +414,21 @@ public class Usuarios extends AppCompatActivity implements UsuariosAdapter.OnUsu
                 swipeRefreshLayout.setRefreshing(false);
             }
         });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == Activity.RESULT_OK) {
+            if (requestCode == REQUEST_CODE_NU) {
+                Bundle b = data.getExtras();
+                if (data != null) {
+                    Usuario usuarioResult = (Usuario) b.getSerializable("usuarioResult");
+                    usuarios.add(0, usuarioResult);
+                    usuariosAdapter.notifyItemInserted(0);
+                    recyclerView.scrollToPosition(0);
+                }
+            }
+        }
     }
 }
