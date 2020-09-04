@@ -561,7 +561,7 @@ public class NuevoVisitanteActivity extends AppCompatActivity implements Validat
         return bitmapDrawable == null || bitmapDrawable.getBitmap() == null;
     }
 
-    void showLoadingwDialog() {
+    public void showLoadingwDialog() {
 
         final LoadingFragment dialogFragment = new LoadingFragment();
         FragmentTransaction ft;

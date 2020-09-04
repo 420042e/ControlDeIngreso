@@ -7,6 +7,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:background="#FFFFFF"
     android:id="@+id/contenedor"
+
     android:focusableInTouchMode="true"
     android:orientation="vertical">
     <com.google.android.material.appbar.AppBarLayout

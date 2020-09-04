@@ -1,7 +1,11 @@
 package com.stbnlycan.fragments;
 
+import android.app.Dialog;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 
@@ -61,12 +65,27 @@ public class LoadingFragment extends DialogFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_loading, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_dialog_busqueda_ci, container, false);
+        return rootView;
+        /*View rootView = inflater.inflate(R.layout.fragment_loading, container, false);
         getDialog().setTitle("Procesando...");
         getDialog().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
 
         setCancelable(false);
         // Inflate the layout for this fragment
-        return rootView;
+        return rootView;*/
+    }
+
+    @NonNull
+    @Override
+    public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity()).setTitle("Procesando...");
+        LayoutInflater inflater = getActivity().getLayoutInflater();
+        View rootView = inflater.inflate(R.layout.fragment_loading, null);
+        builder.setView(rootView);
+
+        setCancelable(false);
+        // Inflate the layout for this fragment
+        return builder.create();
     }
 }

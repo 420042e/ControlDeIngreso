@@ -1,5 +1,6 @@
 package com.stbnlycan.fragments;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -18,6 +19,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
 
 import com.stbnlycan.adapters.ACAdapter;
@@ -47,7 +49,9 @@ public class DFSalida extends DialogFragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.df_salida, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_dialog_busqueda_ci, container, false);
+        return rootView;
+        /*View rootView = inflater.inflate(R.layout.df_salida, container, false);
         getDialog().setTitle("Atención");
         getDialog().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
 
@@ -68,7 +72,34 @@ public class DFSalida extends DialogFragment {
             }
         });
 
-        return rootView;
+        return rootView;*/
+    }
+
+    @NonNull
+    @Override
+    public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity()).setTitle("Atención");
+        LayoutInflater inflater = getActivity().getLayoutInflater();
+        View rootView = inflater.inflate(R.layout.df_salida, null);
+        builder.setView(rootView);
+
+        setCancelable(false);
+        btnNF =  (Button) rootView.findViewById(R.id.btnNF);
+        msg =  (TextView) rootView.findViewById(R.id.msg);
+
+        visitantes = new ArrayList<>();
+
+        visitaRecibida = (Visita) getArguments().getSerializable("visita");
+
+        msg.setText("Salida registrada:\r\n"+visitaRecibida.getVisitante().getVteNombre()+ " " + visitaRecibida.getVisitante().getVteApellidos());
+
+        btnNF.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dismiss();
+            }
+        });
+        return builder.create();
     }
 
     @Override

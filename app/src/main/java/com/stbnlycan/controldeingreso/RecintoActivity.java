@@ -32,6 +32,7 @@ import com.stbnlycan.adapters.RecintoAdapter;
 import com.stbnlycan.fragments.BusquedaCiDialogFragment;
 import com.stbnlycan.fragments.DFIngreso;
 import com.stbnlycan.fragments.DFSalida;
+import com.stbnlycan.fragments.LoadingFragment;
 import com.stbnlycan.interfaces.BuscarXQRAPIs;
 import com.stbnlycan.interfaces.LogoutAPIs;
 import com.stbnlycan.interfaces.RegistrarSalidaAPIs;
@@ -56,6 +57,7 @@ public class RecintoActivity extends AppCompatActivity implements RecintoAdapter
     private Toolbar toolbar;
     private Recinto recintoRecibido;
     private BusquedaCiDialogFragment dialogFragment;
+    private LoadingFragment loadingFragment;
 
     private String rol;
     private String authorization;
@@ -220,7 +222,7 @@ public class RecintoActivity extends AppCompatActivity implements RecintoAdapter
     protected void onActivityResult(int requestCode, int resultCode, Intent data)
     {
         super.onActivityResult(requestCode, resultCode, data);
-        IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
+        final IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
         if(result != null)
         {
             if(result.getContents() == null)
@@ -229,7 +231,16 @@ public class RecintoActivity extends AppCompatActivity implements RecintoAdapter
             }
             else
             {
+                /*showLoadingwDialog();
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        registrarSalida(result.getContents());
+                    }
+                }, 300);*/
+
                 //Toast.makeText(this,  "ID Participante "+result.getContents(), Toast.LENGTH_LONG).show();
+                showLoadingwDialog();
                 registrarSalida(result.getContents());
             }
         }
@@ -301,8 +312,34 @@ public class RecintoActivity extends AppCompatActivity implements RecintoAdapter
         dfSalida.show(ft, "dialogAdvertencia");
     }
 
+    public void showLoadingwDialog() {
+
+        loadingFragment = new LoadingFragment();
+        FragmentTransaction ft;
+        Bundle bundle = new Bundle();
+        bundle.putInt("tiempo", 0);
+        loadingFragment.setArguments(bundle);
+        //dialogFragment.setTargetFragment(this, 1);
+        ft = getSupportFragmentManager().beginTransaction();
+        Fragment prev = getSupportFragmentManager().findFragmentByTag("dialogLoading");
+        if (prev != null) {
+            ft.remove(prev);
+        }
+        ft.addToBackStack(null);
+        loadingFragment.show(ft, "dialogLoading");
+    }
+
     @Override
     public void onBusquedaCiListener(Visitante visitante) {
+        /*showLoadingwDialog();
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                registrarSalidaXCi(visitante);
+            }
+        }, 300);*/
+
+        showLoadingwDialog();
         registrarSalidaXCi(visitante);
     }
 
@@ -317,11 +354,13 @@ public class RecintoActivity extends AppCompatActivity implements RecintoAdapter
                 if (jsonString.contains("visCod")) {
                     Visita visitaRecibida = new Gson().fromJson(jsonString, Visita.class);
                     //Toast.makeText(getApplicationContext(), visitaRecibida.getVisitante().getVteNombre()+ " " + visitaRecibida.getVisitante().getVteApellidos() + " ha salido de " + visitaRecibida.getAreaRecinto().getAreaNombre(), Toast.LENGTH_LONG).show();
+                    loadingFragment.dismiss();
                     showDFSalida(visitaRecibida);
                 } else {
                     Error error = new Gson().fromJson(jsonString, Error.class);
                     Toast.makeText(getApplicationContext(), ""+error.getMessage(), Toast.LENGTH_LONG).show();
                     buscarXQR(llave);
+                    loadingFragment.dismiss();
                 }
             }
             @Override
@@ -344,12 +383,14 @@ public class RecintoActivity extends AppCompatActivity implements RecintoAdapter
                     //Toast.makeText(getApplicationContext(), visitaRecibida.getVisitante().getVteNombre()+ " " + visitaRecibida.getVisitante().getVteApellidos() + " ha salido de " + visitaRecibida.getAreaRecinto().getAreaNombre(), Toast.LENGTH_LONG).show();
 
                     dialogFragment.dismiss();
+                    loadingFragment.dismiss();
                     showDFSalida(visitaRecibida);
                 } else {
                     Error error = new Gson().fromJson(jsonString, Error.class);
                     Toast.makeText(getApplicationContext(), ""+error.getMessage(), Toast.LENGTH_LONG).show();
                     iniciarRVActivity(visitante);
                     dialogFragment.dismiss();
+                    loadingFragment.dismiss();
                 }
             }
             @Override

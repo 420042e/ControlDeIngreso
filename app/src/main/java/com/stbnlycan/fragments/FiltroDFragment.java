@@ -1,5 +1,6 @@
 package com.stbnlycan.fragments;
 
+import android.app.Dialog;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -12,6 +13,7 @@ import android.widget.EditText;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
 
 import com.stbnlycan.controldeingreso.R;
@@ -25,13 +27,28 @@ public class FiltroDFragment extends DialogFragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_dialog_busqueda_ci, container, false);
+        return rootView;
+        /*View rootView = inflater.inflate(R.layout.fragment_dialog_busqueda_ci, container, false);
         getDialog().setTitle("Búsqueda de CI");
         getDialog().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
 
         setCancelable(false);
         editText = rootView.findViewById(R.id.ci);
 
-        return rootView;
+        return rootView;*/
+    }
+
+    @NonNull
+    @Override
+    public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity()).setTitle("Búsqueda de CI");
+        LayoutInflater inflater = getActivity().getLayoutInflater();
+        View rootView = inflater.inflate(R.layout.fragment_dialog_busqueda_ci, null);
+        builder.setView(rootView);
+
+        setCancelable(false);
+        editText = rootView.findViewById(R.id.ci);
+        return builder.create();
     }
 
     @Override

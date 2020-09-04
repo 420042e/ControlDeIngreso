@@ -2,6 +2,8 @@ package com.stbnlycan.controldeingreso;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -244,6 +246,9 @@ public class NuevoUsuario extends AppCompatActivity implements Validator.Validat
             Bundle extras = data.getExtras();
             Bitmap imageBitmap = (Bitmap)extras.get("data");
             //visitanteIV.setImageBitmap(imageBitmap);
+            Log.d("msg1234",""+imageBitmap.toString());
+
+
 
             // CALL THIS METHOD TO GET THE URI FROM THE BITMAP
             Uri tempUri = getImageUri(getApplicationContext(), imageBitmap);
@@ -258,14 +263,14 @@ public class NuevoUsuario extends AppCompatActivity implements Validator.Validat
             int height = displayMetrics.heightPixels;
             int width = displayMetrics.widthPixels;
 
-            Log.d("msg2134",""+finalFile);
+            Picasso.get().load(finalFile).resize(width, width).into(visitanteIV);
 
-            //Picasso.get().load(finalFile).resize(width, width).into(visitanteIV);
+            Log.d("msg128",""+finalFile);
 
-            visitanteIV.setImageBitmap(imageBitmap);
+            /*visitanteIV.setImageBitmap(imageBitmap);
             visitanteIV.getLayoutParams().width = width;
             visitanteIV.getLayoutParams().height = width;
-            visitanteIV.setScaleType(ImageView.ScaleType.CENTER_CROP);
+            visitanteIV.setScaleType(ImageView.ScaleType.CENTER_CROP);*/
 
         }
         if (resultCode == Activity.RESULT_OK) {
@@ -283,8 +288,14 @@ public class NuevoUsuario extends AppCompatActivity implements Validator.Validat
 
     public Uri getImageUri(Context inContext, Bitmap inImage) {
         Bitmap OutImage = Bitmap.createScaledBitmap(inImage, 1000, 1000,true);
-        String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), OutImage, "Title", null);
+        String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), OutImage, "Title", "From Camera");
         return Uri.parse(path);
+
+        /*ContentValues values=new ContentValues();
+        values.put(MediaStore.Images.Media.TITLE,"Title");
+        values.put(MediaStore.Images.Media.DESCRIPTION,"From Camera");
+        Uri path=getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,values);
+        return path;*/
     }
 
     public String getRealPathFromURI(Uri uri) {
