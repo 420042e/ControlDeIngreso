@@ -15,6 +15,7 @@ import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.FileUtils;
@@ -41,6 +42,7 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
@@ -73,7 +75,10 @@ import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import okhttp3.MediaType;
@@ -128,6 +133,10 @@ public class NuevoUsuario extends AppCompatActivity implements Validator.Validat
     private Recinto recintoRecibido;
     private Usuario usuario;
 
+    static final int REQUEST_TAKE_PHOTO = 1;
+    private Uri uri;
+    private String currentPhotoPath;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -172,14 +181,59 @@ public class NuevoUsuario extends AppCompatActivity implements Validator.Validat
         btnNF.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent imageTakeIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                /*Intent imageTakeIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                 if(imageTakeIntent.resolveActivity(getPackageManager())!=null)
                 {
                     startActivityForResult(imageTakeIntent, REQUEST_IMAGE_CAPTURE);
+                }*/
+
+
+
+
+                Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+                    File photoFile = null;
+                    try {
+                        photoFile = createImageFile();
+                    } catch (IOException ex) {
+                        // Error occurred while creating the File
+                    }
+                    if (photoFile != null) {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+                        {
+                            Uri photoURI = FileProvider.getUriForFile(getApplicationContext(),"com.stbnlycan.controldeingreso.fileprovider", photoFile);
+                            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+
+                            uri = photoURI;
+                            Log.d("msg4213","hola 1");
+                            Log.d("msg4214",""+photoFile);
+                            imagenObtenida = photoFile.toString();
+                        }
+                        else
+                        {
+                            uri = FileProvider.getUriForFile(getApplicationContext(),"com.stbnlycan.controldeingreso.fileprovider", photoFile);
+                            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photoFile));
+                            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+
+                            Log.d("msg4219","hola 2");
+                            Log.d("msg4214",""+photoFile);
+                            imagenObtenida = photoFile.toString();
+                        }
+                    }
                 }
             }
         });
 
+    }
+
+    private File createImageFile() throws IOException {
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(imageFileName,".jpg",storageDir);
+        currentPhotoPath = image.getAbsolutePath();
+        return image;
     }
 
     public void iniciarSpinnerEmpresa() {
@@ -240,10 +294,13 @@ public class NuevoUsuario extends AppCompatActivity implements Validator.Validat
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Log.d("msg42545",""+requestCode+" "+resultCode+" "+REQUEST_IMAGE_CAPTURE+" "+RESULT_OK);
         if(requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK)
         {
-            Bundle extras = data.getExtras();
+            Log.d("msg42546",""+requestCode+" "+resultCode);
+            /*Bundle extras = data.getExtras();
             Bitmap imageBitmap = (Bitmap)extras.get("data");
             //visitanteIV.setImageBitmap(imageBitmap);
             Log.d("msg1234",""+imageBitmap.toString());
@@ -265,7 +322,44 @@ public class NuevoUsuario extends AppCompatActivity implements Validator.Validat
 
             Picasso.get().load(finalFile).resize(width, width).into(visitanteIV);
 
-            Log.d("msg128",""+finalFile);
+            Log.d("msg128",""+finalFile);*/
+
+
+            //Log.d("msg887",""+);
+
+            DisplayMetrics displayMetrics = new DisplayMetrics();
+            getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+            int height = displayMetrics.heightPixels;
+            int width = displayMetrics.widthPixels;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+            {
+                Log.d("msg554","hola 1");
+                if(data.getExtras() != null)
+                {
+                    Bundle extras = data.getExtras();
+                    Bitmap imageBitmap = (Bitmap) extras.get("data");
+                    visitanteIV.setImageBitmap(imageBitmap);
+                    visitanteIV.getLayoutParams().width = width;
+                    visitanteIV.getLayoutParams().height = width;
+                    visitanteIV.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                }
+                else
+                {
+                    visitanteIV.setImageURI(uri);
+                    visitanteIV.getLayoutParams().width = width;
+                    visitanteIV.getLayoutParams().height = width;
+                    visitanteIV.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                }
+            }
+            else
+            {
+                Log.d("msg554","hola 2");
+                visitanteIV.setImageURI(uri);
+                visitanteIV.getLayoutParams().width = width;
+                visitanteIV.getLayoutParams().height = width;
+                visitanteIV.setScaleType(ImageView.ScaleType.CENTER_CROP);
+            }
+
 
             /*visitanteIV.setImageBitmap(imageBitmap);
             visitanteIV.getLayoutParams().width = width;
@@ -273,7 +367,7 @@ public class NuevoUsuario extends AppCompatActivity implements Validator.Validat
             visitanteIV.setScaleType(ImageView.ScaleType.CENTER_CROP);*/
 
         }
-        if (resultCode == Activity.RESULT_OK) {
+        /*if (resultCode == Activity.RESULT_OK) {
             if (requestCode == REQUEST_CODE_NE) {
                 Bundle b = data.getExtras();
                 if (data != null) {
@@ -282,8 +376,8 @@ public class NuevoUsuario extends AppCompatActivity implements Validator.Validat
                     rolS.setSelection(1, true);
                 }
             }
-        }
-        super.onActivityResult(requestCode, resultCode, data);
+        }*/
+
     }
 
     public Uri getImageUri(Context inContext, Bitmap inImage) {
