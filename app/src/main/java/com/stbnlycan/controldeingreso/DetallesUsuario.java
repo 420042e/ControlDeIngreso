@@ -106,7 +106,7 @@ public class DetallesUsuario extends AppCompatActivity {
         Picasso picasso = new Picasso.Builder(this)
                 .downloader(new OkHttp3Downloader(client))
                 .build();
-        picasso.load("http://190.129.90.115:8083/ingresoVisitantes/visitante/mostrarFoto?foto=" + usuarioRecibido.getPic()).resize(width, width).into(visitanteIV);
+        picasso.load("http://190.129.90.115:8083/ingresoVisitantes/usuarios/mostrarFoto?foto=" + usuarioRecibido.getPic()).resize(width, width).into(visitanteIV);
 
 
         usernameET.setText(usuarioRecibido.getUsername());

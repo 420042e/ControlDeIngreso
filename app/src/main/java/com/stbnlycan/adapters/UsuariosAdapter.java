@@ -58,7 +58,7 @@ public class UsuariosAdapter extends RecyclerView.Adapter<UsuariosAdapter.ARV> i
         Picasso picasso = new Picasso.Builder(context)
                 .downloader(new OkHttp3Downloader(client))
                 .build();
-        picasso.load("http://190.129.90.115:8083/ingresoVisitantes/visitante/mostrarFoto?foto=" + visitante.getPic()).resize(150, 150).into(holder.imgVisitante);
+        picasso.load("http://190.129.90.115:8083/ingresoVisitantes/usuarios/mostrarFoto?foto=" + visitante.getPic()).fit().into(holder.imgVisitante);
 
         holder.visitante = eventosList.get(position);
     }

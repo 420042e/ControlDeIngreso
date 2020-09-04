@@ -152,6 +152,7 @@ public class Usuarios extends AppCompatActivity implements UsuariosAdapter.OnUsu
                 currentItems = manager.getChildCount();
                 totalItems = manager.getItemCount();
                 scrollOutItems = manager.findFirstVisibleItemPosition();
+                Log.d("msg547",""+currentItems +" "+ scrollOutItems +" "+ totalItems);
                 if(isScrolling && (currentItems + scrollOutItems == totalItems) && totalItems != Integer.parseInt(totalElements))
                 {
                     isScrolling = false;
@@ -354,7 +355,7 @@ public class Usuarios extends AppCompatActivity implements UsuariosAdapter.OnUsu
     private void mostrarMasUsuarios() {
         Retrofit retrofit = NetworkClient.getRetrofitClient(this);
         ListaUsuariosAPIs listaUsuariosAPIs = retrofit.create(ListaUsuariosAPIs.class);
-        Call<ListaUsuarios> call = listaUsuariosAPIs.listaUsuarios("0","10", authorization);
+        Call<ListaUsuarios> call = listaUsuariosAPIs.listaUsuarios(Integer.toString(nPag),"10", authorization);
         call.enqueue(new Callback<ListaUsuarios>() {
             @Override
             public void onResponse(Call <ListaUsuarios> call, retrofit2.Response<ListaUsuarios> response) {
