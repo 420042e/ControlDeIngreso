@@ -176,7 +176,8 @@ public class NuevoUsuario extends AppCompatActivity implements Validator.Validat
 
 
 
-
+        //getDataEmpresa();
+        //getDataTipoVisitante();
 
         btnNF.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -195,8 +196,9 @@ public class NuevoUsuario extends AppCompatActivity implements Validator.Validat
                             Uri photoURI = FileProvider.getUriForFile(getApplicationContext(),"com.stbnlycan.controldeingreso.fileprovider", photoFile);
                             takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
                             startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
-                            
+
                             uri = photoURI;
+                            Log.d("msg4214",""+photoFile);
                             imagenObtenida = photoFile.toString();
                         }
                         else
@@ -489,11 +491,23 @@ public class NuevoUsuario extends AppCompatActivity implements Validator.Validat
         call.enqueue(new Callback<Usuario>() {
             @Override
             public void onResponse(Call <Usuario> call, Response<Usuario> response) {
-                usuario.setPic(response.body().getPic());
+                Log.d("msg1",""+response);
+                try
+                {
+                    //esto funciona cuando es responsebody
+                    //Log.d("msg2",""+response.body().string());
+                }
+                catch (Exception ex)
+                {
+                    Log.d("msg4",""+ex);
+                }
+
+                //usuario.setPic(response.body().getPic());
                 //usuario.setPic(imagenObtenida);
+
                 Toast.makeText(getApplicationContext(), "Se guardó el nuevo usuario", Toast.LENGTH_LONG).show();
                 Intent intent = new Intent();
-                intent.putExtra("usuarioResult", usuario);
+                intent.putExtra("usuarioResult", response.body());
                 setResult(RESULT_OK, intent);
                 finish();
             }
