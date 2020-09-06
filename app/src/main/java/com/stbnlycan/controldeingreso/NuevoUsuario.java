@@ -75,6 +75,7 @@ import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -175,21 +176,11 @@ public class NuevoUsuario extends AppCompatActivity implements Validator.Validat
 
 
 
-        //getDataEmpresa();
-        //getDataTipoVisitante();
+
 
         btnNF.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                /*Intent imageTakeIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                if(imageTakeIntent.resolveActivity(getPackageManager())!=null)
-                {
-                    startActivityForResult(imageTakeIntent, REQUEST_IMAGE_CAPTURE);
-                }*/
-
-
-
-
                 Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                 if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
                     File photoFile = null;
@@ -204,10 +195,8 @@ public class NuevoUsuario extends AppCompatActivity implements Validator.Validat
                             Uri photoURI = FileProvider.getUriForFile(getApplicationContext(),"com.stbnlycan.controldeingreso.fileprovider", photoFile);
                             takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
                             startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
-
+                            
                             uri = photoURI;
-                            Log.d("msg4213","hola 1");
-                            Log.d("msg4214",""+photoFile);
                             imagenObtenida = photoFile.toString();
                         }
                         else
@@ -216,8 +205,7 @@ public class NuevoUsuario extends AppCompatActivity implements Validator.Validat
                             takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photoFile));
                             startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
 
-                            Log.d("msg4219","hola 2");
-                            Log.d("msg4214",""+photoFile);
+                            Log.d("msg4215",""+photoFile);
                             imagenObtenida = photoFile.toString();
                         }
                     }
@@ -299,42 +287,15 @@ public class NuevoUsuario extends AppCompatActivity implements Validator.Validat
         Log.d("msg42545",""+requestCode+" "+resultCode+" "+REQUEST_IMAGE_CAPTURE+" "+RESULT_OK);
         if(requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK)
         {
-            Log.d("msg42546",""+requestCode+" "+resultCode);
-            /*Bundle extras = data.getExtras();
-            Bitmap imageBitmap = (Bitmap)extras.get("data");
-            //visitanteIV.setImageBitmap(imageBitmap);
-            Log.d("msg1234",""+imageBitmap.toString());
-
-
-
-            // CALL THIS METHOD TO GET THE URI FROM THE BITMAP
-            Uri tempUri = getImageUri(getApplicationContext(), imageBitmap);
-
-            // CALL THIS METHOD TO GET THE ACTUAL PATH
-            File finalFile = new File(getRealPathFromURI(tempUri));
-
-            imagenObtenida = finalFile.toString();
-
-            DisplayMetrics displayMetrics = new DisplayMetrics();
-            getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-            int height = displayMetrics.heightPixels;
-            int width = displayMetrics.widthPixels;
-
-            Picasso.get().load(finalFile).resize(width, width).into(visitanteIV);
-
-            Log.d("msg128",""+finalFile);*/
-
-
-            //Log.d("msg887",""+);
-
+            redimensionarImg();
             DisplayMetrics displayMetrics = new DisplayMetrics();
             getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
             int height = displayMetrics.heightPixels;
             int width = displayMetrics.widthPixels;
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
             {
-                Log.d("msg554","hola 1");
-                if(data.getExtras() != null)
+                //if(data.getExtras() != null)
+                if(data != null)
                 {
                     Bundle extras = data.getExtras();
                     Bitmap imageBitmap = (Bitmap) extras.get("data");
@@ -359,25 +320,54 @@ public class NuevoUsuario extends AppCompatActivity implements Validator.Validat
                 visitanteIV.getLayoutParams().height = width;
                 visitanteIV.setScaleType(ImageView.ScaleType.CENTER_CROP);
             }
+        }
+    }
+
+    public void redimensionarImg()
+    {
+        try
+        {
+            /*String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+            String imageFileName = "JPEG_" + timeStamp + "_";
+            File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+            File image = File.createTempFile(imageFileName,".jpg",storageDir);
+            currentPhotoPath = image.getAbsolutePath();*/
 
 
-            /*visitanteIV.setImageBitmap(imageBitmap);
-            visitanteIV.getLayoutParams().width = width;
-            visitanteIV.getLayoutParams().height = width;
-            visitanteIV.setScaleType(ImageView.ScaleType.CENTER_CROP);*/
+            // we'll start with the original picture already open to a file
+            File imgFileOrig = new File(imagenObtenida); //change "getPic()" for whatever you need to open the image file.
+            Bitmap b = BitmapFactory.decodeFile(imgFileOrig.getAbsolutePath());
+            // original measurements
+            int origWidth = b.getWidth();
+            int origHeight = b.getHeight();
+
+            final int destWidth = 600;//or the width you need
+
+            if(origWidth > destWidth)
+            {
+                // picture is wider than we want it, we calculate its target height
+                int destHeight = origHeight/( origWidth / destWidth ) ;
+                // we create an scaled bitmap so it reduces the image, not just trim it
+                Bitmap b2 = Bitmap.createScaledBitmap(b, destWidth, destHeight, false);
+                ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+                // compress to the format you want, JPEG, PNG...
+                // 70 is the 0-100 quality percentage
+                b2.compress(Bitmap.CompressFormat.JPEG,70 , outStream);
+                // we save the file, at least until we have made use of it
+                //File f = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES) + File.separator + "test.jpg");
+                File f = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES) + File.separator + imgFileOrig.getName());
+                f.createNewFile();
+                //write the bytes in file
+                FileOutputStream fo = new FileOutputStream(f);
+                fo.write(outStream.toByteArray());
+                // remember close de FileOutput
+                fo.close();
+            }
+        }
+        catch (Exception ex)
+        {
 
         }
-        /*if (resultCode == Activity.RESULT_OK) {
-            if (requestCode == REQUEST_CODE_NE) {
-                Bundle b = data.getExtras();
-                if (data != null) {
-                    Rol rolResult = (Rol) b.getSerializable("rolResult");
-                    empresas.add(1, rolResult);
-                    rolS.setSelection(1, true);
-                }
-            }
-        }*/
-
     }
 
     public Uri getImageUri(Context inContext, Bitmap inImage) {
@@ -499,11 +489,8 @@ public class NuevoUsuario extends AppCompatActivity implements Validator.Validat
         call.enqueue(new Callback<Usuario>() {
             @Override
             public void onResponse(Call <Usuario> call, Response<Usuario> response) {
-                Gson gson = new Gson();
-                String descripcion = gson.toJson(usuario);
-                //Log.d("msg1255",""+response.body());
-
                 usuario.setPic(response.body().getPic());
+                //usuario.setPic(imagenObtenida);
                 Toast.makeText(getApplicationContext(), "Se guardó el nuevo usuario", Toast.LENGTH_LONG).show();
                 Intent intent = new Intent();
                 intent.putExtra("usuarioResult", usuario);
