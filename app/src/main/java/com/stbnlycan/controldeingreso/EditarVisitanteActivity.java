@@ -6,11 +6,15 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -32,6 +36,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
@@ -56,9 +61,13 @@ import com.stbnlycan.models.Recinto;
 import com.stbnlycan.models.TipoVisitante;
 import com.stbnlycan.models.Visitante;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import okhttp3.Interceptor;
@@ -114,6 +123,10 @@ public class EditarVisitanteActivity extends AppCompatActivity implements Valida
     private SharedPreferences pref;
     private SharedPreferences.Editor editor;
 
+    private Uri uri;
+    private Visitante visitanteResult;
+    private boolean cambioFoto;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -141,6 +154,7 @@ public class EditarVisitanteActivity extends AppCompatActivity implements Valida
 
         /*ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);*/
+        cambioFoto = false;
 
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -193,10 +207,39 @@ public class EditarVisitanteActivity extends AppCompatActivity implements Valida
         btnNF.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent imageTakeIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                /*Intent imageTakeIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                 if(imageTakeIntent.resolveActivity(getPackageManager())!=null)
                 {
                     startActivityForResult(imageTakeIntent, REQUEST_IMAGE_CAPTURE);
+                }*/
+                Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+                    File photoFile = null;
+                    try {
+                        photoFile = createImageFile();
+                    } catch (IOException ex) {
+                        // Error occurred while creating the File
+                    }
+                    if (photoFile != null) {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+                        {
+                            uri = FileProvider.getUriForFile(getApplicationContext(),"com.stbnlycan.controldeingreso.fileprovider", photoFile);
+                            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
+                            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+
+                            Log.d("msg4214",""+photoFile);
+                            imagenObtenida = photoFile.toString();
+                        }
+                        else
+                        {
+                            uri = FileProvider.getUriForFile(getApplicationContext(),"com.stbnlycan.controldeingreso.fileprovider", photoFile);
+                            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photoFile));
+                            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+
+                            Log.d("msg4215",""+photoFile);
+                            imagenObtenida = photoFile.toString();
+                        }
+                    }
                 }
             }
         });
@@ -208,6 +251,14 @@ public class EditarVisitanteActivity extends AppCompatActivity implements Valida
                 startActivityForResult(intent, REQUEST_CODE_NE);
             }
         });
+    }
+
+    private File createImageFile() throws IOException {
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(imageFileName,".jpg",storageDir);
+        return image;
     }
 
     public void iniciarSpinnerEmpresa() {
@@ -326,7 +377,8 @@ public class EditarVisitanteActivity extends AppCompatActivity implements Valida
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        if(requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK)
+        super.onActivityResult(requestCode, resultCode, data);
+        /*if(requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK)
         {
             Bundle extras = data.getExtras();
             Bitmap imageBitmap = (Bitmap)extras.get("data");
@@ -353,6 +405,45 @@ public class EditarVisitanteActivity extends AppCompatActivity implements Valida
             //imagenObtenida = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/prueba.jpg";
 
             subirImagen(descripcion);
+        }*/
+        if(requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK)
+        {
+            redimensionarImg();
+            DisplayMetrics displayMetrics = new DisplayMetrics();
+            getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+            int height = displayMetrics.heightPixels;
+            int width = displayMetrics.widthPixels;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+            {
+                //if(data.getExtras() != null)
+                if(data != null)
+                {
+                    Bundle extras = data.getExtras();
+                    Bitmap imageBitmap = (Bitmap) extras.get("data");
+                    visitanteIV.setImageBitmap(imageBitmap);
+                    visitanteIV.getLayoutParams().width = width;
+                    visitanteIV.getLayoutParams().height = width;
+                    visitanteIV.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                }
+                else
+                {
+                    visitanteIV.setImageURI(uri);
+                    visitanteIV.getLayoutParams().width = width;
+                    visitanteIV.getLayoutParams().height = width;
+                    visitanteIV.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                }
+            }
+            else
+            {
+                Log.d("msg554","hola 2");
+                visitanteIV.setImageURI(uri);
+                visitanteIV.getLayoutParams().width = width;
+                visitanteIV.getLayoutParams().height = width;
+                visitanteIV.setScaleType(ImageView.ScaleType.CENTER_CROP);
+            }
+            Gson gson = new Gson();
+            String descripcion = gson.toJson(visitanteRecibido);
+            subirImagen(descripcion);
         }
         if (resultCode == Activity.RESULT_OK) {
             if (requestCode == REQUEST_CODE_NE) {
@@ -364,7 +455,62 @@ public class EditarVisitanteActivity extends AppCompatActivity implements Valida
                 }
             }
         }
-        super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    public void redimensionarImg()
+    {
+        try
+        {
+            /*String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+            String imageFileName = "JPEG_" + timeStamp + "_";
+            File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+            File image = File.createTempFile(imageFileName,".jpg",storageDir);
+            currentPhotoPath = image.getAbsolutePath();*/
+
+
+            // we'll start with the original picture already open to a file
+            File imgFileOrig = new File(imagenObtenida); //change "getPic()" for whatever you need to open the image file.
+            Bitmap b = BitmapFactory.decodeFile(imgFileOrig.getAbsolutePath());
+
+            // original measurements
+            int origWidth = b.getWidth();
+            int origHeight = b.getHeight();
+
+            final int destWidth = 600;//or the width you need
+
+            if(origWidth > destWidth)
+            {
+                // picture is wider than we want it, we calculate its target height
+                int destHeight = origHeight/( origWidth / destWidth ) ;
+                // we create an scaled bitmap so it reduces the image, not just trim it
+                Bitmap b2 = Bitmap.createScaledBitmap(b, destWidth, destHeight, false);
+
+                if(origWidth > origHeight)
+                {
+                    Matrix matrix = new Matrix();
+                    matrix.postRotate(90);
+                    b2 = Bitmap.createBitmap(b2, 0, 0, b2.getWidth(), b2.getHeight(), matrix, true);
+                }
+
+                ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+                // compress to the format you want, JPEG, PNG...
+                // 70 is the 0-100 quality percentage
+                b2.compress(Bitmap.CompressFormat.JPEG,100 , outStream);
+                // we save the file, at least until we have made use of it
+                //File f = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES) + File.separator + "test.jpg");
+                File f = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES) + File.separator + imgFileOrig.getName());
+                f.createNewFile();
+                //write the bytes in file
+                FileOutputStream fo = new FileOutputStream(f);
+                fo.write(outStream.toByteArray());
+                // remember close de FileOutput
+                fo.close();
+            }
+        }
+        catch (Exception ex)
+        {
+
+        }
     }
 
     public Uri getImageUri(Context inContext, Bitmap inImage) {
@@ -391,7 +537,20 @@ public class EditarVisitanteActivity extends AppCompatActivity implements Valida
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                finish();
+                if(cambioFoto)
+                {
+                    cambioFoto = false;
+                    Intent intent = new Intent();
+                    intent.putExtra("visitanteResult", visitanteResult);
+                    intent.putExtra("position", position);
+                    setResult(RESULT_OK, intent);
+                    finish();
+                }
+                else
+                {
+                    finish();
+                }
+                //finish();
                 return false;
             case R.id.action_editar_visitante:
                 validator.validate();
@@ -536,7 +695,7 @@ public class EditarVisitanteActivity extends AppCompatActivity implements Valida
                 //visitante.setVteEstado("ACT");
 
                 Intent intent = new Intent();
-                intent.putExtra("visitanteResult", visitante);
+                intent.putExtra("visitanteResult", visitanteRecibido);
                 intent.putExtra("position", position);
                 setResult(RESULT_OK, intent);
                 finish();
@@ -651,12 +810,11 @@ public class EditarVisitanteActivity extends AppCompatActivity implements Valida
             @Override
             public void onResponse(Call <Visitante> call, retrofit2.Response <Visitante> response) {
 
-                Visitante visitanteCB = response.body();
-
                 Toast.makeText(getApplicationContext(), "Se guardó la nueva imágen", Toast.LENGTH_LONG).show();
+                visitanteResult = response.body();
 
-                visitanteRecibido.setVteImagen(visitanteCB.getVteImagen());
-
+                visitanteRecibido.setVteImagen(response.body().getVteImagen());
+                cambioFoto = true;
 
 
                 /*Gson gson2 = new Gson();
@@ -672,4 +830,21 @@ public class EditarVisitanteActivity extends AppCompatActivity implements Valida
         });
     }
 
+    @Override
+    public void onBackPressed() {
+        //super.onBackPressed();
+        if(cambioFoto)
+        {
+            cambioFoto = false;
+            Intent intent = new Intent();
+            intent.putExtra("visitanteResult", visitanteResult);
+            intent.putExtra("position", position);
+            setResult(RESULT_OK, intent);
+            finish();
+        }
+        else
+        {
+            super.onBackPressed();
+        }
+    }
 }

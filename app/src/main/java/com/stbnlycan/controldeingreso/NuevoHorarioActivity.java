@@ -180,7 +180,8 @@ public class NuevoHorarioActivity extends AppCompatActivity implements Validator
                 Toast.makeText(getApplicationContext(), "El nuevo horario fué registrado", Toast.LENGTH_LONG).show();
                 horario.setHorEstado("0");
                 Intent intent = new Intent();
-                intent.putExtra("horarioResult", horario);
+                //intent.putExtra("horarioResult", horario);
+                intent.putExtra("horarioResult", horarioRecibido);
                 setResult(RESULT_OK, intent);
                 finish();
                 //finish();

@@ -12,6 +12,7 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -351,10 +352,18 @@ public class NuevoUsuario extends AppCompatActivity implements Validator.Validat
                 int destHeight = origHeight/( origWidth / destWidth ) ;
                 // we create an scaled bitmap so it reduces the image, not just trim it
                 Bitmap b2 = Bitmap.createScaledBitmap(b, destWidth, destHeight, false);
+
+                if(origWidth > origHeight)
+                {
+                    Matrix matrix = new Matrix();
+                    matrix.postRotate(90);
+                    b2 = Bitmap.createBitmap(b2, 0, 0, b2.getWidth(), b2.getHeight(), matrix, true);
+                }
+
                 ByteArrayOutputStream outStream = new ByteArrayOutputStream();
                 // compress to the format you want, JPEG, PNG...
                 // 70 is the 0-100 quality percentage
-                b2.compress(Bitmap.CompressFormat.JPEG,70 , outStream);
+                b2.compress(Bitmap.CompressFormat.JPEG,100 , outStream);
                 // we save the file, at least until we have made use of it
                 //File f = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES) + File.separator + "test.jpg");
                 File f = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES) + File.separator + imgFileOrig.getName());

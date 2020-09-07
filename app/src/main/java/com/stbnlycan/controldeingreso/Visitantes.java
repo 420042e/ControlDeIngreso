@@ -5,6 +5,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.MenuItemCompat;
 import androidx.cursoradapter.widget.CursorAdapter;
 import androidx.cursoradapter.widget.SimpleCursorAdapter;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -81,6 +82,7 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
     private SharedPreferences.Editor editor;
 
     private String totalElements;
+    private boolean sugerenciaPress;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -146,8 +148,10 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
                 currentItems = manager.getChildCount();
                 totalItems = manager.getItemCount();
                 scrollOutItems = manager.findFirstVisibleItemPosition();
+                Log.d("msg2134","currentItems "+currentItems + " scrollOutItems "+ scrollOutItems +" totalItems "+ totalItems);
                 if(isScrolling && (currentItems + scrollOutItems == totalItems)  && totalItems != Integer.parseInt(totalElements))
                 {
+                    Log.d("msg2134","hola");
                     isScrolling = false;
                     nPag++;
                     mostrarMasVisitantes();
@@ -395,6 +399,9 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
                 visitantes.clear();
                 visitantes.add(suggestions.get(position));
                 visitantesAdapter.notifyDataSetChanged();
+
+                sugerenciaPress = true;
+
                 return true;
             }
         });
