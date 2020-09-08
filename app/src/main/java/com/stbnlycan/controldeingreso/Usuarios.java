@@ -88,6 +88,8 @@ public class Usuarios extends AppCompatActivity implements UsuariosAdapter.OnUsu
 
     private final static int REQUEST_CODE_NU = 1;
 
+    private boolean sugerenciaPress;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -153,7 +155,7 @@ public class Usuarios extends AppCompatActivity implements UsuariosAdapter.OnUsu
                 totalItems = manager.getItemCount();
                 scrollOutItems = manager.findFirstVisibleItemPosition();
                 Log.d("msg547",""+currentItems +" "+ scrollOutItems +" "+ totalItems);
-                if(isScrolling && (currentItems + scrollOutItems == totalItems) && totalItems != Integer.parseInt(totalElements))
+                if(isScrolling && (currentItems + scrollOutItems == totalItems) && totalItems != Integer.parseInt(totalElements)  && !sugerenciaPress)
                 {
                     isScrolling = false;
                     nPag++;
@@ -269,6 +271,18 @@ public class Usuarios extends AppCompatActivity implements UsuariosAdapter.OnUsu
                     return false;
                 }
                 return false;
+            }
+        });
+        searchItem.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
+            @Override
+            public boolean onMenuItemActionExpand(MenuItem item) {
+                sugerenciaPress = true;
+                return true;
+            }
+            @Override
+            public boolean onMenuItemActionCollapse(MenuItem item) {
+                sugerenciaPress = false;
+                return true;
             }
         });
         return true;

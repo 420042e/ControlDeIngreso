@@ -28,6 +28,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AbsListView;
 import android.widget.AutoCompleteTextView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -148,10 +149,8 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
                 currentItems = manager.getChildCount();
                 totalItems = manager.getItemCount();
                 scrollOutItems = manager.findFirstVisibleItemPosition();
-                Log.d("msg2134","currentItems "+currentItems + " scrollOutItems "+ scrollOutItems +" totalItems "+ totalItems);
-                if(isScrolling && (currentItems + scrollOutItems == totalItems)  && totalItems != Integer.parseInt(totalElements))
+                if(isScrolling && (currentItems + scrollOutItems == totalItems)  && totalItems != Integer.parseInt(totalElements) && !sugerenciaPress)
                 {
-                    Log.d("msg2134","hola");
                     isScrolling = false;
                     nPag++;
                     mostrarMasVisitantes();
@@ -400,8 +399,6 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
                 visitantes.add(suggestions.get(position));
                 visitantesAdapter.notifyDataSetChanged();
 
-                sugerenciaPress = true;
-
                 return true;
             }
         });
@@ -434,6 +431,18 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
                     return false;
                 }
                 return false;
+            }
+        });
+        searchItem.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
+            @Override
+            public boolean onMenuItemActionExpand(MenuItem item) {
+                sugerenciaPress = true;
+                return true;
+            }
+            @Override
+            public boolean onMenuItemActionCollapse(MenuItem item) {
+                sugerenciaPress = false;
+                return true;
             }
         });
         return true;

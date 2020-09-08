@@ -115,6 +115,8 @@ public class Visitas extends AppCompatActivity implements VisitasAdapter.OnVisit
     private SharedPreferences pref;
     private SharedPreferences.Editor editor;
 
+    private boolean sugerenciaPress;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -173,7 +175,7 @@ public class Visitas extends AppCompatActivity implements VisitasAdapter.OnVisit
                 currentItems = manager.getChildCount();
                 totalItems = manager.getItemCount();
                 scrollOutItems = manager.findFirstVisibleItemPosition();
-                if(isScrolling && (currentItems + scrollOutItems == totalItems))
+                if(isScrolling && (currentItems + scrollOutItems == totalItems) && !sugerenciaPress)
                 {
                     isScrolling = false;
                     nPag++;
@@ -550,6 +552,18 @@ public class Visitas extends AppCompatActivity implements VisitasAdapter.OnVisit
                     }, 300);
                 }
                 return false;
+            }
+        });
+        searchItem.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
+            @Override
+            public boolean onMenuItemActionExpand(MenuItem item) {
+                sugerenciaPress = true;
+                return true;
+            }
+            @Override
+            public boolean onMenuItemActionCollapse(MenuItem item) {
+                sugerenciaPress = false;
+                return true;
             }
         });
         return true;

@@ -73,6 +73,8 @@ public class Empresas extends AppCompatActivity implements EmpresasAdapter.OnVis
     private final static int REQUEST_CODE_NE = 1;
     private final static int REQUEST_CODE_EE = 2;
 
+    private boolean sugerenciaPress;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -111,7 +113,7 @@ public class Empresas extends AppCompatActivity implements EmpresasAdapter.OnVis
                 currentItems = manager.getChildCount();
                 totalItems = manager.getItemCount();
                 scrollOutItems = manager.findFirstVisibleItemPosition();
-                if(isScrolling && (currentItems + scrollOutItems == totalItems))
+                if(isScrolling && (currentItems + scrollOutItems == totalItems) && !sugerenciaPress)
                 {
                     isScrolling = false;
                     nPag++;
@@ -268,6 +270,18 @@ public class Empresas extends AppCompatActivity implements EmpresasAdapter.OnVis
                 nombre = newText.toUpperCase();
                 buscarEmpresaXNombre();
                 return false;
+            }
+        });
+        searchItem.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
+            @Override
+            public boolean onMenuItemActionExpand(MenuItem item) {
+                sugerenciaPress = true;
+                return true;
+            }
+            @Override
+            public boolean onMenuItemActionCollapse(MenuItem item) {
+                sugerenciaPress = false;
+                return true;
             }
         });
         return true;
