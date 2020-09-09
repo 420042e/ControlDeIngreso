@@ -606,11 +606,11 @@ public class NuevoVisitanteActivity extends AppCompatActivity implements Validat
 
                 Visitante visitanteResult = response.body();
                 Toast.makeText(getApplicationContext(), "Se guardó el nuevo asistente", Toast.LENGTH_LONG).show();
-                enviarCorreoIngreso(visitanteResult);
-                /*Intent intent = new Intent();
+                //enviarCorreoIngreso(visitanteResult);
+                Intent intent = new Intent();
                 intent.putExtra("visitanteResult", visitanteResult);
                 setResult(RESULT_OK, intent);
-                finish();*/
+                finish();
             }
 
             @Override

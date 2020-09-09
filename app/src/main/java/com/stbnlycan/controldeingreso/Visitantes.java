@@ -8,6 +8,8 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.MenuItemCompat;
 import androidx.cursoradapter.widget.CursorAdapter;
 import androidx.cursoradapter.widget.SimpleCursorAdapter;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -34,6 +36,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.stbnlycan.adapters.VisitantesAdapter;
+import com.stbnlycan.fragments.LoadingFragment;
 import com.stbnlycan.interfaces.EnviarCorreoIAPIs;
 import com.stbnlycan.interfaces.ListaVisitantesXNombreAPIs;
 import com.stbnlycan.interfaces.ListaVisitantesAPIs;
@@ -84,6 +87,7 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
 
     private String totalElements;
     private boolean sugerenciaPress;
+    private LoadingFragment dialogFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -464,6 +468,7 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
 
     @Override
     public void OnEEClick(Visitante visitante) {
+        showLoadingwDialog();
         enviarCorreoIngreso(visitante);
     }
 
@@ -474,6 +479,23 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
         startActivity(intent);
     }
 
+    public void showLoadingwDialog() {
+
+        dialogFragment = new LoadingFragment();
+        FragmentTransaction ft;
+        Bundle bundle = new Bundle();
+        bundle.putInt("tiempo", 0);
+        dialogFragment.setArguments(bundle);
+        //dialogFragment.setTargetFragment(this, 1);
+        ft = getSupportFragmentManager().beginTransaction();
+        Fragment prev = getSupportFragmentManager().findFragmentByTag("dialogLoading");
+        if (prev != null) {
+            ft.remove(prev);
+        }
+        ft.addToBackStack(null);
+        dialogFragment.show(ft, "dialogLoading");
+    }
+
     private void enviarCorreoIngreso(final Visitante visitante) {
         Retrofit retrofit = NetworkClient.getRetrofitClient(this);
         EnviarCorreoIAPIs enviarCorreoIAPIs = retrofit.create(EnviarCorreoIAPIs.class);
@@ -481,13 +503,17 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
         call.enqueue(new Callback() {
             @Override
             public void onResponse(Call call, retrofit2.Response response) {
+                Log.d("msg44",""+response.body());
                 if (response.body() != null) {
                     Toast.makeText(getApplicationContext(), "Se envió el correo de ingreso a "+visitante.getVteNombre() +" "+visitante.getVteApellidos(), Toast.LENGTH_LONG).show();
                 }
+                dialogFragment.dismiss();
             }
             @Override
             public void onFailure(Call call, Throwable t) {
-                Log.d("msg4",""+t);
+                Log.d("msg45",""+t);
+                Toast.makeText(getApplicationContext(), "Hubo un error al enviar el correo de ingreso a "+visitante.getVteNombre() +" "+visitante.getVteApellidos(), Toast.LENGTH_LONG).show();
+                dialogFragment.dismiss();
             }
         });
     }

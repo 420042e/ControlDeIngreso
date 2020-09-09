@@ -80,7 +80,6 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
     private EditText nombreET;
     private EditText apellidosET;
 
-    @NotEmpty
     private EditText observacion;
     private Validator validator;
 
@@ -261,8 +260,7 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
         }
     }
 
-    private void registrarIngreso(Visita visita) {
-
+    private void registrarIngreso(final Visita visita) {
         Retrofit retrofit = NetworkClient.getRetrofitClient(this);
         RegistrarIngresoAPIs registrarIngresoAPIs = retrofit.create(RegistrarIngresoAPIs.class);
         Call<JsonObject> call = registrarIngresoAPIs.registrarIngreso(visita, authorization);

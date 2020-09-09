@@ -154,7 +154,6 @@ public class Usuarios extends AppCompatActivity implements UsuariosAdapter.OnUsu
                 currentItems = manager.getChildCount();
                 totalItems = manager.getItemCount();
                 scrollOutItems = manager.findFirstVisibleItemPosition();
-                Log.d("msg547",""+currentItems +" "+ scrollOutItems +" "+ totalItems);
                 if(isScrolling && (currentItems + scrollOutItems == totalItems) && totalItems != Integer.parseInt(totalElements)  && !sugerenciaPress)
                 {
                     isScrolling = false;
