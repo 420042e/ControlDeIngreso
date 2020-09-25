@@ -30,6 +30,7 @@ import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 import com.stbnlycan.adapters.RecintoAdapter;
 import com.stbnlycan.fragments.BusquedaCiDialogFragment;
+import com.stbnlycan.fragments.DFError;
 import com.stbnlycan.fragments.DFIngreso;
 import com.stbnlycan.fragments.DFSalida;
 import com.stbnlycan.fragments.LoadingFragment;
@@ -253,12 +254,39 @@ public class RecintoActivity extends AppCompatActivity implements RecintoAdapter
             if (requestCode == REQUEST_CODE_RV) {
                 Bundle b = data.getExtras();
                 if (data != null) {
-                    Visita visitaResult = (Visita) b.getSerializable("visitaResult");
-                    showDFIngreso(visitaResult);
+                    if(b.getSerializable("success").toString().equals("true"))
+                    {
+                        Visita visitaResult = (Visita) b.getSerializable("visitaResult");
+                        showDFIngreso(visitaResult);
+                    }
+                    else if(b.getSerializable("success").toString().equals("false"))
+                    {
+                        Error errorResult = (Error) b.getSerializable("errorResult");
+                        showDFError(errorResult.getMessage());
+                    }
+                    /*Visita visitaResult = (Visita) b.getSerializable("visitaResult");
+                    showDFIngreso(visitaResult);*/
                 }
             }
         }
         //super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    public void showDFError(String mensaje) {
+        DFError dfError = new DFError();
+        FragmentTransaction ft;
+        Bundle bundle = new Bundle();
+        bundle.putBoolean("notAlertDialog", true);
+        bundle.putSerializable("mensaje", mensaje);
+        dfError.setArguments(bundle);
+        //dialogFragment.setOnEventoClickListener(RecintoActivity.this);
+        ft = getSupportFragmentManager().beginTransaction();
+        Fragment prev = getSupportFragmentManager().findFragmentByTag("dialogError");
+        if (prev != null) {
+            ft.remove(prev);
+        }
+        ft.addToBackStack(null);
+        dfError.show(ft, "dialogError");
     }
 
     public void showCiDialog() {
