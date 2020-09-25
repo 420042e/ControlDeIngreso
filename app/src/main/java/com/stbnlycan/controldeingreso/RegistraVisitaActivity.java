@@ -36,6 +36,7 @@ import com.mobsandgeeks.saripaar.annotation.NotEmpty;
 import com.mobsandgeeks.saripaar.annotation.Select;
 import com.squareup.picasso.OkHttp3Downloader;
 import com.squareup.picasso.Picasso;
+import com.stbnlycan.fragments.DFError;
 import com.stbnlycan.fragments.DFIngreso;
 import com.stbnlycan.interfaces.AreaRecintoAPIs;
 import com.stbnlycan.interfaces.LogoutAPIs;
@@ -272,12 +273,19 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
                     Visita visitaRecibida = new Gson().fromJson(jsonString, Visita.class);
                     //Toast.makeText(getApplicationContext(), visitaRecibida.getVisitante().getVteNombre()+ " " + visitaRecibida.getVisitante().getVteApellidos() + " ha ingresado a " + visitaRecibida.getAreaRecinto().getAreaNombre(), Toast.LENGTH_LONG).show();
                     Intent intent = new Intent();
+                    intent.putExtra("success", "true");
                     intent.putExtra("visitaResult", visitaRecibida);
                     setResult(RESULT_OK, intent);
                     finish();
                 } else {
                     Error error = new Gson().fromJson(jsonString, Error.class);
-                    Toast.makeText(getApplicationContext(), ""+error.getMessage(), Toast.LENGTH_LONG).show();
+                    //Toast.makeText(getApplicationContext(), ""+error.getMessage(), Toast.LENGTH_LONG).show();
+
+                    //showDFError(error.getMessage());
+                    Intent intent = new Intent();
+                    intent.putExtra("success", "false");
+                    intent.putExtra("errorResult", error);
+                    setResult(RESULT_OK, intent);
                     finish();
                 }
             }
@@ -333,6 +341,23 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_rv, menu);
         return true;
+    }
+
+    public void showDFError(String mensaje) {
+        DFError dfError = new DFError();
+        FragmentTransaction ft;
+        Bundle bundle = new Bundle();
+        bundle.putBoolean("notAlertDialog", true);
+        bundle.putSerializable("mensaje", mensaje);
+        dfError.setArguments(bundle);
+        //dialogFragment.setOnEventoClickListener(RecintoActivity.this);
+        ft = getSupportFragmentManager().beginTransaction();
+        Fragment prev = getSupportFragmentManager().findFragmentByTag("dialogError");
+        if (prev != null) {
+            ft.remove(prev);
+        }
+        ft.addToBackStack(null);
+        dfError.show(ft, "dialogError");
     }
 
 }

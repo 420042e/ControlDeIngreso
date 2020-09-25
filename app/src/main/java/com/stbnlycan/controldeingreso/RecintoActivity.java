@@ -262,7 +262,15 @@ public class RecintoActivity extends AppCompatActivity implements RecintoAdapter
                     else if(b.getSerializable("success").toString().equals("false"))
                     {
                         Error errorResult = (Error) b.getSerializable("errorResult");
-                        showDFError(errorResult.getMessage());
+                        if(errorResult.getMessage().equals("Se encuentra fuera de los días de entrada asignados o no existe un horario asignado."))
+                        {
+                            showDFError("Se encuentra fuera del horario asignado");
+                        }
+                        else
+                        {
+                            showDFError(errorResult.getMessage());
+                        }
+                        //showDFError(errorResult.getMessage());
                     }
                     /*Visita visitaResult = (Visita) b.getSerializable("visitaResult");
                     showDFIngreso(visitaResult);*/
