@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
 
-public class Horario  implements Serializable
+public class Horario implements Serializable
 {
     @SerializedName("horCod")
     @Expose

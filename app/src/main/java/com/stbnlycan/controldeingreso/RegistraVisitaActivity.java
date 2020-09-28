@@ -46,7 +46,9 @@ import com.stbnlycan.models.Aduana;
 import com.stbnlycan.models.AreaRecinto;
 import com.stbnlycan.models.Empresa;
 import com.stbnlycan.models.Error;
+import com.stbnlycan.models.Motivo;
 import com.stbnlycan.models.Recinto;
+import com.stbnlycan.models.TipoDocumento;
 import com.stbnlycan.models.TipoVisitante;
 import com.stbnlycan.models.Visita;
 import com.stbnlycan.models.Visitante;
@@ -70,12 +72,23 @@ import retrofit2.Retrofit;
 public class RegistraVisitaActivity extends AppCompatActivity implements Validator.ValidationListener {
 
     private ArrayList<AreaRecinto> areaRecinto;
+    private ArrayList<Motivo> motivo;
+    private ArrayList<TipoDocumento> tipoDocumento;
+
     private ArrayAdapter<AreaRecinto> adapterAreaR;
+    private ArrayAdapter<Motivo> adapterMotivo;
+    private ArrayAdapter<TipoDocumento> adapterTipoDoc;
     private Visitante visitanteRecibido;
     private Recinto recintoRecibido;
 
     @Select
     private Spinner areaRecintoS;
+
+    @Select
+    private Spinner motivoS;
+
+    @Select
+    private Spinner tipoDocS;
 
     private EditText ciET;
     private EditText nombreET;
@@ -92,6 +105,9 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
     private SharedPreferences pref;
     private SharedPreferences.Editor editor;
 
+    private Button fotoDoc;
+    private Button escanearQR;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -103,7 +119,12 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
         nombreET = findViewById(R.id.nombre);
         apellidosET = findViewById(R.id.apellidos);
         areaRecintoS = findViewById(R.id.area_recinto);
+        motivoS = findViewById(R.id.motivo);
+        tipoDocS = findViewById(R.id.tipoDoc);
         observacion = findViewById(R.id.observacion);
+
+        fotoDoc = findViewById(R.id.fotoDoc);
+        escanearQR = findViewById(R.id.escanearQR);
 
         validator = new Validator(this);
         validator.setValidationListener(this);
@@ -156,6 +177,23 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
         iniciarSpinnerArea();
         fetchAreaRecintos();
 
+        iniciarSpinnerMotivo();
+
+        iniciarSpinnerTipoDoc();
+
+        fotoDoc.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d("msg123 ", "hola1");
+            }
+        });
+
+        escanearQR.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d("msg124 ", "hola2");
+            }
+        });
     }
 
     public void iniciarSpinnerArea() {
@@ -220,6 +258,107 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
             @Override
             public void onFailure(Call <List<AreaRecinto>> call, Throwable t) {
 
+            }
+        });
+    }
+
+    public void iniciarSpinnerMotivo() {
+        motivo = new ArrayList<>();
+
+        Motivo motivod = new Motivo();
+        motivod.setMvoCod(0);
+        motivod.setMvoNombre("SELECCIONE MOTIVO");
+        motivod.setMvoDescripcion("descripcion");
+
+        motivo.add(motivod);
+        adapterMotivo = new ArrayAdapter<Motivo>(this, R.layout.style_spinner, motivo)
+        {
+            @Override
+            public boolean isEnabled(int position) {
+                if (position == 0) {
+                    return false;
+                } else {
+                    return true;
+                }
+            }
+
+            @Override
+            public View getDropDownView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+                View view = super.getDropDownView(position, convertView, parent);
+                TextView textview = (TextView) view;
+                if (position == 0) {
+                    textview.setTextColor(Color.GRAY);
+                } else {
+                    textview.setTextColor(Color.BLACK);
+                }
+                return view;
+            }
+        };
+        adapterMotivo.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        motivoS.setAdapter(adapterMotivo);
+        motivoS.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                /*AreaRecinto areaRecinto = (AreaRecinto) parent.getSelectedItem();
+                displayAreaRData(areaRecinto);*/
+                Motivo motivo = (Motivo) parent.getSelectedItem();
+
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
+    }
+
+    public void iniciarSpinnerTipoDoc() {
+        tipoDocumento = new ArrayList<>();
+
+        /*AreaRecinto area = new AreaRecinto();
+        area.setAreaCod("cod");
+        area.setAreaNombre("SELECCIONE TIPO DE DOCUMENTO");
+        area.setAreaDescripcion("descripcion");
+        area.setAreaEstado("estado");*/
+
+        TipoDocumento tipoDocumentod = new TipoDocumento();
+        tipoDocumentod.setTdoCod(0);
+        tipoDocumentod.setTdoNombre("SELECCIONE TIPO DE DOCUMENTO");
+        tipoDocumentod.setTdoDescripcion("descripcion");
+
+        tipoDocumento.add(tipoDocumentod);
+        adapterTipoDoc = new ArrayAdapter<TipoDocumento>(this, R.layout.style_spinner, tipoDocumento)
+        {
+            @Override
+            public boolean isEnabled(int position) {
+                if (position == 0) {
+                    return false;
+                } else {
+                    return true;
+                }
+            }
+
+            @Override
+            public View getDropDownView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
+                View view = super.getDropDownView(position, convertView, parent);
+                TextView textview = (TextView) view;
+                if (position == 0) {
+                    textview.setTextColor(Color.GRAY);
+                } else {
+                    textview.setTextColor(Color.BLACK);
+                }
+                return view;
+            }
+        };
+        adapterTipoDoc.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        tipoDocS.setAdapter(adapterTipoDoc);
+        tipoDocS.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                /*AreaRecinto areaRecinto = (AreaRecinto) parent.getSelectedItem();
+                displayAreaRData(areaRecinto);*/
+                TipoDocumento tipoDocumento = (TipoDocumento) parent.getSelectedItem();
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
             }
         });
     }
