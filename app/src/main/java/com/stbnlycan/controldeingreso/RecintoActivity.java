@@ -232,23 +232,10 @@ public class RecintoActivity extends AppCompatActivity implements RecintoAdapter
             }
             else
             {
-                /*showLoadingwDialog();
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        registrarSalida(result.getContents());
-                    }
-                }, 300);*/
-
-                //Toast.makeText(this,  "ID Participante "+result.getContents(), Toast.LENGTH_LONG).show();
                 showLoadingwDialog();
                 registrarSalida(result.getContents());
             }
         }
-        /*else
-        {
-            super.onActivityResult(requestCode, resultCode, data);
-        }*/
 
         if (resultCode == Activity.RESULT_OK) {
             if (requestCode == REQUEST_CODE_RV) {
@@ -270,14 +257,10 @@ public class RecintoActivity extends AppCompatActivity implements RecintoAdapter
                         {
                             showDFError(errorResult.getMessage());
                         }
-                        //showDFError(errorResult.getMessage());
                     }
-                    /*Visita visitaResult = (Visita) b.getSerializable("visitaResult");
-                    showDFIngreso(visitaResult);*/
                 }
             }
         }
-        //super.onActivityResult(requestCode, resultCode, data);
     }
 
     public void showDFError(String mensaje) {

@@ -340,28 +340,6 @@ public class NuevoVisitanteActivity extends AppCompatActivity implements Validat
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        /*if(requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK)
-        {
-            Bundle extras = data.getExtras();
-            Bitmap imageBitmap = (Bitmap)extras.get("data");
-            //visitanteIV.setImageBitmap(imageBitmap);
-
-            // CALL THIS METHOD TO GET THE URI FROM THE BITMAP
-            Uri tempUri = getImageUri(getApplicationContext(), imageBitmap);
-
-            // CALL THIS METHOD TO GET THE ACTUAL PATH
-            File finalFile = new File(getRealPathFromURI(tempUri));
-
-            imagenObtenida = finalFile.toString();
-
-            DisplayMetrics displayMetrics = new DisplayMetrics();
-            getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-            int height = displayMetrics.heightPixels;
-            int width = displayMetrics.widthPixels;
-
-            Picasso.get().load(finalFile).resize(width, width).into(visitanteIV);
-
-        }*/
         if(requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK)
         {
             redimensionarImg();
@@ -371,7 +349,6 @@ public class NuevoVisitanteActivity extends AppCompatActivity implements Validat
             int width = displayMetrics.widthPixels;
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
             {
-                //if(data.getExtras() != null)
                 if(data != null)
                 {
                     Bundle extras = data.getExtras();
