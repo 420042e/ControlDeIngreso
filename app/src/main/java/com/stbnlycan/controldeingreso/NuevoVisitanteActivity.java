@@ -391,13 +391,6 @@ public class NuevoVisitanteActivity extends AppCompatActivity implements Validat
     {
         try
         {
-            /*String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-            String imageFileName = "JPEG_" + timeStamp + "_";
-            File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-            File image = File.createTempFile(imageFileName,".jpg",storageDir);
-            currentPhotoPath = image.getAbsolutePath();*/
-
-
             // we'll start with the original picture already open to a file
             File imgFileOrig = new File(imagenObtenida); //change "getPic()" for whatever you need to open the image file.
             Bitmap b = BitmapFactory.decodeFile(imgFileOrig.getAbsolutePath());
@@ -405,7 +398,7 @@ public class NuevoVisitanteActivity extends AppCompatActivity implements Validat
             int origWidth = b.getWidth();
             int origHeight = b.getHeight();
 
-            Toast.makeText(getApplicationContext(), "origWidth "+origWidth+" origHeight "+origHeight, Toast.LENGTH_LONG).show();
+            //Toast.makeText(getApplicationContext(), "origWidth "+origWidth+" origHeight "+origHeight, Toast.LENGTH_LONG).show();
 
             final int destWidth = 600;//or the width you need
 

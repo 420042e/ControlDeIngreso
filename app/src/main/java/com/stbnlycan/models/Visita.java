@@ -35,8 +35,13 @@ public class Visita implements Serializable {
     @Expose
     private AreaRecinto areaRecinto;
 
-    public Visita() {
-    }
+    @SerializedName("motivoIngreso")
+    @Expose
+    private Motivo motivo;
+
+    @SerializedName("documentoIngreso")
+    @Expose
+    private DocumentoIngreso documentoIngreso;
 
     public String getVisCod() {
         return visCod;
@@ -92,5 +97,21 @@ public class Visita implements Serializable {
 
     public void setAreaRecinto(AreaRecinto areaRecinto) {
         this.areaRecinto = areaRecinto;
+    }
+
+    public Motivo getMotivo() {
+        return motivo;
+    }
+
+    public void setMotivo(Motivo motivo) {
+        this.motivo = motivo;
+    }
+
+    public DocumentoIngreso getDocumentoIngreso() {
+        return documentoIngreso;
+    }
+
+    public void setDocumentoIngreso(DocumentoIngreso documentoIngreso) {
+        this.documentoIngreso = documentoIngreso;
     }
 }
