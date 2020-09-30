@@ -129,12 +129,13 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
     private SharedPreferences.Editor editor;
 
     private Button fotoDoc;
-    private Button escanearQR;
 
     private Uri uri;
     private static final int REQUEST_IMAGE_CAPTURE = 101;
     private String imagenObtenida;
     private String codigoQR;
+
+    private EditText doiDocumentoET;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -151,9 +152,9 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
         motivoS = findViewById(R.id.motivo);
         tipoDocS = findViewById(R.id.tipoDoc);
         observacion = findViewById(R.id.observacion);
+        doiDocumentoET = findViewById(R.id.doiDocumentoET);
 
         fotoDoc = findViewById(R.id.fotoDoc);
-        escanearQR = findViewById(R.id.escanearQR);
 
         validator = new Validator(this);
         validator.setValidationListener(this);
@@ -204,6 +205,10 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
         apellidosET.setEnabled(false);
         apellidosET.setFocusable(false);
 
+        doiDocumentoET.setFocusable(false);
+
+        doiDocumentoET.setText("OBTENER DOI DEL DOCUMENTO");
+
 
         iniciarSpinnerArea();
         fetchAreaRecintos();
@@ -250,10 +255,9 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
             }
         });
 
-        escanearQR.setOnClickListener(new View.OnClickListener() {
+        doiDocumentoET.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.d("msg124 ", "hola2");
                 escaner();
             }
         });
@@ -279,6 +283,7 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
                 //registrarSalida(result.getContents());
                 Log.d("msg123",result.getContents());
                 codigoQR = result.getContents();
+                doiDocumentoET.setText(result.getContents());
             }
         }
 

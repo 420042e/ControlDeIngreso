@@ -6,12 +6,15 @@ import androidx.appcompat.widget.Toolbar;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.gson.Gson;
 import com.mobsandgeeks.saripaar.annotation.NotEmpty;
 import com.squareup.picasso.OkHttp3Downloader;
 import com.squareup.picasso.Picasso;
@@ -48,6 +51,14 @@ public class DetallesVisita extends AppCompatActivity {
     private EditText fIngreso;
     @NotEmpty
     private EditText fSalida;
+    @NotEmpty
+    private EditText motivo;
+    @NotEmpty
+    private EditText tipoDoc;
+    @NotEmpty
+    private EditText doiDocumento;
+
+    private ImageView doiImagenIV;
 
     private TextInputLayout tilfSalida;
 
@@ -72,12 +83,21 @@ public class DetallesVisita extends AppCompatActivity {
         fSalida = findViewById(R.id.fSalida);
         observacion = findViewById(R.id.observacion);
         tilfSalida = findViewById(R.id.tilfSalida);
+        doiDocumento = findViewById(R.id.doiDocumento);
+        doiImagenIV = findViewById(R.id.doiImagenIV);
+
+        motivo = findViewById(R.id.motivo);
+        tipoDoc = findViewById(R.id.tipoDoc);
 
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         visitaRecibida = (Visita) getIntent().getSerializableExtra("visita");
+
+        Gson gson = new Gson();
+        String descripcion = gson.toJson(visitaRecibida);
+        Log.d("msg915",""+descripcion);
 
         pref = getApplicationContext().getSharedPreferences("MyPref", 0);
         editor = pref.edit();
@@ -132,6 +152,33 @@ public class DetallesVisita extends AppCompatActivity {
         /*fIngreso.setText(visitaRecibida.getVisIngreso());
         fSalida.setText(visitaRecibida.getVisSalida());*/
         observacion.setText(visitaRecibida.getVisObs());
+
+        motivo.setText(visitaRecibida.getMotivo().getMvoNombre());
+        tipoDoc.setText(visitaRecibida.getDocumentoIngreso().getTipoDocumento().getTdoNombre());
+        doiDocumento.setText(visitaRecibida.getDocumentoIngreso().getDoiDocumento());
+
+
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        int height = displayMetrics.heightPixels;
+        int width = displayMetrics.widthPixels;
+
+        OkHttpClient client = new OkHttpClient.Builder()
+                .addInterceptor(new Interceptor() {
+                    @Override
+                    public okhttp3.Response intercept(Chain chain) throws IOException {
+                        Request newRequest = chain.request().newBuilder()
+                                .addHeader("Authorization", authorization)
+                                .build();
+                        return chain.proceed(newRequest);
+                    }
+                })
+                .build();
+        Picasso picasso = new Picasso.Builder(this)
+                .downloader(new OkHttp3Downloader(client))
+                .build();
+        picasso.load("http://190.129.90.115:8083/ingresoVisitantes/documentoIngreso/mostrarFoto?foto=" + visitaRecibida.getDocumentoIngreso().getDoiImagen()).resize(width, width).into(doiImagenIV);
+
     }
 
     @Override

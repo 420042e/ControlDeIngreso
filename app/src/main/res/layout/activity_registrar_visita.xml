@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:android="http://schemas.android.com/apk/res/android"
@@ -147,23 +147,32 @@
                     android:background="@drawable/style_spinner1"
                     android:layout_margin="5dp"/>
 
-
-
                 <TextView
-                    android:id="@+id/textView46"
+                    android:id="@+id/textView3"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
-                    android:layout_marginEnd="10dp"
-                    android:text="Tipo de documento"
+                    android:paddingLeft="5dp"
+                    android:text="DOI Documento"
                     android:textSize="12sp" />
 
-                <Spinner
-                    android:id="@+id/tipoDoc"
+                <EditText
+                    android:id="@+id/doiDocumentoET"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/style_spinner1"
-                    android:layout_margin="5dp"/>
+                    android:layout_margin="5dp"
+                    android:background="@drawable/style_edittext"
+                    android:cursorVisible="false"
+                    android:ems="10"
+                    android:focusable="false"
+                    android:focusableInTouchMode="false"
+                    android:hint="Obtener DOI del documento"
+                    android:inputType="date"
+                    android:paddingLeft="10dp"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="10dp"
+                    android:textSize="14sp"
+                    tools:text="Escanear QR del documento" />
+
 
                 <TextView
                     android:id="@+id/textView5"
@@ -178,11 +187,16 @@
                     android:id="@+id/observacion"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:background="@drawable/style_edittext"
                     android:ems="10"
+                    android:layout_margin="5dp"
                     android:gravity="start|top"
                     android:inputType="textMultiLine"
                     android:lines="4"
-                    android:maxLines="4" />
+                    android:maxLines="4"
+                    android:paddingLeft="10dp"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="10dp"/>
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -208,26 +222,23 @@
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent" />
 
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/escanearQR"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-
-                        android:layout_marginLeft="2dp"
-                        android:layout_marginRight="5dp"
-                        android:layout_weight="1"
-                        android:gravity="center"
-                        android:text="Documento QR"
-                        android:textAllCaps="true"
-                        app:backgroundTint="#8BC34A"
-                        app:icon="@drawable/ic_phone_android_black_24dp"
-                        app:iconGravity="textStart"
-                        app:iconTint="#FFFFFF"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent" />
-
                 </LinearLayout>
+
+                <TextView
+                    android:id="@+id/textView46"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:text="Tipo de documento"
+                    android:textSize="12sp" />
+
+                <Spinner
+                    android:id="@+id/tipoDoc"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="5dp"
+                    android:background="@drawable/style_spinner1" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
