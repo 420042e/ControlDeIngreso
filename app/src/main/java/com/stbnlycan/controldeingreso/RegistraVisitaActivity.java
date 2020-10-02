@@ -110,8 +110,6 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
     @Select
     private Spinner motivoS;
 
-    private Spinner tipoDocS;
-
     private EditText ciET;
     private EditText nombreET;
     private EditText apellidosET;
@@ -135,7 +133,7 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
     private String imagenObtenida;
     private String codigoQR;
 
-    private EditText doiDocumentoET;
+    private final static int REQUEST_CODE_DOI = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -150,9 +148,7 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
         apellidosET = findViewById(R.id.apellidos);
         areaRecintoS = findViewById(R.id.area_recinto);
         motivoS = findViewById(R.id.motivo);
-        tipoDocS = findViewById(R.id.tipoDoc);
         observacion = findViewById(R.id.observacion);
-        doiDocumentoET = findViewById(R.id.doiDocumentoET);
 
         fotoDoc = findViewById(R.id.fotoDoc);
 
@@ -205,9 +201,7 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
         apellidosET.setEnabled(false);
         apellidosET.setFocusable(false);
 
-        doiDocumentoET.setFocusable(false);
 
-        doiDocumentoET.setText("OBTENER DOI DEL DOCUMENTO");
 
 
         iniciarSpinnerArea();
@@ -216,14 +210,11 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
         iniciarSpinnerMotivo();
         fetchMotivos();
 
-        iniciarSpinnerTipoDoc();
-        fetchTipoDoc();
-
         fotoDoc.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Log.d("msg123 ", "hola1");
-                Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                /*Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                 if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
                     File photoFile = null;
                     try {
@@ -251,16 +242,17 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
                             imagenObtenida = photoFile.toString();
                         }
                     }
-                }
+                }*/
+                iniciarDOIActivity();
             }
         });
 
-        doiDocumentoET.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                escaner();
-            }
-        });
+    }
+
+    public void iniciarDOIActivity() {
+        Intent intent = new Intent(RegistraVisitaActivity.this, DocumentosIngreso.class);
+        //intent.putExtra("recCod", getIntent().getStringExtra("recCod"));
+        startActivityForResult(intent, REQUEST_CODE_DOI);
     }
 
     private File createImageFile() throws IOException {
@@ -269,122 +261,6 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
         File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
         File image = File.createTempFile(imageFileName,".jpg",storageDir);
         return image;
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        final IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
-        if (result != null) {
-            if (result.getContents() == null) {
-                Toast.makeText(this, "Cancelaste el escaneo de ingreso", Toast.LENGTH_LONG).show();
-            } else {
-                //showLoadingwDialog();
-                //registrarSalida(result.getContents());
-                Log.d("msg123",result.getContents());
-                codigoQR = result.getContents();
-                doiDocumentoET.setText(result.getContents());
-            }
-        }
-
-
-        if(requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK)
-        {
-            redimensionarImg();
-            DisplayMetrics displayMetrics = new DisplayMetrics();
-            getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-            int height = displayMetrics.heightPixels;
-            int width = displayMetrics.widthPixels;
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-            {
-                if(data != null)
-                {
-                    Bundle extras = data.getExtras();
-                    Bitmap imageBitmap = (Bitmap) extras.get("data");
-                    doiImagenIV.setImageBitmap(imageBitmap);
-                    doiImagenIV.getLayoutParams().width = width;
-                    doiImagenIV.getLayoutParams().height = width;
-                    doiImagenIV.setScaleType(ImageView.ScaleType.CENTER_CROP);
-                }
-                else
-                {
-                    doiImagenIV.setImageURI(uri);
-                    doiImagenIV.getLayoutParams().width = width;
-                    doiImagenIV.getLayoutParams().height = width;
-                    doiImagenIV.setScaleType(ImageView.ScaleType.CENTER_CROP);
-                }
-            }
-            else
-            {
-                Log.d("msg554","hola 2");
-                doiImagenIV.setImageURI(uri);
-                doiImagenIV.getLayoutParams().width = width;
-                doiImagenIV.getLayoutParams().height = width;
-                doiImagenIV.setScaleType(ImageView.ScaleType.CENTER_CROP);
-            }
-        }
-    }
-
-    public void redimensionarImg()
-    {
-        try
-        {
-            // we'll start with the original picture already open to a file
-            File imgFileOrig = new File(imagenObtenida); //change "getPic()" for whatever you need to open the image file.
-            Bitmap b = BitmapFactory.decodeFile(imgFileOrig.getAbsolutePath());
-            // original measurements
-            int origWidth = b.getWidth();
-            int origHeight = b.getHeight();
-
-            //Toast.makeText(getApplicationContext(), "origWidth "+origWidth+" origHeight "+origHeight, Toast.LENGTH_LONG).show();
-
-            final int destWidth = 600;//or the width you need
-
-            if(origWidth > destWidth)
-            {
-                // picture is wider than we want it, we calculate its target height
-                int destHeight = origHeight/( origWidth / destWidth ) ;
-                // we create an scaled bitmap so it reduces the image, not just trim it
-                Bitmap b2 = Bitmap.createScaledBitmap(b, destWidth, destHeight, false);
-
-                if(origWidth > origHeight)
-                {
-                    Matrix matrix = new Matrix();
-                    matrix.postRotate(90);
-                    b2 = Bitmap.createBitmap(b2, 0, 0, b2.getWidth(), b2.getHeight(), matrix, true);
-                }
-
-                ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-                // compress to the format you want, JPEG, PNG...
-                // 70 is the 0-100 quality percentage
-                b2.compress(Bitmap.CompressFormat.JPEG,100 , outStream);
-                // we save the file, at least until we have made use of it
-                //File f = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES) + File.separator + "test.jpg");
-                File f = new File(getExternalFilesDir(Environment.DIRECTORY_PICTURES) + File.separator + imgFileOrig.getName());
-                f.createNewFile();
-                //write the bytes in file
-                FileOutputStream fo = new FileOutputStream(f);
-                fo.write(outStream.toByteArray());
-                // remember close de FileOutput
-                fo.close();
-            }
-        }
-        catch (Exception ex)
-        {
-
-        }
-    }
-
-    public void escaner()
-    {
-        IntentIntegrator intent = new IntentIntegrator( this);
-        intent.setDesiredBarcodeFormats(IntentIntegrator.QR_CODE_TYPES);
-
-        intent.setPrompt("Registrando documento de ingreso");
-        intent.setCameraId(0);
-        intent.setBeepEnabled(false);
-        intent.setBarcodeImageEnabled(false);
-        intent.initiateScan();
     }
 
     public void iniciarSpinnerArea() {
@@ -520,78 +396,6 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
         });
     }
 
-    public void iniciarSpinnerTipoDoc() {
-        tipoDocumento = new ArrayList<>();
-
-        /*AreaRecinto area = new AreaRecinto();
-        area.setAreaCod("cod");
-        area.setAreaNombre("SELECCIONE TIPO DE DOCUMENTO");
-        area.setAreaDescripcion("descripcion");
-        area.setAreaEstado("estado");*/
-
-        TipoDocumento tipoDocumentod = new TipoDocumento();
-        tipoDocumentod.setTdoCod(0);
-        tipoDocumentod.setTdoNombre("SELECCIONE TIPO DE DOCUMENTO");
-        tipoDocumentod.setTdoDescripcion("descripcion");
-
-        tipoDocumento.add(tipoDocumentod);
-        adapterTipoDoc = new ArrayAdapter<TipoDocumento>(this, R.layout.style_spinner, tipoDocumento)
-        {
-            @Override
-            public boolean isEnabled(int position) {
-                if (position == 0) {
-                    return false;
-                } else {
-                    return true;
-                }
-            }
-
-            @Override
-            public View getDropDownView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-                View view = super.getDropDownView(position, convertView, parent);
-                TextView textview = (TextView) view;
-                if (position == 0) {
-                    textview.setTextColor(Color.GRAY);
-                } else {
-                    textview.setTextColor(Color.BLACK);
-                }
-                return view;
-            }
-        };
-        adapterTipoDoc.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        tipoDocS.setAdapter(adapterTipoDoc);
-        tipoDocS.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                /*AreaRecinto areaRecinto = (AreaRecinto) parent.getSelectedItem();
-                displayAreaRData(areaRecinto);*/
-                TipoDocumento tipoDocumento = (TipoDocumento) parent.getSelectedItem();
-            }
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-            }
-        });
-    }
-
-    private void fetchTipoDoc() {
-        Retrofit retrofit = NetworkClient.getRetrofitClient(this);
-        TipoDocAPIs tipoDocAPIs = retrofit.create(TipoDocAPIs.class);
-        Call<List<TipoDocumento>> call = tipoDocAPIs.listaTipoDoc(authorization);
-        call.enqueue(new Callback<List<TipoDocumento>>() {
-            @Override
-            public void onResponse(Call <List<TipoDocumento>> call, retrofit2.Response<List<TipoDocumento>> response) {
-                for(int i = 0 ; i < response.body().size() ; i++)
-                {
-                    tipoDocumento.add(response.body().get(i));
-                }
-            }
-            @Override
-            public void onFailure(Call <List<TipoDocumento>> call, Throwable t) {
-
-            }
-        });
-    }
-
     private void displayAreaRData(AreaRecinto areaRecinto) {
         String cod = areaRecinto.getAreaCod();
         String nombre = areaRecinto.getAreaNombre();
@@ -610,15 +414,10 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
         visita.setAreaRecinto(areaRecinto);
 
         Motivo motivo = (Motivo) motivoS.getSelectedItem();
-        TipoDocumento tipoDocumento = (TipoDocumento) tipoDocS.getSelectedItem();
 
-        DocumentoIngreso documentoIngreso = new DocumentoIngreso();
-        documentoIngreso.setDoiImagen("");
-        documentoIngreso.setDoiDocumento(codigoQR);
-        documentoIngreso.setTipoDocumento(tipoDocumento);
+
 
         visita.setMotivo(motivo);
-        visita.setDocumentoIngreso(documentoIngreso);
 
         //registrarIngreso(visita);
 

@@ -147,32 +147,6 @@
                     android:background="@drawable/style_spinner1"
                     android:layout_margin="5dp"/>
 
-                <TextView
-                    android:id="@+id/textView3"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingLeft="5dp"
-                    android:text="DOI Documento"
-                    android:textSize="12sp" />
-
-                <EditText
-                    android:id="@+id/doiDocumentoET"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="5dp"
-                    android:background="@drawable/style_edittext"
-                    android:cursorVisible="false"
-                    android:ems="10"
-                    android:focusable="false"
-                    android:focusableInTouchMode="false"
-                    android:hint="Obtener DOI del documento"
-                    android:inputType="date"
-                    android:paddingLeft="10dp"
-                    android:paddingTop="10dp"
-                    android:paddingBottom="10dp"
-                    android:textSize="14sp"
-                    tools:text="Escanear QR del documento" />
-
 
                 <TextView
                     android:id="@+id/textView5"
@@ -212,7 +186,7 @@
                         android:layout_marginRight="2dp"
                         android:layout_weight="1"
                         android:gravity="center"
-                        android:text="Foto documento"
+                        android:text="Adjuntar documentos de ingreso"
                         android:textAllCaps="true"
                         app:backgroundTint="#03A9F4"
                         app:icon="@drawable/ic_photo_black_24dp"
@@ -222,34 +196,6 @@
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent" />
 
-                </LinearLayout>
-
-                <TextView
-                    android:id="@+id/textView46"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
-                    android:layout_marginEnd="10dp"
-                    android:text="Tipo de documento"
-                    android:textSize="12sp" />
-
-                <Spinner
-                    android:id="@+id/tipoDoc"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="5dp"
-                    android:background="@drawable/style_spinner1" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="vertical">
-
-                    <ImageView
-                        android:id="@+id/doiImagenIV"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_gravity="center_horizontal" />
                 </LinearLayout>
 
                 <TextView
