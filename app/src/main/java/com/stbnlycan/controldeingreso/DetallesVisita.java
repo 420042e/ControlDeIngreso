@@ -154,8 +154,8 @@ public class DetallesVisita extends AppCompatActivity {
         observacion.setText(visitaRecibida.getVisObs());
 
         motivo.setText(visitaRecibida.getMotivo().getMvoNombre());
-        tipoDoc.setText(visitaRecibida.getDocumentoIngreso().getTipoDocumento().getTdoNombre());
-        doiDocumento.setText(visitaRecibida.getDocumentoIngreso().getDoiDocumento());
+        /*tipoDoc.setText(visitaRecibida.getDocumentosIngreso().get(0).getTipoDocumento().getTdoNombre());
+        doiDocumento.setText(visitaRecibida.getDocumentosIngreso().get(0).getDoiDocumento());*/
 
 
         DisplayMetrics displayMetrics = new DisplayMetrics();
@@ -163,7 +163,7 @@ public class DetallesVisita extends AppCompatActivity {
         int height = displayMetrics.heightPixels;
         int width = displayMetrics.widthPixels;
 
-        OkHttpClient client = new OkHttpClient.Builder()
+        /*OkHttpClient client = new OkHttpClient.Builder()
                 .addInterceptor(new Interceptor() {
                     @Override
                     public okhttp3.Response intercept(Chain chain) throws IOException {
@@ -177,7 +177,7 @@ public class DetallesVisita extends AppCompatActivity {
         Picasso picasso = new Picasso.Builder(this)
                 .downloader(new OkHttp3Downloader(client))
                 .build();
-        picasso.load("http://190.129.90.115:8083/ingresoVisitantes/documentoIngreso/mostrarFoto?foto=" + visitaRecibida.getDocumentoIngreso().getDoiImagen()).resize(width, width).into(doiImagenIV);
+        picasso.load("http://190.129.90.115:8083/ingresoVisitantes/documentoIngreso/mostrarFoto?foto=" + visitaRecibida.getDocumentosIngreso().get(0).getDoiImagen()).resize(width, width).into(doiImagenIV);*/
 
     }
 

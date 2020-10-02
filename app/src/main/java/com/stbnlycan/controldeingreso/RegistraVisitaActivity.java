@@ -9,6 +9,7 @@ import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -19,6 +20,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.FileUtils;
 import android.provider.MediaStore;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -134,6 +136,8 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
     private String codigoQR;
 
     private final static int REQUEST_CODE_DOI = 1;
+    private ArrayList<DocumentoIngreso> doisResult;
+    private ArrayList<String> srcs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -168,6 +172,8 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
 
         visitanteRecibido = (Visitante) getIntent().getSerializableExtra("visitante");
         recintoRecibido = (Recinto) getIntent().getSerializableExtra("recinto");
+
+        srcs = new ArrayList<>();
 
         DisplayMetrics displayMetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
@@ -415,7 +421,7 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
 
         Motivo motivo = (Motivo) motivoS.getSelectedItem();
 
-
+        visita.setDocumentosIngreso(doisResult);
 
         visita.setMotivo(motivo);
 
@@ -481,13 +487,19 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
     }
 
     private void registrarIngreso2(String filePath, String descripcion) {
+        List<MultipartBody.Part> files  = new ArrayList<>();
+        for(int i = 0 ; i < srcs.size() ; i++)
+        {
+            File file = new File(srcs.get(i));
+            RequestBody fileReqBody = RequestBody.create(MediaType.parse("image/*"), file);
+            MultipartBody.Part imageRequest = MultipartBody.Part.createFormData("file[]", file.getName(), fileReqBody);
+            files .add(imageRequest);
+        }
+
         Retrofit retrofit = NetworkClient.getRetrofitClient(this);
         RegistrarIngreso2APIs uploadAPIs = retrofit.create(RegistrarIngreso2APIs.class);
-        File file = new File(filePath);
-        RequestBody fileReqBody = RequestBody.create(MediaType.parse("image/*"), file);
-        MultipartBody.Part part = MultipartBody.Part.createFormData("file", file.getName(), fileReqBody);
         RequestBody description = RequestBody.create(MediaType.parse("text/plain"), descripcion);
-        Call <String> call = uploadAPIs.uploadImage(part, description, authorization);
+        Call <String> call = uploadAPIs.uploadImage(files , description, authorization);
         call.enqueue(new Callback<String>() {
             @Override
             public void onResponse(Call <String> call, retrofit2.Response<String> response) {
@@ -523,43 +535,26 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
                 Log.d("msg2",""+t);
             }
         });
-
-
-
-
-        /*Retrofit retrofit = NetworkClient.getRetrofitClient(this);
-        RegistrarIngresoAPIs registrarIngresoAPIs = retrofit.create(RegistrarIngresoAPIs.class);
-        Call<JsonObject> call = registrarIngresoAPIs.registrarIngreso(visita, authorization);
-        call.enqueue(new Callback<JsonObject>() {
-            @Override
-            public void onResponse(Call <JsonObject> call, retrofit2.Response<JsonObject> response) {
-                String jsonString = response.body().toString();
-                if (jsonString.contains("visCod")) {
-                    Visita visitaRecibida = new Gson().fromJson(jsonString, Visita.class);
-                    //Toast.makeText(getApplicationContext(), visitaRecibida.getVisitante().getVteNombre()+ " " + visitaRecibida.getVisitante().getVteApellidos() + " ha ingresado a " + visitaRecibida.getAreaRecinto().getAreaNombre(), Toast.LENGTH_LONG).show();
-                    Intent intent = new Intent();
-                    intent.putExtra("success", "true");
-                    intent.putExtra("visitaResult", visitaRecibida);
-                    setResult(RESULT_OK, intent);
-                    finish();
-                } else {
-                    Error error = new Gson().fromJson(jsonString, Error.class);
-                    //Toast.makeText(getApplicationContext(), ""+error.getMessage(), Toast.LENGTH_LONG).show();
-
-                    //showDFError(error.getMessage());
-                    Intent intent = new Intent();
-                    intent.putExtra("success", "false");
-                    intent.putExtra("errorResult", error);
-                    setResult(RESULT_OK, intent);
-                    finish();
-                }
-            }
-            @Override
-            public void onFailure(Call <JsonObject> call, Throwable t) {
-                Log.d("msg",""+t.toString());
-            }
-        });*/
     }
+
+    /*@NonNull
+    private MultipartBody.Part prepareFilePart(String partName, Uri fileUri) {
+        // https://github.com/iPaulPro/aFileChooser/blob/master/aFileChooser/src/com/ipaulpro/afilechooser/utils/FileUtils.java
+        // use the FileUtils to get the actual file by uri
+        File file = FileUtils.getFile(this, fileUri);
+        //compress the image using Compressor lib
+        Timber.d("size of image before compression --> " + file.getTotalSpace());
+        compressedImageFile = new Compressor(this).compressToFile(file);
+        Timber.d("size of image after compression --> " + compressedImageFile.getTotalSpace());
+        // create RequestBody instance from file
+        RequestBody requestFile =
+                RequestBody.create(
+                        MediaType.parse(getContentResolver().getType(fileUri)),
+                        compressedImageFile);
+
+        // MultipartBody.Part is used to send also the actual file name
+        return MultipartBody.Part.createFormData(partName, file.getName(), requestFile);
+    }*/
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
@@ -623,6 +618,31 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
         }
         ft.addToBackStack(null);
         dfError.show(ft, "dialogError");
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == Activity.RESULT_OK)
+        {
+            if (requestCode == REQUEST_CODE_DOI)
+            {
+                Bundle b = data.getExtras();
+                if (data != null)
+                {
+                    doisResult = (ArrayList<DocumentoIngreso>) b.getSerializable("doisResult");
+                    for(int i = 0 ; i < doisResult.size() ;i++)
+                    {
+                        Log.d("msg943",""+doisResult.get(i).getTipoDocumento().getTdoNombre());
+                        Log.d("msg943",""+doisResult.get(i).getDoiImagen());
+                        srcs.add(doisResult.get(i).getDoiImagen());
+
+                        File f = new File(doisResult.get(i).getDoiImagen());
+                        doisResult.get(i).setDoiImagen(f.getName());
+                    }
+                }
+            }
+        }
     }
 
 }

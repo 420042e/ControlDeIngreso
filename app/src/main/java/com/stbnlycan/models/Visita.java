@@ -4,6 +4,7 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
 public class Visita implements Serializable {
 
@@ -39,9 +40,9 @@ public class Visita implements Serializable {
     @Expose
     private Motivo motivo;
 
-    @SerializedName("documentoIngreso")
+    @SerializedName("documentosIngreso")
     @Expose
-    private DocumentoIngreso documentoIngreso;
+    private ArrayList<DocumentoIngreso> documentosIngreso;
 
     public String getVisCod() {
         return visCod;
@@ -107,11 +108,11 @@ public class Visita implements Serializable {
         this.motivo = motivo;
     }
 
-    public DocumentoIngreso getDocumentoIngreso() {
-        return documentoIngreso;
+    public ArrayList<DocumentoIngreso> getDocumentosIngreso() {
+        return documentosIngreso;
     }
 
-    public void setDocumentoIngreso(DocumentoIngreso documentoIngreso) {
-        this.documentoIngreso = documentoIngreso;
+    public void setDocumentosIngreso(ArrayList<DocumentoIngreso> documentoIngreso) {
+        this.documentosIngreso = documentoIngreso;
     }
 }

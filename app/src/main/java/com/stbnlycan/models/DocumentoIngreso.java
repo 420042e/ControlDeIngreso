@@ -24,9 +24,6 @@ public class DocumentoIngreso implements Serializable {
     @Expose
     private TipoDocumento tipoDocumento;
 
-    @SerializedName("visitas")
-    @Expose
-    private List<Visita> visitas = new ArrayList<>();
 
     public Integer getDoiCod() {
         return doiCod;
@@ -60,11 +57,4 @@ public class DocumentoIngreso implements Serializable {
         this.tipoDocumento = tipoDocumento;
     }
 
-    public List<Visita> getVisitas() {
-        return visitas;
-    }
-
-    public void setVisitas(List<Visita> visitas) {
-        this.visitas = visitas;
-    }
 }

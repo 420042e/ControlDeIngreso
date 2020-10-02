@@ -20,7 +20,6 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".DocumentosIngreso"></activity>
 
         <provider
             android:name="androidx.core.content.FileProvider"
@@ -32,6 +31,9 @@
                 android:resource="@xml/file_paths" />
         </provider>
 
+        <activity
+            android:name=".DocumentosIngreso"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".DetallesUsuario"
             android:screenOrientation="portrait" />
