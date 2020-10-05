@@ -15,6 +15,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Matrix;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -36,6 +38,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 import com.mobsandgeeks.saripaar.ValidationError;
@@ -119,7 +122,8 @@ public class DocumentosIngreso extends AppCompatActivity implements DOIAdapter.O
 
         doiDocumentoET.setFocusable(false);
 
-        dois = new ArrayList<>();
+        //dois = new ArrayList<>();
+        dois = (ArrayList<DocumentoIngreso>) getIntent().getSerializableExtra("dois");
 
         doiAdapter = new DOIAdapter(dois);
         doiAdapter.setOnDOIClickListener(DocumentosIngreso.this);
@@ -223,6 +227,7 @@ public class DocumentosIngreso extends AppCompatActivity implements DOIAdapter.O
             Log.d("msg6545 ", "" + imagenObtenida);
             File f = new File(imagenObtenida);
             Picasso.get().load(f).resize(300, 300).into(doiImagenIV);
+            doiImagenIV.setTag("Img");
 
             /*Bitmap bmImg = BitmapFactory.decodeFile(f.getAbsolutePath());
             doiImagenIV.setImageBitmap(bmImg);*/
@@ -431,23 +436,33 @@ public class DocumentosIngreso extends AppCompatActivity implements DOIAdapter.O
 
     @Override
     public void onValidationSucceeded() {
-        File f = new File(imagenObtenida);
-        DocumentoIngreso doi = new DocumentoIngreso();
-        doi.setDoiImagen(imagenObtenida);
-        doi.setDoiDocumento(qrObtenido);
-        TipoDocumento tipoDocumento = (TipoDocumento) tipoDocS.getSelectedItem();
-        doi.setTipoDocumento(tipoDocumento);
-        dois.add(0, doi);
-        recyclerView.smoothScrollToPosition(0);
-        doiAdapter.notifyItemInserted(0);
+        Log.d("msg991",""+doiImagenIV.getTag());
+        if(doiImagenIV.getTag().equals("noImg"))
+        {
+            Toast.makeText(this, "Debes añadir una fotografía", Toast.LENGTH_LONG).show();
+        }
+        else
+        {
+            File f = new File(imagenObtenida);
+            DocumentoIngreso doi = new DocumentoIngreso();
+            doi.setDoiImagen(imagenObtenida);
+            doi.setDoiDocumento(qrObtenido);
+            TipoDocumento tipoDocumento = (TipoDocumento) tipoDocS.getSelectedItem();
+            doi.setTipoDocumento(tipoDocumento);
+            dois.add(0, doi);
+            recyclerView.smoothScrollToPosition(0);
+            doiAdapter.notifyItemInserted(0);
 
-        //Reiniciar componentes
-        tipoDocS.setSelection(0, true);
-        doiDocumentoET.setText("");
-        doiImagenIV.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_add_a_photo_black_48dp));
+            //Reiniciar componentes
+            tipoDocS.setSelection(0, true);
+            doiDocumentoET.setText("");
+            doiImagenIV.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_add_a_photo_black_48dp));
+            doiImagenIV.setTag("noImg");
 
         /*Bitmap bmImg = BitmapFactory.decodeFile(f.getAbsolutePath());
         doiImagenIV.setImageBitmap(bmImg);*/
+        }
+
     }
 
     @Override
@@ -462,4 +477,5 @@ public class DocumentosIngreso extends AppCompatActivity implements DOIAdapter.O
             }
         }
     }
+
 }

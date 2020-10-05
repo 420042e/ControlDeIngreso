@@ -189,7 +189,7 @@
                         android:text="Adjuntar documentos de ingreso"
                         android:textAllCaps="true"
                         app:backgroundTint="#03A9F4"
-                        app:icon="@drawable/ic_photo_black_24dp"
+                        app:icon="@drawable/ic_note_add_black_24dp"
                         app:iconGravity="textStart"
                         app:iconTint="#FFFFFF"
                         app:layout_constraintBottom_toBottomOf="parent"

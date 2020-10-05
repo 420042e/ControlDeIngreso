@@ -4,20 +4,26 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.gson.Gson;
 import com.mobsandgeeks.saripaar.annotation.NotEmpty;
 import com.squareup.picasso.OkHttp3Downloader;
 import com.squareup.picasso.Picasso;
+import com.stbnlycan.interfaces.LogoutAPIs;
 import com.stbnlycan.models.Visita;
 
 import java.io.IOException;
@@ -28,6 +34,9 @@ import java.util.Date;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Retrofit;
 
 public class DetallesVisita extends AppCompatActivity {
 
@@ -53,10 +62,7 @@ public class DetallesVisita extends AppCompatActivity {
     private EditText fSalida;
     @NotEmpty
     private EditText motivo;
-    @NotEmpty
-    private EditText tipoDoc;
-    @NotEmpty
-    private EditText doiDocumento;
+    private Button verDois;
 
     private ImageView doiImagenIV;
 
@@ -83,11 +89,9 @@ public class DetallesVisita extends AppCompatActivity {
         fSalida = findViewById(R.id.fSalida);
         observacion = findViewById(R.id.observacion);
         tilfSalida = findViewById(R.id.tilfSalida);
-        doiDocumento = findViewById(R.id.doiDocumento);
         doiImagenIV = findViewById(R.id.doiImagenIV);
-
         motivo = findViewById(R.id.motivo);
-        tipoDoc = findViewById(R.id.tipoDoc);
+        verDois = findViewById(R.id.verDois);
 
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -95,9 +99,9 @@ public class DetallesVisita extends AppCompatActivity {
 
         visitaRecibida = (Visita) getIntent().getSerializableExtra("visita");
 
-        Gson gson = new Gson();
+        /*Gson gson = new Gson();
         String descripcion = gson.toJson(visitaRecibida);
-        Log.d("msg915",""+descripcion);
+        Log.d("msg915",""+descripcion);*/
 
         pref = getApplicationContext().getSharedPreferences("MyPref", 0);
         editor = pref.edit();
@@ -179,6 +183,22 @@ public class DetallesVisita extends AppCompatActivity {
                 .build();
         picasso.load("http://190.129.90.115:8083/ingresoVisitantes/documentoIngreso/mostrarFoto?foto=" + visitaRecibida.getDocumentosIngreso().get(0).getDoiImagen()).resize(width, width).into(doiImagenIV);*/
 
+        verDois.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(DetallesVisita.this, VerDocumentosIngreso.class);
+                intent.putExtra("visita", visitaRecibida);
+                //startActivityForResult(intent, REQUEST_CODE_NV);
+                startActivity(intent);
+            }
+        });
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_dv, menu);
+        return true;
     }
 
     @Override
@@ -187,7 +207,33 @@ public class DetallesVisita extends AppCompatActivity {
             case android.R.id.home:
                 finish();
                 return false;
+            case R.id.action_salir:
+                cerrarSesion();
+                Intent intent = new Intent(DetallesVisita.this, LoginActivity.class);
+                startActivity(intent);
+                finish();
+                return false;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void cerrarSesion() {
+        Retrofit retrofit = NetworkClient.getRetrofitClient(this);
+        LogoutAPIs logoutAPIs = retrofit.create(LogoutAPIs.class);
+        Call<Void> call = logoutAPIs.logout(pref.getString("access_token", null));
+        call.enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(Call <Void> call, retrofit2.Response<Void> response) {
+                editor.putString("access_token", "");
+                editor.putString("token_type", "");
+                editor.putString("rol", "");
+                editor.apply();
+                Toast.makeText(getApplicationContext(), "Sesión finalizada", Toast.LENGTH_LONG).show();
+            }
+            @Override
+            public void onFailure(Call <Void> call, Throwable t) {
+                Log.d("msg4125","hola "+t.toString());
+            }
+        });
     }
 }

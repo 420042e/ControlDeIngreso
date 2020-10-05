@@ -32,8 +32,11 @@
         </provider>
 
         <activity
+            android:name=".VerDocumentosIngreso"
+            android:screenOrientation="portrait"></activity>
+        <activity
             android:name=".DocumentosIngreso"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"></activity>
         <activity
             android:name=".DetallesUsuario"
             android:screenOrientation="portrait" />

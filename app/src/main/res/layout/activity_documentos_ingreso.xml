@@ -59,7 +59,8 @@
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
                         android:layout_weight="1"
-                        android:src="@drawable/ic_add_a_photo_black_48dp" />
+                        android:src="@drawable/ic_add_a_photo_black_48dp"
+                        android:tag="noImg" />
 
                     <LinearLayout
                         android:id="@+id/filtro"

@@ -50,6 +50,7 @@ import com.squareup.picasso.OkHttp3Downloader;
 import com.squareup.picasso.Picasso;
 import com.stbnlycan.fragments.DFError;
 import com.stbnlycan.fragments.DFIngreso;
+import com.stbnlycan.fragments.LoadingFragment;
 import com.stbnlycan.interfaces.AreaRecintoAPIs;
 import com.stbnlycan.interfaces.LogoutAPIs;
 import com.stbnlycan.interfaces.MotivosAPIs;
@@ -105,6 +106,7 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
     private ArrayAdapter<TipoDocumento> adapterTipoDoc;
     private Visitante visitanteRecibido;
     private Recinto recintoRecibido;
+    private LoadingFragment loadingFragment;
 
     @Select
     private Spinner areaRecintoS;
@@ -160,6 +162,7 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
         validator.setValidationListener(this);
 
         codigoQR = "";
+        doisResult = new ArrayList<>();
 
         pref = getApplicationContext().getSharedPreferences("MyPref", 0);
         editor = pref.edit();
@@ -257,7 +260,7 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
 
     public void iniciarDOIActivity() {
         Intent intent = new Intent(RegistraVisitaActivity.this, DocumentosIngreso.class);
-        //intent.putExtra("recCod", getIntent().getStringExtra("recCod"));
+        intent.putExtra("dois", doisResult);
         startActivityForResult(intent, REQUEST_CODE_DOI);
     }
 
@@ -413,6 +416,12 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
 
     @Override
     public void onValidationSucceeded() {
+        for(int i = 0 ; i < doisResult.size() ;i++)
+        {
+            srcs.add(doisResult.get(i).getDoiImagen());
+            File f = new File(doisResult.get(i).getDoiImagen());
+            doisResult.get(i).setDoiImagen(f.getName());
+        }
         Visita visita = new Visita();
         AreaRecinto areaRecinto = (AreaRecinto) areaRecintoS.getSelectedItem();
         visita.setVisObs(observacion.getText().toString().toUpperCase());
@@ -429,7 +438,8 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
 
         Gson gson = new Gson();
         String descripcion = gson.toJson(visita);
-        Log.d("msg912",""+descripcion);
+        //Log.d("msg912",""+descripcion);
+        showLoadingwDialog();
         registrarIngreso2(imagenObtenida, descripcion);
     }
 
@@ -492,8 +502,8 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
         {
             File file = new File(srcs.get(i));
             RequestBody fileReqBody = RequestBody.create(MediaType.parse("image/*"), file);
-            MultipartBody.Part imageRequest = MultipartBody.Part.createFormData("file[]", file.getName(), fileReqBody);
-            files .add(imageRequest);
+            MultipartBody.Part imageRequest = MultipartBody.Part.createFormData("files", file.getName(), fileReqBody);
+            files.add(imageRequest);
         }
 
         Retrofit retrofit = NetworkClient.getRetrofitClient(this);
@@ -503,15 +513,16 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
         call.enqueue(new Callback<String>() {
             @Override
             public void onResponse(Call <String> call, retrofit2.Response<String> response) {
-                //Log.d("msg432",""+response.body());
                 Gson gson = new Gson();
                 String descripcion = gson.toJson(response.body());
-                Log.d("msg512",""+descripcion);
+                Log.d("msg919",""+descripcion);
+                showLoadingwDialog();
 
-                String jsonString = response.body().toString();
+                String jsonString = response.body();
                 if (jsonString.contains("visCod")) {
                     Visita visitaRecibida = new Gson().fromJson(jsonString, Visita.class);
                     //Toast.makeText(getApplicationContext(), visitaRecibida.getVisitante().getVteNombre()+ " " + visitaRecibida.getVisitante().getVteApellidos() + " ha ingresado a " + visitaRecibida.getAreaRecinto().getAreaNombre(), Toast.LENGTH_LONG).show();
+                    loadingFragment.dismiss();
                     Intent intent = new Intent();
                     intent.putExtra("success", "true");
                     intent.putExtra("visitaResult", visitaRecibida);
@@ -521,6 +532,7 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
                     Error error = new Gson().fromJson(jsonString, Error.class);
                     //Toast.makeText(getApplicationContext(), ""+error.getMessage(), Toast.LENGTH_LONG).show();
 
+                    loadingFragment.dismiss();
                     //showDFError(error.getMessage());
                     Intent intent = new Intent();
                     intent.putExtra("success", "false");
@@ -630,19 +642,34 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
                 Bundle b = data.getExtras();
                 if (data != null)
                 {
+                    //doisResult = null;
                     doisResult = (ArrayList<DocumentoIngreso>) b.getSerializable("doisResult");
-                    for(int i = 0 ; i < doisResult.size() ;i++)
-                    {
-                        Log.d("msg943",""+doisResult.get(i).getTipoDocumento().getTdoNombre());
-                        Log.d("msg943",""+doisResult.get(i).getDoiImagen());
-                        srcs.add(doisResult.get(i).getDoiImagen());
 
+                    /*for(int i = 0 ; i < doisResult.size() ;i++)
+                    {
+                        srcs.add(doisResult.get(i).getDoiImagen());
                         File f = new File(doisResult.get(i).getDoiImagen());
                         doisResult.get(i).setDoiImagen(f.getName());
-                    }
+                    }*/
                 }
             }
         }
+    }
+
+    public void showLoadingwDialog() {
+        loadingFragment = new LoadingFragment();
+        FragmentTransaction ft;
+        Bundle bundle = new Bundle();
+        bundle.putInt("tiempo", 0);
+        loadingFragment.setArguments(bundle);
+        //dialogFragment.setTargetFragment(this, 1);
+        ft = getSupportFragmentManager().beginTransaction();
+        Fragment prev = getSupportFragmentManager().findFragmentByTag("dialogLoading");
+        if (prev != null) {
+            ft.remove(prev);
+        }
+        ft.addToBackStack(null);
+        loadingFragment.show(ft, "dialogLoading");
     }
 
 }
