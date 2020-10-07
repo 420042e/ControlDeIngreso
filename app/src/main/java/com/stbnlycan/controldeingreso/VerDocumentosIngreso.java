@@ -185,6 +185,9 @@ public class VerDocumentosIngreso extends AppCompatActivity implements DOI2Adapt
 
     @Override
     public void OnDOIClick(DocumentoIngreso doi) {
-
+        Intent intent = new Intent(VerDocumentosIngreso.this, Foto.class);
+        intent.putExtra("doi", doi);
+        //startActivityForResult(intent, REQUEST_CODE_DOI);
+        startActivity(intent);
     }
 }

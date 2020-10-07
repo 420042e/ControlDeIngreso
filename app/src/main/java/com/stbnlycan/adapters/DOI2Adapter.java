@@ -54,7 +54,7 @@ public class DOI2Adapter extends RecyclerView.Adapter<DOI2Adapter.ARV>{
     @NonNull
     @Override
     public ARV onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return new DOI2Adapter.ARV(LayoutInflater.from(parent.getContext()).inflate(R.layout.doi_list, parent, false));
+        return new DOI2Adapter.ARV(LayoutInflater.from(parent.getContext()).inflate(R.layout.doi2_list, parent, false));
     }
 
     @Override
