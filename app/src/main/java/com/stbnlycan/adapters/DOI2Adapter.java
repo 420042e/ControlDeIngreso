@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -58,7 +59,7 @@ public class DOI2Adapter extends RecyclerView.Adapter<DOI2Adapter.ARV>{
     }
 
     @Override
-    public void onBindViewHolder(@NonNull DOI2Adapter.ARV holder, int position) {
+    public void onBindViewHolder(@NonNull final DOI2Adapter.ARV holder, int position) {
         DocumentoIngreso doi = doiList.get(position);
 
         /*File f = new File(doi.getDoiImagen());
@@ -66,7 +67,17 @@ public class DOI2Adapter extends RecyclerView.Adapter<DOI2Adapter.ARV>{
         Picasso picasso = new Picasso.Builder(context)
                 .downloader(new OkHttp3Downloader(client))
                 .build();
-        picasso.load("http://190.129.90.115:8083/ingresoVisitantes/documentoIngreso/mostrarFoto?foto=" + doi.getDoiImagen()).fit().into(holder.doiImagen);
+        picasso.load("http://190.129.90.115:8083/ingresoVisitantes/documentoIngreso/mostrarFoto?foto=" + doi.getDoiImagen()).fit().into(holder.doiImagen, new com.squareup.picasso.Callback() {
+            @Override
+            public void onSuccess() {
+                holder.progressBar.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onError(Exception e) {
+
+            }
+        });
 
         //holder.visitante = eventosList.get(position);
 
@@ -85,11 +96,14 @@ public class DOI2Adapter extends RecyclerView.Adapter<DOI2Adapter.ARV>{
         private ImageView doiImagen;
         private TextView tdoNombre;
         private DocumentoIngreso doi;
+        private ProgressBar progressBar;
 
         public ARV(@NonNull View itemView) {
             super(itemView);
             doiImagen = itemView.findViewById(R.id.doiImagen);
             tdoNombre = itemView.findViewById(R.id.tdoNombre);
+            progressBar = itemView.findViewById(R.id.progressBar);
+            progressBar.setVisibility(View.VISIBLE);
 
             itemView.setOnClickListener(this);
         }

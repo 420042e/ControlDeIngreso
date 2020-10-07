@@ -179,9 +179,6 @@ public class Empresas extends AppCompatActivity implements EmpresasAdapter.OnVis
                 return false;
             case R.id.action_salir:
                 cerrarSesion();
-                Intent intentS = new Intent(Empresas.this, LoginActivity.class);
-                startActivity(intentS);
-                finish();
                 return false;
         }
         return super.onOptionsItemSelected(item);
@@ -199,6 +196,9 @@ public class Empresas extends AppCompatActivity implements EmpresasAdapter.OnVis
                 editor.putString("rol", "");
                 editor.apply();
                 Toast.makeText(getApplicationContext(), "Sesión finalizada", Toast.LENGTH_LONG).show();
+                Intent intentS = new Intent(Empresas.this, LoginActivity.class);
+                startActivity(intentS);
+                finish();
             }
             @Override
             public void onFailure(Call <Void> call, Throwable t) {

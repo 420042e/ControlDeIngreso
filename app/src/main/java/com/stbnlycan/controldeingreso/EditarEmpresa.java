@@ -171,9 +171,6 @@ public class EditarEmpresa extends AppCompatActivity implements Validator.Valida
                 return false;
             case R.id.action_salir:
                 cerrarSesion();
-                Intent intent = new Intent(EditarEmpresa.this, LoginActivity.class);
-                startActivity(intent);
-                finish();
                 return false;
         }
         return super.onOptionsItemSelected(item);
@@ -191,6 +188,9 @@ public class EditarEmpresa extends AppCompatActivity implements Validator.Valida
                 editor.putString("rol", "");
                 editor.apply();
                 Toast.makeText(getApplicationContext(), "Sesión finalizada", Toast.LENGTH_LONG).show();
+                Intent intent = new Intent(EditarEmpresa.this, LoginActivity.class);
+                startActivity(intent);
+                finish();
             }
             @Override
             public void onFailure(Call <Void> call, Throwable t) {

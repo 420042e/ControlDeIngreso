@@ -133,9 +133,6 @@ public class NuevoHorarioActivity extends AppCompatActivity implements Validator
                 return false;
             case R.id.action_salir:
                 cerrarSesion();
-                Intent intent = new Intent(NuevoHorarioActivity.this, LoginActivity.class);
-                startActivity(intent);
-                finish();
                 return false;
         }
         return super.onOptionsItemSelected(item);
@@ -153,6 +150,9 @@ public class NuevoHorarioActivity extends AppCompatActivity implements Validator
                 editor.putString("rol", "");
                 editor.apply();
                 Toast.makeText(getApplicationContext(), "Sesión finalizada", Toast.LENGTH_LONG).show();
+                Intent intent = new Intent(NuevoHorarioActivity.this, LoginActivity.class);
+                startActivity(intent);
+                finish();
             }
             @Override
             public void onFailure(Call <Void> call, Throwable t) {

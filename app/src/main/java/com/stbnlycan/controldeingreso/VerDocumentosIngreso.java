@@ -119,9 +119,6 @@ public class VerDocumentosIngreso extends AppCompatActivity implements DOI2Adapt
                 return false;
             case R.id.action_salir:
                 cerrarSesion();
-                Intent intent = new Intent(VerDocumentosIngreso.this, LoginActivity.class);
-                startActivity(intent);
-                finish();
                 return false;
         }
         return super.onOptionsItemSelected(item);
@@ -139,6 +136,9 @@ public class VerDocumentosIngreso extends AppCompatActivity implements DOI2Adapt
                 editor.putString("rol", "");
                 editor.apply();
                 Toast.makeText(getApplicationContext(), "Sesión finalizada", Toast.LENGTH_LONG).show();
+                Intent intent = new Intent(VerDocumentosIngreso.this, LoginActivity.class);
+                startActivity(intent);
+                finish();
             }
 
             @Override

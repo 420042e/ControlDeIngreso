@@ -224,7 +224,7 @@ public class DocumentosIngreso extends AppCompatActivity implements DOIAdapter.O
         }
 
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-            Log.d("msg6545 ", "" + imagenObtenida);
+            //Log.d("msg6545 ", "" + imagenObtenida);
             File f = new File(imagenObtenida);
             Picasso.get().load(f).resize(300, 300).into(doiImagenIV);
             doiImagenIV.setTag("Img");
@@ -280,7 +280,7 @@ public class DocumentosIngreso extends AppCompatActivity implements DOIAdapter.O
 
             //Toast.makeText(getApplicationContext(), "origWidth "+origWidth+" origHeight "+origHeight, Toast.LENGTH_LONG).show();
 
-            final int destWidth = 600;//or the width you need
+            final int destWidth = 1080;//or the width you need
 
             if (origWidth > destWidth) {
                 // picture is wider than we want it, we calculate its target height
@@ -327,9 +327,6 @@ public class DocumentosIngreso extends AppCompatActivity implements DOIAdapter.O
                 return false;
             case R.id.action_salir:
                 cerrarSesion();
-                Intent intent = new Intent(DocumentosIngreso.this, LoginActivity.class);
-                startActivity(intent);
-                finish();
                 return false;
         }
         return super.onOptionsItemSelected(item);
@@ -420,6 +417,9 @@ public class DocumentosIngreso extends AppCompatActivity implements DOIAdapter.O
                 editor.putString("rol", "");
                 editor.apply();
                 Toast.makeText(getApplicationContext(), "Sesión finalizada", Toast.LENGTH_LONG).show();
+                Intent intent = new Intent(DocumentosIngreso.this, LoginActivity.class);
+                startActivity(intent);
+                finish();
             }
 
             @Override

@@ -4,25 +4,37 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Matrix;
 import android.os.Bundle;
+import android.util.Base64;
 import android.util.Log;
+import android.view.Display;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
+import android.view.View;
+import android.view.WindowManager;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.squareup.picasso.OkHttp3Downloader;
 import com.squareup.picasso.Picasso;
+import com.stbnlycan.custom.TouchImageView;
 import com.stbnlycan.interfaces.LogoutAPIs;
 import com.stbnlycan.models.DocumentoIngreso;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.HashMap;
 
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
@@ -34,7 +46,6 @@ import retrofit2.Retrofit;
 
 public class Foto extends AppCompatActivity {
 
-    ImageView imageView;
     Matrix matrix = new Matrix();
     float scale = 1f;
     ScaleGestureDetector SGD;
@@ -43,22 +54,33 @@ public class Foto extends AppCompatActivity {
     private SharedPreferences pref;
     private SharedPreferences.Editor editor;
     private Toolbar toolbar;
+    private ProgressBar progressBar;
+
+    private TouchImageView imageView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_foto);
 
-        setTitle("Foto");
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-        imageView = findViewById(R.id.imageView);
         //SGD = new ScaleGestureDetector(this, new ScaleListener());
+        imageView = findViewById(R.id.imageView);
+        progressBar = findViewById(R.id.progressBar);
+
+        progressBar.setVisibility(View.VISIBLE);
+
+        /*imageView2.setImageResource(R.drawable.icono_visitantes);
+        imageView2.setMaxZoom(4f);*/
 
         doiRecibido = (DocumentoIngreso) getIntent().getSerializableExtra("doi");
+
+        setTitle(doiRecibido.getTipoDocumento().getTdoDescripcion());
+
         pref = getApplicationContext().getSharedPreferences("MyPref", 0);
         editor = pref.edit();
         authorization = pref.getString("token_type", null) + " " + pref.getString("access_token", null);
@@ -77,31 +99,18 @@ public class Foto extends AppCompatActivity {
         Picasso picasso = new Picasso.Builder(this)
                 .downloader(new OkHttp3Downloader(client))
                 .build();
-        picasso.load("http://190.129.90.115:8083/ingresoVisitantes/documentoIngreso/mostrarFoto?foto=" + doiRecibido.getDoiImagen()).fit().into(imageView);
-        Log.d("msg126",""+doiRecibido.getDoiImagen());
+        picasso.load("http://190.129.90.115:8083/ingresoVisitantes/documentoIngreso/mostrarFoto?foto=" + doiRecibido.getDoiImagen()).into(imageView, new com.squareup.picasso.Callback() {
+            @Override
+            public void onSuccess() {
+                progressBar.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onError(Exception e) {
+
+            }
+        });
     }
-
-    /*private class ScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
-        @Override
-        public boolean onScale(ScaleGestureDetector detector) {
-            scale = scale*detector.getScaleFactor();
-            scale = Math.max(0.1f, Math.min(scale, 5f));
-
-            scale = (scale < 1 ? 1 : scale);
-            matrix.setScale(scale, scale);
-            imageView.setImageMatrix(matrix);
-            Log.d("msg123",""+scale+" "+detector.getScaleFactor());
-
-            return true;
-        }
-    }
-
-
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        SGD.onTouchEvent(event);
-        return true;
-    }*/
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -118,9 +127,6 @@ public class Foto extends AppCompatActivity {
                 return false;
             case R.id.action_salir:
                 cerrarSesion();
-                Intent intent = new Intent(Foto.this, LoginActivity.class);
-                startActivity(intent);
-                finish();
                 return false;
         }
         return super.onOptionsItemSelected(item);
@@ -138,6 +144,9 @@ public class Foto extends AppCompatActivity {
                 editor.putString("rol", "");
                 editor.apply();
                 Toast.makeText(getApplicationContext(), "Sesión finalizada", Toast.LENGTH_LONG).show();
+                Intent intent = new Intent(Foto.this, LoginActivity.class);
+                startActivity(intent);
+                finish();
             }
 
             @Override

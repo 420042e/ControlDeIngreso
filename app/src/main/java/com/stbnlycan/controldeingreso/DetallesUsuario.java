@@ -12,8 +12,10 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -58,6 +60,8 @@ public class DetallesUsuario extends AppCompatActivity {
     private String authorization;
     private SharedPreferences pref;
     private SharedPreferences.Editor editor;
+    private ProgressBar progressBar;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -70,7 +74,7 @@ public class DetallesUsuario extends AppCompatActivity {
         authorization = pref.getString("token_type", null) + " " + pref.getString("access_token", null);
         rol = pref.getString("rol", null);
 
-        setTitle("Nuevo usuario");
+        setTitle("Detalles usuario");
 
         DisplayMetrics displayMetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
@@ -86,11 +90,14 @@ public class DetallesUsuario extends AppCompatActivity {
         phoneET = findViewById(R.id.phone);
         addressET = findViewById(R.id.address);
         rolET = findViewById(R.id.rol);
+        progressBar = findViewById(R.id.progressBar);
 
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
+
+        progressBar.setVisibility(View.VISIBLE);
 
         OkHttpClient client = new OkHttpClient.Builder()
                 .addInterceptor(new Interceptor() {
@@ -106,7 +113,17 @@ public class DetallesUsuario extends AppCompatActivity {
         Picasso picasso = new Picasso.Builder(this)
                 .downloader(new OkHttp3Downloader(client))
                 .build();
-        picasso.load("http://190.129.90.115:8083/ingresoVisitantes/usuarios/mostrarFoto?foto=" + usuarioRecibido.getPic()).resize(width, width).into(visitanteIV);
+        picasso.load("http://190.129.90.115:8083/ingresoVisitantes/usuarios/mostrarFoto?foto=" + usuarioRecibido.getPic()).resize(width, width).into(visitanteIV, new com.squareup.picasso.Callback() {
+            @Override
+            public void onSuccess() {
+                progressBar.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onError(Exception e) {
+
+            }
+        } );
 
 
         usernameET.setText(usuarioRecibido.getUsername());
@@ -133,9 +150,6 @@ public class DetallesUsuario extends AppCompatActivity {
                 return false;
             case R.id.action_salir:
                 cerrarSesion();
-                Intent intentS = new Intent(DetallesUsuario.this, LoginActivity.class);
-                startActivity(intentS);
-                finish();
                 return false;
         }
         return super.onOptionsItemSelected(item);
@@ -153,6 +167,9 @@ public class DetallesUsuario extends AppCompatActivity {
                 editor.putString("rol", "");
                 editor.apply();
                 Toast.makeText(getApplicationContext(), "Sesión finalizada", Toast.LENGTH_LONG).show();
+                Intent intentS = new Intent(DetallesUsuario.this, LoginActivity.class);
+                startActivity(intentS);
+                finish();
             }
             @Override
             public void onFailure(Call <Void> call, Throwable t) {

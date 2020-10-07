@@ -28,6 +28,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -40,6 +41,7 @@ import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.gson.Gson;
 import com.mobsandgeeks.saripaar.ValidationError;
 import com.mobsandgeeks.saripaar.Validator;
@@ -113,7 +115,6 @@ public class EditarVisitanteActivity extends AppCompatActivity implements Valida
     private Visitante visitanteRecibido;
     private int position;
     private Toolbar toolbar;
-    private Button btnNF;
     private String imagenObtenida;
     private Button btnNE;
     private final static int REQUEST_CODE_NE = 1;
@@ -126,6 +127,8 @@ public class EditarVisitanteActivity extends AppCompatActivity implements Valida
     private Uri uri;
     private Visitante visitanteResult;
     private boolean cambioFoto;
+    private ProgressBar progressBar;
+    private FloatingActionButton fabNF;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -145,7 +148,8 @@ public class EditarVisitanteActivity extends AppCompatActivity implements Valida
         empresaS = findViewById(R.id.empresa);
         tipoVisitanteS = findViewById(R.id.tipo_visitante);
         btnNE = findViewById(R.id.btnNE);
-        btnNF = findViewById(R.id.btnNF);
+        progressBar = findViewById(R.id.progressBar);
+        fabNF = findViewById(R.id.fabNF);
 
         pref = getApplicationContext().getSharedPreferences("MyPref", 0);
         editor = pref.edit();
@@ -160,6 +164,7 @@ public class EditarVisitanteActivity extends AppCompatActivity implements Valida
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
+        progressBar.setVisibility(View.VISIBLE);
 
         iniciarSpinnerEmpresa();
         iniciarSpinnerTipoVisitante();
@@ -193,7 +198,17 @@ public class EditarVisitanteActivity extends AppCompatActivity implements Valida
         Picasso picasso = new Picasso.Builder(this)
                 .downloader(new OkHttp3Downloader(client))
                 .build();
-        picasso.load("http://190.129.90.115:8083/ingresoVisitantes/visitante/mostrarFoto?foto=" + visitanteRecibido.getVteImagen()).resize(width, width).into(visitanteIV);
+        picasso.load("http://190.129.90.115:8083/ingresoVisitantes/visitante/mostrarFoto?foto=" + visitanteRecibido.getVteImagen()).resize(width, width).into(visitanteIV, new com.squareup.picasso.Callback() {
+            @Override
+            public void onSuccess() {
+                progressBar.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onError(Exception e) {
+
+            }
+        });
 
         ciET.setText(visitanteRecibido.getVteCi());
         nombreET.setText(visitanteRecibido.getVteNombre());
@@ -204,14 +219,9 @@ public class EditarVisitanteActivity extends AppCompatActivity implements Valida
         /*empresaS.setSelection(0);
         tipoVisitanteS.setSelection(0);*/
 
-        btnNF.setOnClickListener(new View.OnClickListener() {
+        fabNF.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                /*Intent imageTakeIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                if(imageTakeIntent.resolveActivity(getPackageManager())!=null)
-                {
-                    startActivityForResult(imageTakeIntent, REQUEST_IMAGE_CAPTURE);
-                }*/
                 Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                 if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
                     File photoFile = null;
@@ -557,9 +567,6 @@ public class EditarVisitanteActivity extends AppCompatActivity implements Valida
                 return false;
             case R.id.action_salir:
                 cerrarSesion();
-                Intent intent = new Intent(EditarVisitanteActivity.this, LoginActivity.class);
-                startActivity(intent);
-                finish();
                 return false;
         }
         return super.onOptionsItemSelected(item);
@@ -574,7 +581,8 @@ public class EditarVisitanteActivity extends AppCompatActivity implements Valida
         {
             menu.getItem(0).setEnabled(false);
             menu.getItem(0).setVisible(false);
-            btnNF.setEnabled(false);
+            //btnNF.setEnabled(false);
+            fabNF.setEnabled(false);
             ciET.setFocusable(false);
             ciET.setFocusableInTouchMode(false);
             nombreET.setFocusable(false);
@@ -619,6 +627,9 @@ public class EditarVisitanteActivity extends AppCompatActivity implements Valida
                 editor.putString("rol", "");
                 editor.apply();
                 Toast.makeText(getApplicationContext(), "Sesión finalizada", Toast.LENGTH_LONG).show();
+                Intent intent = new Intent(EditarVisitanteActivity.this, LoginActivity.class);
+                startActivity(intent);
+                finish();
             }
             @Override
             public void onFailure(Call <Void> call, Throwable t) {

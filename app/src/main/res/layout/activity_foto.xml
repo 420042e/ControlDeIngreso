@@ -30,6 +30,15 @@
         android:layout_height="match_parent"
         android:paddingTop="?actionBarSize">
 
+        <ProgressBar
+            android:id="@+id/progressBar"
+            style="?android:attr/progressBarStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true" />
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -37,14 +46,10 @@
             android:orientation="vertical"
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-            <ImageView
+            <com.stbnlycan.custom.TouchImageView
                 android:id="@+id/imageView"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_alignParentStart="true"
-                android:layout_alignParentLeft="true"
-                android:scaleType="matrix"
-                app:srcCompat="@drawable/codigo_qr" />
+                android:layout_height="match_parent" />
 
         </LinearLayout>
 

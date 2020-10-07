@@ -34,6 +34,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -140,6 +141,7 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
     private final static int REQUEST_CODE_DOI = 1;
     private ArrayList<DocumentoIngreso> doisResult;
     private ArrayList<String> srcs;
+    private ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -155,6 +157,7 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
         areaRecintoS = findViewById(R.id.area_recinto);
         motivoS = findViewById(R.id.motivo);
         observacion = findViewById(R.id.observacion);
+        progressBar = findViewById(R.id.progressBar);
 
         fotoDoc = findViewById(R.id.fotoDoc);
 
@@ -175,6 +178,8 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
 
         visitanteRecibido = (Visitante) getIntent().getSerializableExtra("visitante");
         recintoRecibido = (Recinto) getIntent().getSerializableExtra("recinto");
+
+        progressBar.setVisibility(View.VISIBLE);
 
         srcs = new ArrayList<>();
 
@@ -197,7 +202,17 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
         Picasso picasso = new Picasso.Builder(this)
                 .downloader(new OkHttp3Downloader(client))
                 .build();
-        picasso.load("http://190.129.90.115:8083/ingresoVisitantes/visitante/mostrarFoto?foto=" + visitanteRecibido.getVteImagen()).resize(width, width).into(visitanteIV);
+        picasso.load("http://190.129.90.115:8083/ingresoVisitantes/visitante/mostrarFoto?foto=" + visitanteRecibido.getVteImagen()).resize(width, width).into(visitanteIV, new com.squareup.picasso.Callback() {
+            @Override
+            public void onSuccess() {
+                progressBar.setVisibility(View.GONE);
+            }
+
+            @Override
+            public void onError(Exception e) {
+
+            }
+        });
 
         ciET.setText(visitanteRecibido.getVteCi());
         nombreET.setText(visitanteRecibido.getVteNombre());
@@ -580,9 +595,6 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
                 return false;
             case R.id.action_salir:
                 cerrarSesion();
-                Intent intent = new Intent(RegistraVisitaActivity.this, LoginActivity.class);
-                startActivity(intent);
-                finish();
                 return false;
         }
         return super.onOptionsItemSelected(item);
@@ -600,6 +612,9 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
                 editor.putString("rol", "");
                 editor.apply();
                 Toast.makeText(getApplicationContext(), "Sesión finalizada", Toast.LENGTH_LONG).show();
+                Intent intent = new Intent(RegistraVisitaActivity.this, LoginActivity.class);
+                startActivity(intent);
+                finish();
             }
             @Override
             public void onFailure(Call <Void> call, Throwable t) {
@@ -644,6 +659,8 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
                 {
                     //doisResult = null;
                     doisResult = (ArrayList<DocumentoIngreso>) b.getSerializable("doisResult");
+
+                    fotoDoc.setText("Documentos de Ingreso "+"("+doisResult.size()+")");
 
                     /*for(int i = 0 ; i < doisResult.size() ;i++)
                     {

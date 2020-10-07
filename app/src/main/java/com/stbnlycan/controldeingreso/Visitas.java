@@ -457,9 +457,6 @@ public class Visitas extends AppCompatActivity implements VisitasAdapter.OnVisit
                 return false;
             case R.id.action_salir:
                 cerrarSesion();
-                Intent intent = new Intent(Visitas.this, LoginActivity.class);
-                startActivity(intent);
-                finish();
                 return false;
         }
         return super.onOptionsItemSelected(item);
@@ -581,6 +578,9 @@ public class Visitas extends AppCompatActivity implements VisitasAdapter.OnVisit
                 editor.putString("rol", "");
                 editor.apply();
                 Toast.makeText(getApplicationContext(), "Sesión finalizada", Toast.LENGTH_LONG).show();
+                Intent intent = new Intent(Visitas.this, LoginActivity.class);
+                startActivity(intent);
+                finish();
             }
             @Override
             public void onFailure(Call <Void> call, Throwable t) {

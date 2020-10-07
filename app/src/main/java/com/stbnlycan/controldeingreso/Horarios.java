@@ -154,9 +154,6 @@ public class Horarios extends AppCompatActivity implements HorariosAdapter.OnVis
                 return false;
             case R.id.action_salir:
                 cerrarSesion();
-                Intent intent = new Intent(Horarios.this, LoginActivity.class);
-                startActivity(intent);
-                finish();
                 return false;
         }
         return super.onOptionsItemSelected(item);
@@ -174,6 +171,9 @@ public class Horarios extends AppCompatActivity implements HorariosAdapter.OnVis
                 editor.putString("rol", "");
                 editor.apply();
                 Toast.makeText(getApplicationContext(), "Sesión finalizada", Toast.LENGTH_LONG).show();
+                Intent intent = new Intent(Horarios.this, LoginActivity.class);
+                startActivity(intent);
+                finish();
             }
             @Override
             public void onFailure(Call <Void> call, Throwable t) {
