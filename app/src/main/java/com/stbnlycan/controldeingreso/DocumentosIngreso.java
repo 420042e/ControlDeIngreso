@@ -280,7 +280,7 @@ public class DocumentosIngreso extends AppCompatActivity implements DOIAdapter.O
 
             //Toast.makeText(getApplicationContext(), "origWidth "+origWidth+" origHeight "+origHeight, Toast.LENGTH_LONG).show();
 
-            final int destWidth = 1080;//or the width you need
+            final int destWidth = 768;//or the width you need
 
             if (origWidth > destWidth) {
                 // picture is wider than we want it, we calculate its target height

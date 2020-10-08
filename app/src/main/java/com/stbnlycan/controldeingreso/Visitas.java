@@ -201,6 +201,7 @@ public class Visitas extends AppCompatActivity implements VisitasAdapter.OnVisit
         CalendarConstraints.Builder constraintsBuilder = new CalendarConstraints.Builder();
         builder.setTitleText("SELECCIONE UN RANGO DE FECHAS");
         builder.setCalendarConstraints(constraintsBuilder.build());
+        builder.setTheme(R.style.ThemeOverlay_MaterialComponents_MaterialCalendar);
 
         picker = builder.build();
         picker.addOnPositiveButtonClickListener(new MaterialPickerOnPositiveButtonClickListener<Pair<Long, Long>>() {
