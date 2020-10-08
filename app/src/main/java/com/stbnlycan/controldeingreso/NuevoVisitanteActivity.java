@@ -46,6 +46,7 @@ import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.gson.Gson;
 import com.mobsandgeeks.saripaar.ValidationError;
 import com.mobsandgeeks.saripaar.Validator;
@@ -119,7 +120,6 @@ public class NuevoVisitanteActivity extends AppCompatActivity implements Validat
 
     private Validator validator;
     private Toolbar toolbar;
-    private Button btnNF;
     private String imagenObtenida;
     private Button btnNE;
     private final static int REQUEST_CODE_NE = 1;
@@ -129,6 +129,7 @@ public class NuevoVisitanteActivity extends AppCompatActivity implements Validat
     private SharedPreferences.Editor editor;
 
     private Uri uri;
+    private FloatingActionButton fabNF;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -148,11 +149,11 @@ public class NuevoVisitanteActivity extends AppCompatActivity implements Validat
         empresaS = findViewById(R.id.empresa);
         tipoVisitanteS = findViewById(R.id.tipo_visitante);
         btnNE = findViewById(R.id.btnNE);
-        btnNF = findViewById(R.id.btnNF);
 
         pref = getApplicationContext().getSharedPreferences("MyPref", 0);
         editor = pref.edit();
         authorization = pref.getString("token_type", null) + " " + pref.getString("access_token", null);
+        fabNF = findViewById(R.id.fabNF);
 
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -167,14 +168,9 @@ public class NuevoVisitanteActivity extends AppCompatActivity implements Validat
         //getDataEmpresa();
         //getDataTipoVisitante();
 
-        btnNF.setOnClickListener(new View.OnClickListener() {
+        fabNF.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                /*Intent imageTakeIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                if(imageTakeIntent.resolveActivity(getPackageManager())!=null)
-                {
-                    startActivityForResult(imageTakeIntent, REQUEST_IMAGE_CAPTURE);
-                }*/
                 Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                 if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
                     File photoFile = null;

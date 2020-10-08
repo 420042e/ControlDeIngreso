@@ -47,6 +47,7 @@ import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.gson.Gson;
 import com.mobsandgeeks.saripaar.ValidationError;
 import com.mobsandgeeks.saripaar.Validator;
@@ -123,7 +124,6 @@ public class NuevoUsuario extends AppCompatActivity implements Validator.Validat
 
     private Validator validator;
     private Toolbar toolbar;
-    private Button btnNF;
     private String imagenObtenida;
     private final static int REQUEST_CODE_NE = 1;
 
@@ -138,6 +138,7 @@ public class NuevoUsuario extends AppCompatActivity implements Validator.Validat
     static final int REQUEST_TAKE_PHOTO = 1;
     private Uri uri;
     private String currentPhotoPath;
+    private FloatingActionButton fabNF;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -151,7 +152,6 @@ public class NuevoUsuario extends AppCompatActivity implements Validator.Validat
 
         setTitle("Nuevo usuario");
         visitanteIV = findViewById(R.id.visitanteIV);
-        btnNF = findViewById(R.id.btnNF);
         usernameET = findViewById(R.id.username);
         passwordET = findViewById(R.id.password);
         emailET = findViewById(R.id.email);
@@ -160,6 +160,7 @@ public class NuevoUsuario extends AppCompatActivity implements Validator.Validat
         phoneET = findViewById(R.id.phone);
         addressET = findViewById(R.id.address);
         rolS = findViewById(R.id.rol);
+        fabNF = findViewById(R.id.fabNF);
 
         pref = getApplicationContext().getSharedPreferences("MyPref", 0);
         editor = pref.edit();
@@ -180,7 +181,7 @@ public class NuevoUsuario extends AppCompatActivity implements Validator.Validat
         //getDataEmpresa();
         //getDataTipoVisitante();
 
-        btnNF.setOnClickListener(new View.OnClickListener() {
+        fabNF.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
@@ -430,7 +431,7 @@ public class NuevoUsuario extends AppCompatActivity implements Validator.Validat
 
         if(rol.equals("USER") || rol.equals(""))
         {
-            btnNF.setEnabled(false);
+            fabNF.setEnabled(false);
             usernameET.setFocusable(false);
             usernameET.setFocusableInTouchMode(false);
             passwordET.setFocusable(false);
