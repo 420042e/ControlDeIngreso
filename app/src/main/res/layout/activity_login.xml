@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/fragmentradio"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -16,7 +17,8 @@
             android:layout_width="90dp"
             android:layout_height="wrap_content"
             android:src="@drawable/login"
-            android:visibility="gone" />
+            android:visibility="gone"
+            tools:ignore="ContentDescription" />
 
         <EditText
             android:id="@+id/username"
@@ -26,15 +28,16 @@
             android:layout_marginTop="60dp"
             android:layout_marginRight="10dp"
             android:background="@drawable/shapeemail"
-            android:drawableLeft="@drawable/ic_person_black_24dp"
+            android:drawableStart="@drawable/ic_person_black_24dp"
             android:drawablePadding="10dp"
-            android:hint="Nombre de usuario"
+            android:hint="@string/nombre_usuario"
             android:padding="15dp"
             android:textColor="@color/white"
             android:textColorHighlight="@color/white"
             android:textColorHint="@color/white"
             android:maxLines="1"
-            android:inputType="text" />
+            android:inputType="text"
+            android:importantForAutofill="no" />
 
         <EditText
             android:id="@+id/password"
@@ -42,14 +45,15 @@
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
             android:background="@drawable/shapeemail"
-            android:drawableLeft="@drawable/ic_lock_black_24dp"
+            android:drawableStart="@drawable/ic_lock_black_24dp"
             android:drawablePadding="10dp"
-            android:hint="Contraseña"
+            android:hint="@string/password"
             android:inputType="textPassword"
             android:padding="15dp"
             android:textColor="@color/white"
             android:textColorHighlight="@color/white"
-            android:textColorHint="@color/white" />
+            android:textColorHint="@color/white"
+            android:importantForAutofill="no" />
 
         <Button
             android:id="@+id/btn_ingreso"
@@ -62,7 +66,7 @@
             android:background="@drawable/shapelogin"
             android:padding="15dp"
             android:shadowColor="@android:color/transparent"
-            android:text="Ingresar" />
+            android:text="@string/btn_ingreso" />
 
     </LinearLayout>
     <FrameLayout

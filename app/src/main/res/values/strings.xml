@@ -10,4 +10,47 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
+    <string name="texto">Texto</string>
+    <string name="nombre_usuario">Nombre de usuario</string>
+    <string name="password">Contraseña</string>
+    <string name="btn_ingreso">Ingresar</string>
+    <string name="direccion">Dirección</string>
+    <string name="telefono">Teléfono</string>
+    <string name="ocupacion">Ocupación</string>
+    <string name="nombre_completo">Nombre completo</string>
+    <string name="email">Email</string>
+    <string name="rol">Rol</string>
+
+    <string name="ci">Cédula de identidad *</string>
+    <string name="nombres">Nombres *</string>
+    <string name="apellidos">Apellidos *</string>
+    <string name="telcel">Teléfono/Celular *</string>
+    <string name="correo">Correo electrónico *</string>
+    <string name="empresa">Empresa *</string>
+    <string name="tipo_vis">Tipo de visitante *</string>
+    <string name="campo_requerido">* indica campo requerido</string>
+
+    <string name="horario_tipo_vis">Tipo de visitante</string>
+    <string name="horario_nombre">Nombre</string>
+    <string name="horario_descripcion">Descripción</string>
+    <string name="horario_dias">Días</string>
+    <string name="horario_ingreso">Ingreso</string>
+    <string name="horario_salida">Salida</string>
+
+    <string name="dv_doi">Ver documentos de ingreso</string>
+    <string name="motivo">Motivo</string>
+    <string name="observacion">Observación</string>
+    <string name="salida">Salida</string>
+    <string name="dv_ingreso">Ingreso</string>
+    <string name="dv_visita">Visita</string>
+    <string name="dv_tipo_vis">Tipo de visitante</string>
+    <string name="dv_empresa">Empresa</string>
+    <string name="dv_telcel">Teléfono/Celular</string>
+    <string name="dv_apellidos">Apellidos</string>
+    <string name="dv_nombres">Nombres</string>
+
+    <string name="dvis">Visitante</string>
+    <string name="dvis_nombre">Nombre</string>
+    <string name="dvis_paterno">Apellido Paterno</string>
+
 </resources>

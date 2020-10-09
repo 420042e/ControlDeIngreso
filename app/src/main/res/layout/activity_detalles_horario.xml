@@ -53,8 +53,9 @@
                         android:focusable="false"
                         android:focusableInTouchMode="false"
                         android:fontFamily="@font/ubuntu_light"
-                        android:hint="Tipo de visitante"
-                        android:inputType="textPersonName" />
+                        android:hint="@string/horario_tipo_vis"
+                        android:inputType="textPersonName"
+                        android:importantForAutofill="no" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
@@ -69,8 +70,9 @@
                         android:ems="10"
                         android:focusable="false"
                         android:focusableInTouchMode="false"
-                        android:hint="Nombre"
-                        android:inputType="textPersonName" />
+                        android:hint="@string/horario_nombre"
+                        android:inputType="textPersonName"
+                        android:importantForAutofill="no" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
@@ -85,8 +87,9 @@
                         android:ems="10"
                         android:focusable="false"
                         android:focusableInTouchMode="false"
-                        android:hint="Descripción"
-                        android:inputType="textPersonName" />
+                        android:hint="@string/horario_descripcion"
+                        android:inputType="textPersonName"
+                        android:importantForAutofill="no" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
@@ -101,8 +104,9 @@
                         android:ems="10"
                         android:focusable="false"
                         android:focusableInTouchMode="false"
-                        android:hint="Días"
-                        android:inputType="textPersonName" />
+                        android:hint="@string/horario_dias"
+                        android:inputType="textPersonName"
+                        android:importantForAutofill="no" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
@@ -117,8 +121,9 @@
                         android:ems="10"
                         android:focusable="false"
                         android:focusableInTouchMode="false"
-                        android:hint="Ingreso"
-                        android:inputType="textPersonName|time" />
+                        android:hint="@string/horario_ingreso"
+                        android:inputType="textPersonName|time"
+                        android:importantForAutofill="no" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
@@ -133,8 +138,9 @@
                         android:ems="10"
                         android:focusable="false"
                         android:focusableInTouchMode="false"
-                        android:hint="Salida"
-                        android:inputType="textPersonName" />
+                        android:hint="@string/horario_salida"
+                        android:inputType="textPersonName"
+                        android:importantForAutofill="no" />
                 </com.google.android.material.textfield.TextInputLayout>
 
             </LinearLayout>

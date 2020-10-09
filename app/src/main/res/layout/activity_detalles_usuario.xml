@@ -64,7 +64,8 @@
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintHorizontal_bias="0.486"
                             app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" />
+                            app:layout_constraintTop_toTopOf="parent"
+                            tools:ignore="ContentDescription" />
 
                         <ProgressBar
                             android:id="@+id/progressBar"
@@ -89,8 +90,9 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:ems="10"
-                        android:hint="Nombre de usuario"
-                        android:inputType="textPersonName" />
+                        android:hint="@string/nombre_usuario"
+                        android:inputType="textPersonName"
+                        android:importantForAutofill="no" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
@@ -103,8 +105,9 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:ems="10"
-                        android:hint="Email"
-                        android:inputType="textEmailAddress" />
+                        android:hint="@string/email"
+                        android:inputType="textEmailAddress"
+                        android:importantForAutofill="no" />
 
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -118,8 +121,9 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:ems="10"
-                        android:hint="Nombre completo"
-                        android:inputType="textPersonName" />
+                        android:hint="@string/nombre_completo"
+                        android:inputType="textPersonName"
+                        android:importantForAutofill="no" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
@@ -132,8 +136,9 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:ems="10"
-                        android:hint="Ocupación"
-                        android:inputType="textEmailAddress" />
+                        android:hint="@string/ocupacion"
+                        android:inputType="textEmailAddress"
+                        android:importantForAutofill="no" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
@@ -146,8 +151,9 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:ems="10"
-                        android:hint="Teléfono"
-                        android:inputType="numberDecimal" />
+                        android:hint="@string/telefono"
+                        android:inputType="numberDecimal"
+                        android:importantForAutofill="no" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
@@ -160,8 +166,9 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:ems="10"
-                        android:hint="Dirección"
-                        android:inputType="textEmailAddress" />
+                        android:hint="@string/direccion"
+                        android:inputType="textEmailAddress"
+                        android:importantForAutofill="no" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
@@ -174,8 +181,9 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:ems="10"
-                        android:hint="Rol"
-                        android:inputType="textEmailAddress" />
+                        android:hint="@string/rol"
+                        android:inputType="textEmailAddress"
+                        android:importantForAutofill="no" />
                 </com.google.android.material.textfield.TextInputLayout>
 
             </LinearLayout>

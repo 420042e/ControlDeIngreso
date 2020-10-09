@@ -476,41 +476,6 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
         }
     }
 
-    private void registrarIngreso(final Visita visita) {
-        Retrofit retrofit = NetworkClient.getRetrofitClient(this);
-        RegistrarIngresoAPIs registrarIngresoAPIs = retrofit.create(RegistrarIngresoAPIs.class);
-        Call<JsonObject> call = registrarIngresoAPIs.registrarIngreso(visita, authorization);
-        call.enqueue(new Callback<JsonObject>() {
-            @Override
-            public void onResponse(Call <JsonObject> call, retrofit2.Response<JsonObject> response) {
-                String jsonString = response.body().toString();
-                if (jsonString.contains("visCod")) {
-                    Visita visitaRecibida = new Gson().fromJson(jsonString, Visita.class);
-                    //Toast.makeText(getApplicationContext(), visitaRecibida.getVisitante().getVteNombre()+ " " + visitaRecibida.getVisitante().getVteApellidos() + " ha ingresado a " + visitaRecibida.getAreaRecinto().getAreaNombre(), Toast.LENGTH_LONG).show();
-                    Intent intent = new Intent();
-                    intent.putExtra("success", "true");
-                    intent.putExtra("visitaResult", visitaRecibida);
-                    setResult(RESULT_OK, intent);
-                    finish();
-                } else {
-                    Error error = new Gson().fromJson(jsonString, Error.class);
-                    //Toast.makeText(getApplicationContext(), ""+error.getMessage(), Toast.LENGTH_LONG).show();
-
-                    //showDFError(error.getMessage());
-                    Intent intent = new Intent();
-                    intent.putExtra("success", "false");
-                    intent.putExtra("errorResult", error);
-                    setResult(RESULT_OK, intent);
-                    finish();
-                }
-            }
-            @Override
-            public void onFailure(Call <JsonObject> call, Throwable t) {
-                Log.d("msg",""+t.toString());
-            }
-        });
-    }
-
     private void registrarIngreso2(String filePath, String descripcion) {
         List<MultipartBody.Part> files  = new ArrayList<>();
         for(int i = 0 ; i < srcs.size() ; i++)
@@ -528,15 +493,11 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
         call.enqueue(new Callback<String>() {
             @Override
             public void onResponse(Call <String> call, retrofit2.Response<String> response) {
-                Gson gson = new Gson();
-                String descripcion = gson.toJson(response.body());
-                Log.d("msg919",""+descripcion);
                 showLoadingwDialog();
 
                 String jsonString = response.body();
                 if (jsonString.contains("visCod")) {
                     Visita visitaRecibida = new Gson().fromJson(jsonString, Visita.class);
-                    //Toast.makeText(getApplicationContext(), visitaRecibida.getVisitante().getVteNombre()+ " " + visitaRecibida.getVisitante().getVteApellidos() + " ha ingresado a " + visitaRecibida.getAreaRecinto().getAreaNombre(), Toast.LENGTH_LONG).show();
                     loadingFragment.dismiss();
                     Intent intent = new Intent();
                     intent.putExtra("success", "true");
@@ -545,10 +506,7 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
                     finish();
                 } else {
                     Error error = new Gson().fromJson(jsonString, Error.class);
-                    //Toast.makeText(getApplicationContext(), ""+error.getMessage(), Toast.LENGTH_LONG).show();
-
                     loadingFragment.dismiss();
-                    //showDFError(error.getMessage());
                     Intent intent = new Intent();
                     intent.putExtra("success", "false");
                     intent.putExtra("errorResult", error);
@@ -563,25 +521,6 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
             }
         });
     }
-
-    /*@NonNull
-    private MultipartBody.Part prepareFilePart(String partName, Uri fileUri) {
-        // https://github.com/iPaulPro/aFileChooser/blob/master/aFileChooser/src/com/ipaulpro/afilechooser/utils/FileUtils.java
-        // use the FileUtils to get the actual file by uri
-        File file = FileUtils.getFile(this, fileUri);
-        //compress the image using Compressor lib
-        Timber.d("size of image before compression --> " + file.getTotalSpace());
-        compressedImageFile = new Compressor(this).compressToFile(file);
-        Timber.d("size of image after compression --> " + compressedImageFile.getTotalSpace());
-        // create RequestBody instance from file
-        RequestBody requestFile =
-                RequestBody.create(
-                        MediaType.parse(getContentResolver().getType(fileUri)),
-                        compressedImageFile);
-
-        // MultipartBody.Part is used to send also the actual file name
-        return MultipartBody.Part.createFormData(partName, file.getName(), requestFile);
-    }*/
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
@@ -657,17 +596,8 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
                 Bundle b = data.getExtras();
                 if (data != null)
                 {
-                    //doisResult = null;
                     doisResult = (ArrayList<DocumentoIngreso>) b.getSerializable("doisResult");
-
                     fotoDoc.setText("Documentos de Ingreso "+"("+doisResult.size()+")");
-
-                    /*for(int i = 0 ; i < doisResult.size() ;i++)
-                    {
-                        srcs.add(doisResult.get(i).getDoiImagen());
-                        File f = new File(doisResult.get(i).getDoiImagen());
-                        doisResult.get(i).setDoiImagen(f.getName());
-                    }*/
                 }
             }
         }

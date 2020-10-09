@@ -51,7 +51,8 @@
                         android:id="@+id/visitanteIV"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:layout_gravity="center_horizontal" />
+                        android:layout_gravity="center_horizontal"
+                        tools:ignore="ContentDescription" />
 
                 </LinearLayout>
 
@@ -75,10 +76,10 @@
                             android:id="@+id/textView10"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginLeft="5dp"
+                            android:layout_marginStart="5dp"
                             android:layout_marginBottom="10dp"
                             android:gravity="center"
-                            android:text="Visitante" />
+                            android:text="@string/dvis" />
 
                         <com.google.android.material.textfield.TextInputLayout
                             android:layout_width="match_parent"
@@ -91,8 +92,9 @@
                                 android:ems="10"
                                 android:focusable="false"
                                 android:focusableInTouchMode="false"
-                                android:hint="Nombres"
-                                android:inputType="textPersonName" />
+                                android:hint="@string/dv_nombres"
+                                android:inputType="textPersonName"
+                                android:importantForAutofill="no" />
 
                         </com.google.android.material.textfield.TextInputLayout>
 
@@ -108,8 +110,9 @@
                                 android:ems="10"
                                 android:focusable="false"
                                 android:focusableInTouchMode="false"
-                                android:hint="Apellidos"
-                                android:inputType="textPersonName" />
+                                android:hint="@string/dv_apellidos"
+                                android:inputType="textPersonName"
+                                android:importantForAutofill="no" />
 
                         </com.google.android.material.textfield.TextInputLayout>
 
@@ -125,8 +128,9 @@
                                 android:ems="10"
                                 android:focusable="false"
                                 android:focusableInTouchMode="false"
-                                android:hint="Teléfono/Celular "
-                                android:inputType="number" />
+                                android:hint="@string/dv_telcel"
+                                android:inputType="number"
+                                android:importantForAutofill="no" />
                         </com.google.android.material.textfield.TextInputLayout>
 
                         <com.google.android.material.textfield.TextInputLayout
@@ -141,8 +145,9 @@
                                 android:ems="10"
                                 android:focusable="false"
                                 android:focusableInTouchMode="false"
-                                android:hint="Empresa"
-                                android:inputType="textEmailAddress" />
+                                android:hint="@string/empresa"
+                                android:inputType="textEmailAddress"
+                                android:importantForAutofill="no" />
                         </com.google.android.material.textfield.TextInputLayout>
 
                         <com.google.android.material.textfield.TextInputLayout
@@ -157,8 +162,9 @@
                                 android:ems="10"
                                 android:focusable="false"
                                 android:focusableInTouchMode="false"
-                                android:hint="Tipo de visitante"
-                                android:inputType="textEmailAddress" />
+                                android:hint="@string/dv_tipo_vis"
+                                android:inputType="textEmailAddress"
+                                android:importantForAutofill="no" />
                         </com.google.android.material.textfield.TextInputLayout>
                     </LinearLayout>
 
@@ -184,10 +190,10 @@
                             android:id="@+id/textView11"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginLeft="5dp"
+                            android:layout_marginStart="5dp"
                             android:layout_marginBottom="10dp"
                             android:gravity="center"
-                            android:text="Visita" />
+                            android:text="@string/dv_visita" />
 
                         <com.google.android.material.textfield.TextInputLayout
                             android:layout_width="match_parent"
@@ -202,9 +208,10 @@
                                 android:focusable="false"
                                 android:focusableInTouchMode="false"
                                 android:gravity="top"
-                                android:hint="Ingreso"
+                                android:hint="@string/dv_ingreso"
                                 android:inputType="textMultiLine"
-                                android:maxLines="4" />
+                                android:maxLines="4"
+                                android:importantForAutofill="no" />
                         </com.google.android.material.textfield.TextInputLayout>
 
                         <com.google.android.material.textfield.TextInputLayout
@@ -221,9 +228,10 @@
                                 android:focusable="false"
                                 android:focusableInTouchMode="false"
                                 android:gravity="top"
-                                android:hint="Salida"
+                                android:hint="@string/salida"
                                 android:inputType="textMultiLine"
-                                android:maxLines="4" />
+                                android:maxLines="4"
+                                android:importantForAutofill="no" />
                         </com.google.android.material.textfield.TextInputLayout>
 
                         <com.google.android.material.textfield.TextInputLayout
@@ -239,9 +247,10 @@
                                 android:focusable="false"
                                 android:focusableInTouchMode="false"
                                 android:gravity="top"
-                                android:hint="Observación"
+                                android:hint="@string/observacion"
                                 android:inputType="textMultiLine"
-                                android:maxLines="4" />
+                                android:maxLines="4"
+                                android:importantForAutofill="no" />
                         </com.google.android.material.textfield.TextInputLayout>
 
                         <com.google.android.material.textfield.TextInputLayout
@@ -257,9 +266,10 @@
                                 android:focusable="false"
                                 android:focusableInTouchMode="false"
                                 android:gravity="top"
-                                android:hint="Motivo"
+                                android:hint="@string/motivo"
                                 android:inputType="textMultiLine"
-                                android:maxLines="4" />
+                                android:maxLines="4"
+                                android:importantForAutofill="no" />
                         </com.google.android.material.textfield.TextInputLayout>
 
                         <LinearLayout
@@ -269,14 +279,14 @@
 
                             <com.google.android.material.button.MaterialButton
                                 android:id="@+id/verDois"
-                                android:layout_width="match_parent"
+                                android:layout_width="0dp"
                                 android:layout_height="match_parent"
 
-                                android:layout_marginLeft="5dp"
-                                android:layout_marginRight="2dp"
+                                android:layout_marginStart="5dp"
+                                android:layout_marginEnd="2dp"
                                 android:layout_weight="1"
                                 android:gravity="center"
-                                android:text="Ver documentos de ingreso"
+                                android:text="@string/dv_doi"
                                 android:textAllCaps="true"
                                 app:backgroundTint="#03A9F4"
                                 app:icon="@drawable/ic_photo_black_24dp"
@@ -297,7 +307,8 @@
                                 android:id="@+id/doiImagenIV"
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
-                                android:layout_gravity="center_horizontal" />
+                                android:layout_gravity="center_horizontal"
+                                tools:ignore="ContentDescription" />
 
                         </LinearLayout>
                     </LinearLayout>

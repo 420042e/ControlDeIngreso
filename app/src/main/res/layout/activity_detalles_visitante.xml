@@ -15,7 +15,8 @@
             android:layout_height="wrap_content"
             android:ems="10"
             android:inputType="textPersonName"
-            android:hint="Nombre"/>
+            android:hint="@string/dvis_nombre"
+            android:importantForAutofill="no" />
 
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -29,8 +30,9 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:ems="10"
-            android:hint="Apellido Paterno"
-            android:inputType="textPersonName" />
+            android:hint="@string/dvis_paterno"
+            android:inputType="textPersonName"
+            android:importantForAutofill="no" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
@@ -44,7 +46,8 @@
             android:layout_weight="1"
             android:ems="10"
             android:hint="Apellido Materno"
-            android:inputType="textPersonName" />
+            android:inputType="textPersonName"
+            android:importantForAutofill="no" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout

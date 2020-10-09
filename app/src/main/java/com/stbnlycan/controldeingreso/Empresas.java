@@ -30,6 +30,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
 import com.stbnlycan.adapters.EmpresasAdapter;
 import com.stbnlycan.adapters.VisitantesAdapter;
 import com.stbnlycan.interfaces.ListaEmpresasAPIs;
@@ -294,6 +295,10 @@ public class Empresas extends AppCompatActivity implements EmpresasAdapter.OnVis
         call.enqueue(new Callback<ListaEmpresas>() {
             @Override
             public void onResponse(Call <ListaEmpresas> call, retrofit2.Response<ListaEmpresas> response) {
+                Log.d("msg990",""+" nPag: "+nPag+" authorization: "+authorization);
+                Gson gson = new Gson();
+                String descripcion = gson.toJson(response.body());
+                Log.d("msg991",""+descripcion+" nPag: "+nPag+" authorization: "+authorization);
                 bar.setVisibility(View.GONE);
                 recyclerView.setVisibility(View.VISIBLE);
                 ListaEmpresas listaEmpresas = response.body();
@@ -314,18 +319,6 @@ public class Empresas extends AppCompatActivity implements EmpresasAdapter.OnVis
 
                     recyclerView.setAdapter(empresasAdapter);
                 }
-
-                /*for(int i = 0 ; i < response.body().size() ; i++)
-                {
-                    visitantes.add(response.body().get(i));
-                }
-                visitantesAdapter = new VisitantesAdapter(visitantes);
-                visitantesAdapter.setOnVisitanteClickListener(Visitantes.this);
-
-                recyclerView.setAdapter(visitantesAdapter);*/
-
-                //visitantesAdapter.notifyDataSetChanged();
-                //swipeRefreshLayout.setRefreshing(false);
             }
             @Override
             public void onFailure(Call <ListaEmpresas> call, Throwable t) {
@@ -360,6 +353,7 @@ public class Empresas extends AppCompatActivity implements EmpresasAdapter.OnVis
                     empresasAdapter.notifyDataSetChanged();
                     swipeRefreshLayout.setRefreshing(false);
                 }
+                nPag = 0;
             }
             @Override
             public void onFailure(Call <ListaEmpresas> call, Throwable t) {

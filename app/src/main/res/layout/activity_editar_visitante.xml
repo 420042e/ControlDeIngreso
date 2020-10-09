@@ -64,7 +64,8 @@
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintHorizontal_bias="0.486"
                             app:layout_constraintStart_toStartOf="parent"
-                            app:layout_constraintTop_toTopOf="parent" />
+                            app:layout_constraintTop_toTopOf="parent"
+                            tools:ignore="ContentDescription" />
 
                         <ProgressBar
                             android:id="@+id/progressBar"
@@ -90,8 +91,9 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:ems="10"
-                        android:hint="Cédula de identidad *"
-                        android:inputType="number" />
+                        android:hint="@string/ci"
+                        android:inputType="number"
+                        android:importantForAutofill="no" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
@@ -103,8 +105,9 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:ems="10"
-                        android:hint="Nombres *"
-                        android:inputType="textPersonName" />
+                        android:hint="@string/nombres"
+                        android:inputType="textPersonName"
+                        android:importantForAutofill="no" />
 
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -118,8 +121,9 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:ems="10"
-                        android:hint="Apellidos *"
-                        android:inputType="textPersonName" />
+                        android:hint="@string/apellidos"
+                        android:inputType="textPersonName"
+                        android:importantForAutofill="no" />
 
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -133,8 +137,9 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:ems="10"
-                        android:hint="Teléfono/Celular *"
-                        android:inputType="number" />
+                        android:hint="@string/telcel"
+                        android:inputType="phone"
+                        android:importantForAutofill="no" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
@@ -147,8 +152,9 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:ems="10"
-                        android:hint="Correo electrónico *"
-                        android:inputType="textEmailAddress" />
+                        android:hint="@string/email"
+                        android:inputType="textEmailAddress"
+                        android:importantForAutofill="no" />
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
@@ -159,8 +165,8 @@
                     android:id="@+id/textView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="5dp"
-                    android:text="Empresa *"
+                    android:layout_marginStart="5dp"
+                    android:text="@string/empresa"
                     android:textSize="12sp" />
 
                 <LinearLayout
@@ -195,8 +201,8 @@
                     android:id="@+id/textView2"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="5dp"
-                    android:text="Tipo de visitante *"
+                    android:layout_marginStart="5dp"
+                    android:text="@string/tipo_vis"
                     android:textSize="12sp" />
 
                 <Spinner
@@ -210,8 +216,8 @@
                     android:id="@+id/textView8"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="5dp"
-                    android:text="* indica campo requerido"
+                    android:layout_marginStart="5dp"
+                    android:text="@string/campo_requerido"
                     android:textSize="12sp" />
 
             </LinearLayout>
@@ -237,6 +243,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
         android:clickable="true"
+        android:focusable="true"
         android:src="@drawable/ic_photo_camera_black_24dp"
         app:layout_anchor="@id/visitanteIV"
         app:layout_anchorGravity="bottom|right|end"
