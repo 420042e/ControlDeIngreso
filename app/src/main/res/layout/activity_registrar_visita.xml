@@ -30,6 +30,7 @@
         android:paddingTop="?actionBarSize">
 
         <ScrollView
+            android:id="@+id/scroll"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginBottom="20sp"
@@ -152,8 +153,8 @@
                     android:id="@+id/area_recinto"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/style_spinner1"
-                    android:layout_margin="5dp"/>
+                    android:layout_margin="5dp"
+                    android:background="@drawable/style_spinner1" />
 
                 <TextView
                     android:id="@+id/textView44"
@@ -168,8 +169,8 @@
                     android:id="@+id/motivo"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/style_spinner1"
-                    android:layout_margin="5dp"/>
+                    android:layout_margin="5dp"
+                    android:background="@drawable/style_spinner1" />
 
 
                 <TextView
@@ -185,16 +186,25 @@
                     android:id="@+id/observacion"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_margin="5dp"
                     android:background="@drawable/style_edittext"
                     android:ems="10"
-                    android:layout_margin="5dp"
                     android:gravity="start|top"
                     android:inputType="textMultiLine"
                     android:lines="4"
                     android:maxLines="4"
                     android:paddingLeft="10dp"
                     android:paddingTop="10dp"
-                    android:paddingBottom="10dp"/>
+                    android:paddingBottom="10dp" />
+
+                <TextView
+                    android:id="@+id/textView48"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:text="Documentos de ingreso"
+                    android:textSize="12sp" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -210,7 +220,7 @@
                         android:layout_marginRight="2dp"
                         android:layout_weight="1"
                         android:gravity="center"
-                        android:text="Documentos de ingreso (0)"
+                        android:text="Añadir documento de ingreso"
                         android:textAllCaps="true"
                         app:backgroundTint="#03A9F4"
                         app:icon="@drawable/ic_note_add_black_24dp"
@@ -220,6 +230,21 @@
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent" />
 
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/recyclerView"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scrollbarSize="5dp"
+                        android:scrollbarThumbVertical="@android:color/darker_gray"
+                        android:scrollbars="vertical"
+                        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
                 </LinearLayout>
 
                 <TextView

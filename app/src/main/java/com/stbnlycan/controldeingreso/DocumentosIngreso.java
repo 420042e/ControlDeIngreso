@@ -6,6 +6,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -47,6 +49,7 @@ import com.mobsandgeeks.saripaar.annotation.Select;
 import com.squareup.picasso.Picasso;
 import com.stbnlycan.adapters.DOIAdapter;
 import com.stbnlycan.adapters.RecintoAdapter;
+import com.stbnlycan.fragments.NuevoDocIngFragment;
 import com.stbnlycan.interfaces.LogoutAPIs;
 import com.stbnlycan.interfaces.TipoDocAPIs;
 import com.stbnlycan.models.DocumentoIngreso;
@@ -96,6 +99,8 @@ public class DocumentosIngreso extends AppCompatActivity implements DOIAdapter.O
 
     private Validator validator;
 
+    private NuevoDocIngFragment nuevoDocIngFragment;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -122,7 +127,6 @@ public class DocumentosIngreso extends AppCompatActivity implements DOIAdapter.O
 
         doiDocumentoET.setFocusable(false);
 
-        //dois = new ArrayList<>();
         dois = (ArrayList<DocumentoIngreso>) getIntent().getSerializableExtra("dois");
 
         doiAdapter = new DOIAdapter(dois);
@@ -188,6 +192,7 @@ public class DocumentosIngreso extends AppCompatActivity implements DOIAdapter.O
                 doiAdapter.notifyItemInserted(0);*/
             }
         });
+
     }
 
     public void escaner() {
@@ -325,11 +330,30 @@ public class DocumentosIngreso extends AppCompatActivity implements DOIAdapter.O
                 setResult(RESULT_OK, intentR);
                 finish();
                 return false;
+            case R.id.action_nd:
+                showNuevoDocIngD();
+                return false;
             case R.id.action_salir:
                 cerrarSesion();
                 return false;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public void showNuevoDocIngD() {
+        nuevoDocIngFragment = new NuevoDocIngFragment();
+        FragmentTransaction ft;
+        Bundle bundle = new Bundle();
+        bundle.putInt("tiempo", 0);
+        nuevoDocIngFragment.setArguments(bundle);
+        //dialogFragment.setTargetFragment(this, 1);
+        ft = getSupportFragmentManager().beginTransaction();
+        Fragment prev = getSupportFragmentManager().findFragmentByTag("dialogND");
+        if (prev != null) {
+            ft.remove(prev);
+        }
+        ft.addToBackStack(null);
+        nuevoDocIngFragment.show(ft, "dialogLoadingND");
     }
 
     public void iniciarSpinnerTipoDoc() {
@@ -459,8 +483,6 @@ public class DocumentosIngreso extends AppCompatActivity implements DOIAdapter.O
             doiImagenIV.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_add_a_photo_black_48dp));
             doiImagenIV.setTag("noImg");
 
-        /*Bitmap bmImg = BitmapFactory.decodeFile(f.getAbsolutePath());
-        doiImagenIV.setImageBitmap(bmImg);*/
         }
 
     }

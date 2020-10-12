@@ -1,6 +1,8 @@
 package com.stbnlycan.adapters;
 
 import android.annotation.SuppressLint;
+import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.media.Image;
 import android.util.Log;
 import android.view.Gravity;
@@ -17,6 +19,9 @@ import androidx.appcompat.view.menu.MenuPopupHelper;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.QRCodeWriter;
 import com.squareup.picasso.Picasso;
 import com.stbnlycan.controldeingreso.R;
 import com.stbnlycan.models.DocumentoIngreso;
@@ -44,10 +49,38 @@ public class DOIAdapter extends RecyclerView.Adapter<DOIAdapter.ARV>{
     public void onBindViewHolder(@NonNull DOIAdapter.ARV holder, int position) {
         DocumentoIngreso doi = doiList.get(position);
 
-        File f = new File(doi.getDoiImagen());
-        Picasso.get().load(f).resize(300, 300).into(holder.doiImagen);
+        if(doi.getDoiImagen() != null)
+        {
+            File f = new File(doi.getDoiImagen());
+            Picasso.get().load(f).resize(300, 300).into(holder.doiImagen);
+        }
+
         holder.tdoNombre.setText(doi.getTipoDocumento().getTdoNombre());
         holder.doi =  doiList.get(position);
+        holder.textoQR.setText(doi.getDoiDocumento());
+
+        try {
+            com.google.zxing.Writer writer = new QRCodeWriter();
+            // String finaldata = Uri.encode(data, "utf-8");
+            int width = 250;
+            int height = 250;
+            BitMatrix bm = writer
+                    .encode(doi.getDoiDocumento(), BarcodeFormat.QR_CODE, width, height);
+            Bitmap ImageBitmap = Bitmap.createBitmap(width, height,
+                    Bitmap.Config.ARGB_8888);
+
+            for (int i = 0; i < width; i++) {// width
+                for (int j = 0; j < height; j++) {// height
+                    ImageBitmap.setPixel(i, j, bm.get(i, j) ? Color.BLACK
+                            : Color.WHITE);
+                }
+            }
+            holder.doiImagenIV2.setImageBitmap(ImageBitmap);
+        }
+        catch (Exception ex)
+        {
+
+        }
     }
 
     @Override
@@ -59,15 +92,19 @@ public class DOIAdapter extends RecyclerView.Adapter<DOIAdapter.ARV>{
     {
 
         private ImageView doiImagen;
+        private ImageView doiImagenIV2;
         private TextView tdoNombre;
         private DocumentoIngreso doi;
         private ImageButton more;
+        private TextView textoQR;
 
         public ARV(@NonNull View itemView) {
             super(itemView);
             doiImagen = itemView.findViewById(R.id.doiImagen);
+            doiImagenIV2 = itemView.findViewById(R.id.doiImagenIV2);
             tdoNombre = itemView.findViewById(R.id.tdoNombre);
             more = itemView.findViewById(R.id.more);
+            textoQR = itemView.findViewById(R.id.textoQR);
 
             itemView.setOnClickListener(this);
 

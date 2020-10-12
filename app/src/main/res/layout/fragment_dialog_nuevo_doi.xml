@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="10dp">
+
+    <TextView
+        android:id="@+id/textView46"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:text="Tipo de documento *"
+        android:textSize="12sp" />
+
+    <Spinner
+        android:id="@+id/tipoDoc"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="5dp"
+        android:background="@drawable/style_spinner1" />
+
+    <TextView
+        android:id="@+id/textView47"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:text="Imagen de documento *"
+        android:textSize="12sp" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnAdd"
+        android:layout_width="match_parent"
+
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="2dp"
+        android:layout_weight="0"
+        android:gravity="center"
+        android:text="Obtener Foto"
+        android:textAllCaps="true"
+        android:textColor="@color/color_negro"
+        app:backgroundTint="#E8E8E8"
+        app:iconTint="#FFFFFF"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/textView48"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:text="QR de documento"
+        android:textSize="12sp" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnAddQR"
+        android:layout_width="match_parent"
+
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="5dp"
+        android:layout_marginRight="2dp"
+        android:layout_weight="0"
+        android:gravity="center"
+        android:text="Obtener QR"
+        android:textAllCaps="true"
+        android:textColor="@color/color_negro"
+        app:backgroundTint="#E8E8E8"
+        app:iconTint="#FFFFFF"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnCancel"
+            android:layout_width="match_parent"
+
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="2dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="Cancelar"
+            android:textAllCaps="true"
+            app:backgroundTint="#718F86"
+            app:iconTint="#FFFFFF"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnAceptar"
+            android:layout_width="match_parent"
+
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="2dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="Aceptar"
+            android:textAllCaps="true"
+            app:backgroundTint="#389702"
+            app:iconTint="#FFFFFF"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+    </LinearLayout>
+
+</LinearLayout>

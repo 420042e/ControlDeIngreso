@@ -6,8 +6,12 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.FileProvider;
+import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -35,6 +39,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -49,9 +54,12 @@ import com.mobsandgeeks.saripaar.annotation.NotEmpty;
 import com.mobsandgeeks.saripaar.annotation.Select;
 import com.squareup.picasso.OkHttp3Downloader;
 import com.squareup.picasso.Picasso;
+import com.stbnlycan.adapters.DOIAdapter;
+import com.stbnlycan.custom.CenterZoomLayoutManager;
 import com.stbnlycan.fragments.DFError;
 import com.stbnlycan.fragments.DFIngreso;
 import com.stbnlycan.fragments.LoadingFragment;
+import com.stbnlycan.fragments.NuevoDocIngFragment;
 import com.stbnlycan.interfaces.AreaRecintoAPIs;
 import com.stbnlycan.interfaces.LogoutAPIs;
 import com.stbnlycan.interfaces.MotivosAPIs;
@@ -96,7 +104,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Retrofit;
 
-public class RegistraVisitaActivity extends AppCompatActivity implements Validator.ValidationListener {
+public class RegistraVisitaActivity extends AppCompatActivity implements Validator.ValidationListener, DOIAdapter.OnDOIClickListener, NuevoDocIngFragment.OnInputListener {
 
     private ArrayList<AreaRecinto> areaRecinto;
     private ArrayList<Motivo> motivo;
@@ -143,6 +151,14 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
     private ArrayList<String> srcs;
     private ProgressBar progressBar;
 
+    private NuevoDocIngFragment nuevoDocIngFragment;
+
+    private RecyclerView recyclerView;
+    private DOIAdapter doiAdapter;
+    private ArrayList<DocumentoIngreso> dois;
+    private CenterZoomLayoutManager centerZoomLayoutManager;
+    private ScrollView scrollView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -158,6 +174,8 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
         motivoS = findViewById(R.id.motivo);
         observacion = findViewById(R.id.observacion);
         progressBar = findViewById(R.id.progressBar);
+        recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
+        scrollView = findViewById(R.id.scroll);
 
         fotoDoc = findViewById(R.id.fotoDoc);
 
@@ -166,6 +184,27 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
 
         codigoQR = "";
         doisResult = new ArrayList<>();
+
+        dois = new ArrayList<>();
+        doiAdapter = new DOIAdapter(dois);
+        doiAdapter.setOnDOIClickListener(RegistraVisitaActivity.this);
+        recyclerView.setHasFixedSize(true);
+        //recyclerView.setLayoutManager(new GridLayoutManager(this, 2, GridLayoutManager.HORIZONTAL, false));
+        centerZoomLayoutManager = new CenterZoomLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
+        recyclerView.setLayoutManager(centerZoomLayoutManager);
+        recyclerView.setAdapter(doiAdapter);
+
+        /*DocumentoIngreso doi = new DocumentoIngreso();
+        doi.setDoiImagen("");
+        doi.setDoiDocumento("");
+        TipoDocumento tipoDocumento = new TipoDocumento();
+        tipoDocumento.setTdoCod(1);
+        tipoDocumento.setTdoNombre("Prueba");
+        tipoDocumento.setTdoDescripcion("Desc");
+        doi.setTipoDocumento(tipoDocumento);
+        dois.add(0, doi);
+        doiAdapter.notifyItemInserted(0);*/
+        //doiAdapter.notifyDataSetChanged();
 
         pref = getApplicationContext().getSharedPreferences("MyPref", 0);
         editor = pref.edit();
@@ -238,39 +277,28 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
             @Override
             public void onClick(View v) {
                 Log.d("msg123 ", "hola1");
-                /*Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-                    File photoFile = null;
-                    try {
-                        photoFile = createImageFile();
-                    } catch (IOException ex) {
-                        // Error occurred while creating the File
-                    }
-                    if (photoFile != null) {
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-                        {
-                            uri = FileProvider.getUriForFile(getApplicationContext(),"com.stbnlycan.controldeingreso.fileprovider", photoFile);
-                            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, uri);
-                            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
-
-                            Log.d("msg4214",""+photoFile);
-                            imagenObtenida = photoFile.toString();
-                        }
-                        else
-                        {
-                            uri = FileProvider.getUriForFile(getApplicationContext(),"com.stbnlycan.controldeingreso.fileprovider", photoFile);
-                            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photoFile));
-                            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
-
-                            Log.d("msg4215",""+photoFile);
-                            imagenObtenida = photoFile.toString();
-                        }
-                    }
-                }*/
-                iniciarDOIActivity();
+                //iniciarDOIActivity();
+                showNuevoDocIngD();
             }
         });
 
+    }
+
+    public void showNuevoDocIngD() {
+        nuevoDocIngFragment = new NuevoDocIngFragment();
+        FragmentTransaction ft;
+        Bundle bundle = new Bundle();
+        bundle.putInt("tiempo", 0);
+        nuevoDocIngFragment.setOnInputListener(RegistraVisitaActivity.this);
+        nuevoDocIngFragment.setArguments(bundle);
+        //nuevoDocIngFragment.setTargetFragment(this, 1);
+        ft = getSupportFragmentManager().beginTransaction();
+        Fragment prev = getSupportFragmentManager().findFragmentByTag("dialogND");
+        if (prev != null) {
+            ft.remove(prev);
+        }
+        ft.addToBackStack(null);
+        nuevoDocIngFragment.show(ft, "dialogLoadingND");
     }
 
     public void iniciarDOIActivity() {
@@ -589,6 +617,14 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+
+
+        if (resultCode == 110)
+        {
+            String myData = data.getStringExtra("listdata");
+            Log.d("msg991",""+myData);
+        }
+
         if (resultCode == Activity.RESULT_OK)
         {
             if (requestCode == REQUEST_CODE_DOI)
@@ -597,10 +633,16 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
                 if (data != null)
                 {
                     doisResult = (ArrayList<DocumentoIngreso>) b.getSerializable("doisResult");
-                    fotoDoc.setText("Documentos de Ingreso "+"("+doisResult.size()+")");
+                    //fotoDoc.setText("Documentos de Ingreso "+"("+doisResult.size()+")");
                 }
             }
         }
+
+        // Make sure fragment codes match up
+        /*if (requestCode == DialogFragment.REQUEST_CODE) {
+            String editTextString = data.getStringExtra(
+                    DialogFragment.EDIT_TEXT_BUNDLE_KEY);
+        }*/
     }
 
     public void showLoadingwDialog() {
@@ -619,4 +661,29 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
         loadingFragment.show(ft, "dialogLoading");
     }
 
+    @Override
+    public void OnDOIClick(DocumentoIngreso doi) {
+
+    }
+
+    @Override
+    public void sendInput(DocumentoIngreso doi) {
+        dois.add(dois.size(), doi);
+        doiAdapter.notifyItemInserted(dois.size());
+
+        //centerZoomLayoutManager.scrollToPositionWithOffset(2, 20);
+        //fotoDoc.setText("Documentos de Ingreso "+"("+doisResult.size()+")");
+
+
+
+
+        scrollView.post(new Runnable() {
+            @Override
+            public void run() {
+                scrollView.fullScroll(ScrollView.FOCUS_DOWN);
+            }
+        });
+
+        recyclerView.getLayoutManager().scrollToPosition(centerZoomLayoutManager.findLastVisibleItemPosition() + 1);
+    }
 }

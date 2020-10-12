@@ -8,6 +8,12 @@
         app:showAsAction="always|withText" />
 
     <item
+        android:id="@+id/action_nd"
+        android:icon="@drawable/ic_note_add_black_24dp"
+        android:title="Nuevo documento"
+        app:showAsAction="always|withText" />
+
+    <item
         android:id="@+id/action_salir"
         android:orderInCategory="100"
         android:title="Cerrar sesión"
