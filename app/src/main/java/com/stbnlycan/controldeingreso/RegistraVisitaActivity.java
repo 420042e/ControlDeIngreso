@@ -175,7 +175,7 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
         observacion = findViewById(R.id.observacion);
         progressBar = findViewById(R.id.progressBar);
         recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
-        scrollView = findViewById(R.id.scroll);
+        scrollView = (ScrollView) findViewById(R.id.scroll);
 
         fotoDoc = findViewById(R.id.fotoDoc);
 
@@ -670,19 +670,15 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
     public void sendInput(DocumentoIngreso doi) {
         dois.add(dois.size(), doi);
         doiAdapter.notifyItemInserted(dois.size());
+        //doiAdapter.notifyDataSetChanged();
 
-        //centerZoomLayoutManager.scrollToPositionWithOffset(2, 20);
-        //fotoDoc.setText("Documentos de Ingreso "+"("+doisResult.size()+")");
-
-
-
-
-        scrollView.post(new Runnable() {
+        scrollView.postDelayed(new Runnable() {
             @Override
             public void run() {
                 scrollView.fullScroll(ScrollView.FOCUS_DOWN);
             }
-        });
+        },500);
+
 
         recyclerView.getLayoutManager().scrollToPosition(centerZoomLayoutManager.findLastVisibleItemPosition() + 1);
     }
