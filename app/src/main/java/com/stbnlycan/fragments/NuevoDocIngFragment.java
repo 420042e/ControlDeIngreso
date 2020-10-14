@@ -1,6 +1,7 @@
 package com.stbnlycan.fragments;
 
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -166,6 +167,9 @@ public class NuevoDocIngFragment extends DialogFragment implements Validator.Val
         View rootView = inflater.inflate(R.layout.fragment_dialog_nuevo_doi, null);
         builder.setView(rootView);
 
+        //setStyle(DialogFragment.STYLE_NO_TITLE, R.style.cust_dialog);
+
+
         validator = new Validator(this);
         validator.setValidationListener(this);
 
@@ -204,16 +208,23 @@ public class NuevoDocIngFragment extends DialogFragment implements Validator.Val
             @Override
             public void onClick(View v) {
                 validator.validate();
-
-                /*DocumentoIngreso doi = new DocumentoIngreso();
-                doi.setDoiImagen(imagenObtenida);
-                doi.setDoiDocumento(qrObtenido);
-                TipoDocumento tipoDocumento = (TipoDocumento) tipoDocS.getSelectedItem();
-                doi.setTipoDocumento(tipoDocumento);
-                onInputListener.sendInput(doi);
-                dismiss();*/
             }
         });
+
+        /*builder.setCancelable(false)
+                .setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        Log.d("msg7734","holaaaa");
+                        //validator.validate();
+                    }
+                })
+                .setNegativeButton("Cancelar",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                dialog.cancel();
+                            }
+                        });*/
+
 
         pref = getActivity().getSharedPreferences("MyPref", 0);
         editor = pref.edit();

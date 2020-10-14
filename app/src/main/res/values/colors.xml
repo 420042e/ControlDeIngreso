@@ -7,6 +7,7 @@
     <color name="signupColor">#066e8a</color>
     <color name="color_negro">#000000</color>
     <color name="color_rojo">#FF0000</color>
+    <color name="color_plomo">#B8B8B8</color>
 
     <color name="enabled_color">#F7FE2E</color>
     <color name="disabled_color">#000000</color>

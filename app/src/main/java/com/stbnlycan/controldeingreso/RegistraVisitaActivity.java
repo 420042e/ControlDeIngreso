@@ -104,7 +104,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Retrofit;
 
-public class RegistraVisitaActivity extends AppCompatActivity implements Validator.ValidationListener, DOIAdapter.OnDOIClickListener, NuevoDocIngFragment.OnInputListener {
+public class RegistraVisitaActivity extends AppCompatActivity implements Validator.ValidationListener, DOIAdapter.OnDOIClickListener, DOIAdapter.OnDOIEClickListener, NuevoDocIngFragment.OnInputListener {
 
     private ArrayList<AreaRecinto> areaRecinto;
     private ArrayList<Motivo> motivo;
@@ -159,6 +159,8 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
     private CenterZoomLayoutManager centerZoomLayoutManager;
     private ScrollView scrollView;
 
+    private TextView doiTexto;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -176,6 +178,7 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
         progressBar = findViewById(R.id.progressBar);
         recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
         scrollView = (ScrollView) findViewById(R.id.scroll);
+        doiTexto = findViewById(R.id.doiTexto);
 
         fotoDoc = findViewById(R.id.fotoDoc);
 
@@ -188,6 +191,7 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
         dois = new ArrayList<>();
         doiAdapter = new DOIAdapter(dois);
         doiAdapter.setOnDOIClickListener(RegistraVisitaActivity.this);
+        doiAdapter.setOnDOIEClickListener(RegistraVisitaActivity.this);
         recyclerView.setHasFixedSize(true);
         //recyclerView.setLayoutManager(new GridLayoutManager(this, 2, GridLayoutManager.HORIZONTAL, false));
         centerZoomLayoutManager = new CenterZoomLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
@@ -459,11 +463,17 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
 
     @Override
     public void onValidationSucceeded() {
-        for(int i = 0 ; i < doisResult.size() ;i++)
+        for(int i = 0 ; i < dois.size() ;i++)
         {
-            srcs.add(doisResult.get(i).getDoiImagen());
-            File f = new File(doisResult.get(i).getDoiImagen());
-            doisResult.get(i).setDoiImagen(f.getName());
+            if(dois.get(i).getDoiImagen() != null)
+            {
+                srcs.add(dois.get(i).getDoiImagen());
+                File f = new File(dois.get(i).getDoiImagen());
+                dois.get(i).setDoiImagen(f.getName());
+            }
+            /*srcs.add(dois.get(i).getDoiImagen());
+            File f = new File(dois.get(i).getDoiImagen());
+            dois.get(i).setDoiImagen(f.getName());*/
         }
         Visita visita = new Visita();
         AreaRecinto areaRecinto = (AreaRecinto) areaRecintoS.getSelectedItem();
@@ -473,7 +483,8 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
 
         Motivo motivo = (Motivo) motivoS.getSelectedItem();
 
-        visita.setDocumentosIngreso(doisResult);
+        //visita.setDocumentosIngreso(doisResult);
+        visita.setDocumentosIngreso(dois);
 
         visita.setMotivo(motivo);
 
@@ -671,6 +682,7 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
         dois.add(dois.size(), doi);
         doiAdapter.notifyItemInserted(dois.size());
         //doiAdapter.notifyDataSetChanged();
+        doiTexto.setText("Documentos de ingreso: "+dois.size());
 
         scrollView.postDelayed(new Runnable() {
             @Override
@@ -681,5 +693,11 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
 
 
         recyclerView.getLayoutManager().scrollToPosition(centerZoomLayoutManager.findLastVisibleItemPosition() + 1);
+    }
+
+    @Override
+    public void OnDOIClick(int total) {
+        Log.d("msg321", ""+total);
+        doiTexto.setText("Documentos de ingreso: "+total);
     }
 }

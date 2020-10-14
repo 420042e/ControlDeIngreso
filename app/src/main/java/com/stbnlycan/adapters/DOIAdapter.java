@@ -10,8 +10,10 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -34,6 +36,7 @@ public class DOIAdapter extends RecyclerView.Adapter<DOIAdapter.ARV>{
 
     private List<DocumentoIngreso> doiList;
     private OnDOIClickListener doiListener;
+    private OnDOIEClickListener doiEListener;
 
     public DOIAdapter(List<DocumentoIngreso> doiList) {
         this.doiList = doiList;
@@ -49,38 +52,80 @@ public class DOIAdapter extends RecyclerView.Adapter<DOIAdapter.ARV>{
     public void onBindViewHolder(@NonNull DOIAdapter.ARV holder, int position) {
         DocumentoIngreso doi = doiList.get(position);
 
-        if(doi.getDoiImagen() != null)
+        if(doi.getDoiImagen() != null && doi.getDoiDocumento() != null)
         {
+            holder.seccionQR.setVisibility(View.VISIBLE);
+            holder.seccionFoto.setVisibility(View.VISIBLE);
+            holder.divider.setVisibility(View.VISIBLE);
+
             File f = new File(doi.getDoiImagen());
             Picasso.get().load(f).resize(300, 300).into(holder.doiImagen);
+
+            holder.textoQR.setText(doi.getDoiDocumento());
+            try {
+                com.google.zxing.Writer writer = new QRCodeWriter();
+                int width = 300;
+                int height = 300;
+                BitMatrix bm = writer
+                        .encode(doi.getDoiDocumento(), BarcodeFormat.QR_CODE, width, height);
+                Bitmap ImageBitmap = Bitmap.createBitmap(width, height,
+                        Bitmap.Config.ARGB_8888);
+
+                for (int i = 0; i < width; i++) {// width
+                    for (int j = 0; j < height; j++) {// height
+                        ImageBitmap.setPixel(i, j, bm.get(i, j) ? Color.BLACK
+                                : Color.WHITE);
+                    }
+                }
+                holder.doiImagenIV2.setImageBitmap(ImageBitmap);
+            }
+            catch (Exception ex)
+            {
+
+            }
+        }
+        else if(doi.getDoiImagen() != null && doi.getDoiDocumento() == null)
+        {
+            holder.seccionQR.setVisibility(View.GONE);
+            holder.seccionFoto.setVisibility(View.VISIBLE);
+            holder.divider.setVisibility(View.GONE);
+
+            File f = new File(doi.getDoiImagen());
+            Picasso.get().load(f).resize(300, 300).into(holder.doiImagen);
+        }
+        else if(doi.getDoiImagen() == null && doi.getDoiDocumento() != null)
+        {
+            holder.seccionQR.setVisibility(View.VISIBLE);
+            holder.seccionFoto.setVisibility(View.GONE);
+            holder.divider.setVisibility(View.GONE);
+
+            holder.textoQR.setText(doi.getDoiDocumento());
+            try {
+                com.google.zxing.Writer writer = new QRCodeWriter();
+                int width = 300;
+                int height = 300;
+                BitMatrix bm = writer
+                        .encode(doi.getDoiDocumento(), BarcodeFormat.QR_CODE, width, height);
+                Bitmap ImageBitmap = Bitmap.createBitmap(width, height,
+                        Bitmap.Config.ARGB_8888);
+
+                for (int i = 0; i < width; i++) {// width
+                    for (int j = 0; j < height; j++) {// height
+                        ImageBitmap.setPixel(i, j, bm.get(i, j) ? Color.BLACK
+                                : Color.WHITE);
+                    }
+                }
+                holder.doiImagenIV2.setImageBitmap(ImageBitmap);
+            }
+            catch (Exception ex)
+            {
+
+            }
         }
 
         holder.tdoNombre.setText(doi.getTipoDocumento().getTdoNombre());
         holder.doi =  doiList.get(position);
-        holder.textoQR.setText(doi.getDoiDocumento());
 
-        try {
-            com.google.zxing.Writer writer = new QRCodeWriter();
-            // String finaldata = Uri.encode(data, "utf-8");
-            int width = 250;
-            int height = 250;
-            BitMatrix bm = writer
-                    .encode(doi.getDoiDocumento(), BarcodeFormat.QR_CODE, width, height);
-            Bitmap ImageBitmap = Bitmap.createBitmap(width, height,
-                    Bitmap.Config.ARGB_8888);
-
-            for (int i = 0; i < width; i++) {// width
-                for (int j = 0; j < height; j++) {// height
-                    ImageBitmap.setPixel(i, j, bm.get(i, j) ? Color.BLACK
-                            : Color.WHITE);
-                }
-            }
-            holder.doiImagenIV2.setImageBitmap(ImageBitmap);
-        }
-        catch (Exception ex)
-        {
-
-        }
     }
 
     @Override
@@ -95,27 +140,31 @@ public class DOIAdapter extends RecyclerView.Adapter<DOIAdapter.ARV>{
         private ImageView doiImagenIV2;
         private TextView tdoNombre;
         private DocumentoIngreso doi;
-        private ImageButton more;
         private TextView textoQR;
+        private Button btnMore;
+        private LinearLayout seccionFoto;
+        private LinearLayout seccionQR;
+        private View divider;
 
         public ARV(@NonNull View itemView) {
             super(itemView);
             doiImagen = itemView.findViewById(R.id.doiImagen);
             doiImagenIV2 = itemView.findViewById(R.id.doiImagenIV2);
             tdoNombre = itemView.findViewById(R.id.tdoNombre);
-            more = itemView.findViewById(R.id.more);
+            btnMore = itemView.findViewById(R.id.btnMore);
             textoQR = itemView.findViewById(R.id.textoQR);
+            seccionFoto = itemView.findViewById(R.id.seccionFoto);
+            seccionQR = itemView.findViewById(R.id.seccionQR);
+            divider = itemView.findViewById(R.id.divider);
 
             itemView.setOnClickListener(this);
 
             final View itemView2 = itemView;
 
-            more.setOnClickListener(new View.OnClickListener() {
-                @SuppressLint("RestrictedApi")
+            btnMore.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    PopupMenu popup = new PopupMenu(more.getContext(), itemView2);
-
+                    PopupMenu popup = new PopupMenu(btnMore.getContext(), itemView2);
                     popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                         @Override
                         public boolean onMenuItemClick(MenuItem item) {
@@ -126,30 +175,8 @@ public class DOIAdapter extends RecyclerView.Adapter<DOIAdapter.ARV>{
                                     doiList.remove(getAdapterPosition());
                                     notifyItemRemoved(getAdapterPosition());
                                     notifyItemRangeChanged(getAdapterPosition(),doiList.size());
+                                    doiEListener.OnDOIClick(doiList.size());
                                     return true;
-                                /*case R.id.action_play:
-                                    String valueOfPath = recordName.getText().toString();
-                                    Intent intent = new Intent();
-                                    intent.setAction(android.content.Intent.ACTION_VIEW);
-                                    File file = new File(valueOfPath);
-                                    intent.setDataAndType(Uri.fromFile(file), "audio/*");
-                                    context.startActivity(intent);
-                                    return true;
-                                case R.id.action_share:
-                                    String valueOfPath = recordName.getText().toString();
-                                    File filee = new File(valueOfPath);
-                                    try {
-                                        Intent sendIntent = new Intent();
-                                        sendIntent.setAction(Intent.ACTION_SEND);
-                                        sendIntent.setType("audio/*");
-                                        sendIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(filee));
-                                        context.startActivity(sendIntent);
-                                    } catch (NoSuchMethodError | IllegalArgumentException | NullPointerException e) {
-                                        e.printStackTrace();
-                                    } catch (Exception e) {
-                                        e.printStackTrace();
-                                    }
-                                    return true;*/
                                 default:
                                     return false;
                             }
@@ -171,6 +198,8 @@ public class DOIAdapter extends RecyclerView.Adapter<DOIAdapter.ARV>{
                     popup.show();
                 }
             });
+
+
         }
 
         @Override
@@ -191,6 +220,15 @@ public class DOIAdapter extends RecyclerView.Adapter<DOIAdapter.ARV>{
 
     public void setOnDOIClickListener(OnDOIClickListener listener){
         doiListener = listener;
+    }
+
+    public interface OnDOIEClickListener
+    {
+        void OnDOIClick(int total);
+    }
+
+    public void setOnDOIEClickListener(OnDOIEClickListener listener){
+        doiEListener = listener;
     }
 
 }

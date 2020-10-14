@@ -39,7 +39,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Retrofit;
 
-public class VerDocumentosIngreso extends AppCompatActivity implements DOI2Adapter.OnDOIClickListener{
+public class VerDocumentosIngreso extends AppCompatActivity implements DOI2Adapter.OnDOIClickListener, DOI2Adapter.OnDOIQRClickListener {
 
     private Toolbar toolbar;
     private String authorization;
@@ -92,8 +92,9 @@ public class VerDocumentosIngreso extends AppCompatActivity implements DOI2Adapt
         doiAdapter.setContext(this);
         doiAdapter.setClient(client);
         doiAdapter.setOnDOIClickListener(VerDocumentosIngreso.this);
+        doiAdapter.setOnDOIQRClickListener(VerDocumentosIngreso.this);
         recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
+        recyclerView.setLayoutManager(new GridLayoutManager(this, 1));
         recyclerView.setAdapter(doiAdapter);
 
         bar.setVisibility(View.VISIBLE);
@@ -188,6 +189,13 @@ public class VerDocumentosIngreso extends AppCompatActivity implements DOI2Adapt
         Intent intent = new Intent(VerDocumentosIngreso.this, Foto.class);
         intent.putExtra("doi", doi);
         //startActivityForResult(intent, REQUEST_CODE_DOI);
+        startActivity(intent);
+    }
+
+    @Override
+    public void OnDOIQRClick(DocumentoIngreso doi) {
+        Intent intent = new Intent(VerDocumentosIngreso.this, DoiQR.class);
+        intent.putExtra("doi", doi);
         startActivity(intent);
     }
 }

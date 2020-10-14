@@ -20,6 +20,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
+        <activity android:name=".DoiQR"></activity>
 
         <provider
             android:name="androidx.core.content.FileProvider"
@@ -34,7 +35,6 @@
         <activity
             android:name=".Foto"
             android:screenOrientation="portrait" />
-
         <activity
             android:name=".VerDocumentosIngreso"
             android:screenOrientation="portrait" />
