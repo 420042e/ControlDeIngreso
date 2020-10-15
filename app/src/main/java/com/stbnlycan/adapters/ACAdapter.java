@@ -44,11 +44,6 @@ public class ACAdapter extends ArrayAdapter<Visitante> {
             TextView name = (TextView) view.findViewById(R.id.textView);
             LinearLayout fila = (LinearLayout) view.findViewById(R.id.fila);
             name.setText(visitante.getVteNombre()+" "+visitante.getVteApellidos());
-
-            /*if(position % 2 == 0)
-                fila.setBackgroundColor(0xFFF0F0F0);
-            else
-                fila.setBackgroundColor(0xFFE8E8E8);*/
         } catch (Exception e) {
             e.printStackTrace();
         }
