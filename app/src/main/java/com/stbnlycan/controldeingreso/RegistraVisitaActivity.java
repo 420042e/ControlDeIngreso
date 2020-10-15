@@ -324,7 +324,8 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
 
         AreaRecinto area = new AreaRecinto();
         area.setAreaCod("cod");
-        area.setAreaNombre("SELECCIONE ÁREA DEL RECINTO");
+        //area.setAreaNombre("SELECCIONE ÁREA DEL RECINTO");
+        area.setAreaNombre("CARGANDO...");
         area.setAreaDescripcion("descripcion");
         area.setAreaEstado("estado");
 
@@ -377,6 +378,8 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
                 {
                     areaRecinto.add(response.body().get(i));
                 }
+                areaRecinto.get(0).setAreaNombre("SELECCIONE ÁREA DEL RECINTO");
+                adapterAreaR.notifyDataSetChanged();
             }
             @Override
             public void onFailure(Call <List<AreaRecinto>> call, Throwable t) {
@@ -390,7 +393,8 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
 
         Motivo motivod = new Motivo();
         motivod.setMvoCod(0);
-        motivod.setMvoNombre("SELECCIONE MOTIVO");
+        //motivod.setMvoNombre("SELECCIONE MOTIVO");
+        motivod.setMvoNombre("CARGANDO...");
         motivod.setMvoDescripcion("descripcion");
 
         motivo.add(motivod);
@@ -444,6 +448,8 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
                 {
                     motivo.add(response.body().get(i));
                 }
+                motivo.get(0).setMvoNombre("SELECCIONE MOTIVO");
+                adapterMotivo.notifyDataSetChanged();
             }
             @Override
             public void onFailure(Call <List<Motivo>> call, Throwable t) {

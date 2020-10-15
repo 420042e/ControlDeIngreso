@@ -426,7 +426,8 @@ public class NuevoDocIngFragment extends DialogFragment implements Validator.Val
 
         TipoDocumento tipoDocumentod = new TipoDocumento();
         tipoDocumentod.setTdoCod(0);
-        tipoDocumentod.setTdoNombre("SELECCIONE TIPO DE DOCUMENTO");
+        //tipoDocumentod.setTdoNombre("SELECCIONE TIPO DE DOCUMENTO");
+        tipoDocumentod.setTdoNombre("CARGANDO...");
         tipoDocumentod.setTdoDescripcion("descripcion");
 
         tipoDocumento.add(tipoDocumentod);
@@ -478,6 +479,8 @@ public class NuevoDocIngFragment extends DialogFragment implements Validator.Val
                 for (int i = 0; i < response.body().size(); i++) {
                     tipoDocumento.add(response.body().get(i));
                 }
+                tipoDocumento.get(0).setTdoNombre("SELECCIONE TIPO DE DOCUMENTO");
+                adapterTipoDoc.notifyDataSetChanged();
             }
 
             @Override

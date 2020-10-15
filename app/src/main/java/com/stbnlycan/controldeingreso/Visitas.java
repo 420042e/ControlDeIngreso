@@ -353,7 +353,8 @@ public class Visitas extends AppCompatActivity implements VisitasAdapter.OnVisit
 
         AreaRecinto area = new AreaRecinto();
         area.setAreaCod("cod");
-        area.setAreaNombre("SELECCIONE ÁREA DEL RECINTO");
+        //area.setAreaNombre("SELECCIONE ÁREA DEL RECINTO");
+        area.setAreaNombre("CARGANDO...");
         area.setAreaDescripcion("descripcion");
         area.setAreaEstado("estado");
 
@@ -437,6 +438,8 @@ public class Visitas extends AppCompatActivity implements VisitasAdapter.OnVisit
                 {
                     areaRecinto.add(response.body().get(i));
                 }
+                areaRecinto.get(0).setAreaNombre("SELECCIONE ÁREA DEL RECINTO");
+                adapterAreaR.notifyDataSetChanged();
                 if(response.body().size() > 0)
                 {
                     //areaRecintoS.setSelection(1);

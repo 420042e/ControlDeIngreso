@@ -258,7 +258,8 @@ public class Horarios extends AppCompatActivity implements HorariosAdapter.OnVis
         tipoVisitantes = new ArrayList<>();
         TipoVisitante tipoVisitante = new TipoVisitante();
         tipoVisitante.setTviCod("cod");
-        tipoVisitante.setTviNombre("SELECCIONE TIPO DE VISITANTE");
+        //tipoVisitante.setTviNombre("SELECCIONE TIPO DE VISITANTE");
+        tipoVisitante.setTviNombre("CARGANDO...");
         tipoVisitante.setTviDescripcion("obs");
         tipoVisitante.setHorEstado("estado");
 
@@ -307,25 +308,12 @@ public class Horarios extends AppCompatActivity implements HorariosAdapter.OnVis
         call.enqueue(new Callback<List<TipoVisitante>>() {
             @Override
             public void onResponse(Call <List<TipoVisitante>> call, Response<List<TipoVisitante>> response) {
-                //tipoVisitantes = response.body();
-
                 for(int i = 0 ; i < response.body().size() ; i++)
                 {
                     tipoVisitantes.add(response.body().get(i));
                 }
-
-                /*tipoVisitanteS.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                    @Override
-                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                        tipoVisitanteSel = (TipoVisitante) parent.getSelectedItem();
-                        displayTipoVisitanteData(tipoVisitanteSel);
-
-                        fetchHorarios(recintoRecibido.getRecCod(), tipoVisitanteSel.getTviCod(),"todos","todos");
-                    }
-                    @Override
-                    public void onNothingSelected(AdapterView<?> parent) {
-                    }
-                });*/
+                tipoVisitantes.get(0).setTviNombre("SELECCIONE TIPO DE VISITANTE");
+                adapterTipoVisitante.notifyDataSetChanged();
             }
             @Override
             public void onFailure(Call call, Throwable t) {

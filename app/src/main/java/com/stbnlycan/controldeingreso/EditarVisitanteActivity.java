@@ -275,7 +275,8 @@ public class EditarVisitanteActivity extends AppCompatActivity implements Valida
         empresas = new ArrayList<>();
         Empresa empresa = new Empresa();
         empresa.setEmpCod("cod");
-        empresa.setEmpNombre("SELECCIONE UNA EMPRESA");
+        //empresa.setEmpNombre("SELECCIONE UNA EMPRESA");
+        empresa.setEmpNombre("CARGANDO...");
         empresa.setEmpObs("obs");
         empresas.add(empresa);
         adapterEmpresa = new ArrayAdapter<Empresa>(this, R.layout.style_spinner, empresas){
@@ -318,7 +319,8 @@ public class EditarVisitanteActivity extends AppCompatActivity implements Valida
         tiposVisitante = new ArrayList<>();
         TipoVisitante tipoVisitante = new TipoVisitante();
         tipoVisitante.setTviCod("cod");
-        tipoVisitante.setTviNombre("SELECCIONE TIPO DE VISITANTE");
+        //tipoVisitante.setTviNombre("SELECCIONE TIPO DE VISITANTE");
+        tipoVisitante.setTviNombre("CARGANDO...");
         tipoVisitante.setTviDescripcion("obs");
         tipoVisitante.setHorEstado("estado");
         tiposVisitante.add(tipoVisitante);
@@ -645,7 +647,6 @@ public class EditarVisitanteActivity extends AppCompatActivity implements Valida
         call.enqueue(new Callback<ListaEmpresas>() {
             @Override
             public void onResponse(Call <ListaEmpresas> call, retrofit2.Response<ListaEmpresas> response) {
-                //recintos = response.body();
                 int pos = -1;
                 for(int i = 0 ; i < response.body().getlEmpresa().size() ; i++)
                 {
@@ -655,7 +656,8 @@ public class EditarVisitanteActivity extends AppCompatActivity implements Valida
                         pos = i+1;
                     }
                 }
-                //adapter.notifyDataSetChanged();
+                empresas.get(0).setEmpNombre("SELECCIONE UNA EMPRESA");
+                adapterEmpresa.notifyDataSetChanged();
                 empresaS.setSelection(pos, true);
             }
             @Override
@@ -681,6 +683,8 @@ public class EditarVisitanteActivity extends AppCompatActivity implements Valida
                         pos = i+1;
                     }
                 }
+                tiposVisitante.get(0).setTviNombre("SELECCIONE TIPO DE VISITANTE");
+                adapterTipoVisitante.notifyDataSetChanged();
                 tipoVisitanteS.setSelection(pos, true);
             }
             @Override

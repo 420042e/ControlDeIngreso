@@ -233,7 +233,8 @@ public class NuevoVisitanteActivity extends AppCompatActivity implements Validat
         empresas = new ArrayList<>();
         Empresa empresa = new Empresa();
         empresa.setEmpCod("cod");
-        empresa.setEmpNombre("SELECCIONE UNA EMPRESA");
+        //empresa.setEmpNombre("SELECCIONE UNA EMPRESA");
+        empresa.setEmpNombre("CARGANDO...");
         empresa.setEmpObs("obs");
         empresas.add(empresa);
         adapterEmpresa = new ArrayAdapter<Empresa>(this, R.layout.style_spinner, empresas){
@@ -276,7 +277,8 @@ public class NuevoVisitanteActivity extends AppCompatActivity implements Validat
         tiposVisitante = new ArrayList<>();
         TipoVisitante tipoVisitante = new TipoVisitante();
         tipoVisitante.setTviCod("cod");
-        tipoVisitante.setTviNombre("SELECCIONE TIPO DE VISITANTE");
+        //tipoVisitante.setTviNombre("SELECCIONE TIPO DE VISITANTE");
+        tipoVisitante.setTviNombre("CARGANDO...");
         tipoVisitante.setTviDescripcion("obs");
         tipoVisitante.setHorEstado("estado");
         tiposVisitante.add(tipoVisitante);
@@ -521,13 +523,12 @@ public class NuevoVisitanteActivity extends AppCompatActivity implements Validat
         call.enqueue(new Callback<ListaEmpresas>() {
             @Override
             public void onResponse(Call <ListaEmpresas> call, retrofit2.Response<ListaEmpresas> response) {
-                //recintos = response.body();
-
                 for(int i = 0 ; i < response.body().getlEmpresa().size() ; i++)
                 {
                     empresas.add(response.body().getlEmpresa().get(i));
                 }
-                //adapter.notifyDataSetChanged();
+                empresas.get(0).setEmpNombre("SELECCIONE UNA EMPRESA");
+                adapterEmpresa.notifyDataSetChanged();
             }
             @Override
             public void onFailure(Call <ListaEmpresas> call, Throwable t) {
@@ -547,6 +548,8 @@ public class NuevoVisitanteActivity extends AppCompatActivity implements Validat
                 {
                     tiposVisitante.add(response.body().get(i));
                 }
+                tiposVisitante.get(0).setTviNombre("SELECCIONE TIPO DE VISITANTE");
+                adapterTipoVisitante.notifyDataSetChanged();
             }
             @Override
             public void onFailure(Call <List<TipoVisitante>> call, Throwable t) {
