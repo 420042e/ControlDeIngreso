@@ -471,6 +471,10 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
                 File f = new File(dois.get(i).getDoiImagen());
                 dois.get(i).setDoiImagen(f.getName());
             }
+            else
+            {
+                dois.get(i).setDoiImagen("");
+            }
             /*srcs.add(dois.get(i).getDoiImagen());
             File f = new File(dois.get(i).getDoiImagen());
             dois.get(i).setDoiImagen(f.getName());*/

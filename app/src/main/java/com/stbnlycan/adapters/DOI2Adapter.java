@@ -69,9 +69,7 @@ public class DOI2Adapter extends RecyclerView.Adapter<DOI2Adapter.ARV>{
     public void onBindViewHolder(@NonNull final DOI2Adapter.ARV holder, int position) {
         DocumentoIngreso doi = doiList.get(position);
 
-        Log.d("msg901",""+doi.getDoiImagen());
-
-        if(doi.getDoiImagen() != null && doi.getDoiDocumento() != null)
+        if(!doi.getDoiImagen().equals("") && doi.getDoiDocumento() != null)
         {
             holder.seccionQR.setVisibility(View.VISIBLE);
             holder.seccionFoto.setVisibility(View.VISIBLE);
@@ -86,7 +84,6 @@ public class DOI2Adapter extends RecyclerView.Adapter<DOI2Adapter.ARV>{
                     Log.d("msg512","cargado");
                     holder.doiImagen.setVisibility(View.VISIBLE);
                     holder.progressBar.setVisibility(View.GONE);
-
                 }
 
                 @Override
@@ -118,7 +115,7 @@ public class DOI2Adapter extends RecyclerView.Adapter<DOI2Adapter.ARV>{
 
             }
         }
-        else if(doi.getDoiImagen() != null && doi.getDoiDocumento() == null)
+        else if(!doi.getDoiImagen().equals("") && doi.getDoiDocumento() == null)
         {
             holder.seccionQR.setVisibility(View.GONE);
             holder.seccionFoto.setVisibility(View.VISIBLE);
@@ -140,7 +137,7 @@ public class DOI2Adapter extends RecyclerView.Adapter<DOI2Adapter.ARV>{
                 }
             });
         }
-        else if(doi.getDoiImagen() == null && doi.getDoiDocumento() != null)
+        else if(doi.getDoiImagen().equals("") && doi.getDoiDocumento() != null)
         {
             holder.seccionQR.setVisibility(View.VISIBLE);
             holder.seccionFoto.setVisibility(View.GONE);
