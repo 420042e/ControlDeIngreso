@@ -178,16 +178,17 @@
                         android:id="@+id/btnNE"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
+                        android:layout_marginEnd="5dp"
 
+                        android:layout_weight="1"
                         android:gravity="center"
+                        android:importantForAutofill="no"
                         android:textAllCaps="true"
                         app:backgroundTint="#E8E8E8"
                         app:icon="@drawable/ic_add_black_24dp"
                         app:iconGravity="textStart"
                         app:iconPadding="0dp"
-                        app:iconTint="#000000"
-                        android:importantForAutofill="no" />
+                        app:iconTint="#000000" />
                 </LinearLayout>
 
 
@@ -238,9 +239,10 @@
         android:layout_margin="16dp"
         android:clickable="true"
         android:focusable="true"
-        android:src="@drawable/ic_photo_camera_black_24dp"
+        android:src="@drawable/ic_photo_camera_white_24dp"
+        app:tint="#FFFFFF"
+        app:backgroundTint="#263238"
         app:layout_anchor="@id/visitanteIV"
-        app:layout_anchorGravity="bottom|right|end"
-        app:backgroundTint="#E8E8E8" />
+        app:layout_anchorGravity="bottom|right|end" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

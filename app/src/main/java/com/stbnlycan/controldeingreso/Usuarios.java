@@ -130,7 +130,7 @@ public class Usuarios extends AppCompatActivity implements UsuariosAdapter.OnUsu
                 .build();
 
         usuarios = new ArrayList<>();
-        usuariosAdapter = new UsuariosAdapter(this, client, usuarios);
+        usuariosAdapter = new UsuariosAdapter(this, authorization, usuarios);
         usuariosAdapter.setOnUsuarioClickListener(Usuarios.this);
 
         recyclerView.setAdapter(usuariosAdapter);

@@ -127,7 +127,8 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
                 .build();
 
         visitantes = new ArrayList<>();
-        visitantesAdapter = new VisitantesAdapter(this, client, visitantes);
+        //visitantesAdapter = new VisitantesAdapter(this, client, visitantes);
+        visitantesAdapter = new VisitantesAdapter(this, authorization, visitantes);
         visitantesAdapter.setOnVisitanteClickListener(Visitantes.this);
         visitantesAdapter.setOnVQRClickListener(Visitantes.this);
         visitantesAdapter.setOnEEClickListener(Visitantes.this);
@@ -166,6 +167,8 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
         recyclerView.setVisibility(View.GONE);
         tvFallo.setVisibility(View.GONE);
         tvNoData.setVisibility(View.GONE);
+
+        //recyclerView.getRecycledViewPool().setMaxRecycledViews(0, 0);
 
         actualizarVisitantes();
 

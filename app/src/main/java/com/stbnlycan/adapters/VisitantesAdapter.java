@@ -1,6 +1,7 @@
 package com.stbnlycan.adapters;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,13 +10,21 @@ import android.widget.Button;
 import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.squareup.picasso.OkHttp3Downloader;
-import com.squareup.picasso.Picasso;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.load.model.GlideUrl;
+import com.bumptech.glide.load.model.LazyHeaders;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.request.target.Target;
 import com.stbnlycan.controldeingreso.R;
 import com.stbnlycan.models.Visitante;
 
@@ -32,13 +41,15 @@ public class VisitantesAdapter extends RecyclerView.Adapter<VisitantesAdapter.AR
     private OnVQRClickListener vqrListener;
     private OnEEClickListener eeListener;
     private Context context;
-    private OkHttpClient client;
+    //private OkHttpClient client;
+    private String authorization;
 
-    public VisitantesAdapter(Context context, OkHttpClient client, List<Visitante> eventosList) {
+    public VisitantesAdapter(Context context, String authorization, List<Visitante> eventosList) {
         this.eventosList = eventosList;
         this.eventosListFull = new ArrayList<>(eventosList);
         this.context = context;
-        this.client = client;
+        //this.client = client;
+        this.authorization = authorization;
     }
 
     @NonNull
@@ -48,14 +59,14 @@ public class VisitantesAdapter extends RecyclerView.Adapter<VisitantesAdapter.AR
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ARV holder, int position) {
+    public void onBindViewHolder(@NonNull final ARV holder, int position) {
         Visitante visitante = eventosList.get(position);
         holder.artNaam.setText(visitante.getVteNombre()+" "+visitante.getVteApellidos());
         holder.lugar.setText(visitante.getVteCi());
         holder.tipoVisitante.setText(visitante.getTipoVisitante().getTviNombre());
         holder.empresaNombre.setText(visitante.getEmpresa().getEmpNombre());
 
-        Picasso picasso = new Picasso.Builder(context)
+        /*Picasso picasso = new Picasso.Builder(context)
                 .downloader(new OkHttp3Downloader(client))
                 .build();
         picasso.load("http://190.129.90.115:8083/ingresoVisitantes/visitante/mostrarFoto?foto=" + visitante.getVteImagen()).fit().into(holder.imgVisitante, new com.squareup.picasso.Callback() {
@@ -68,7 +79,33 @@ public class VisitantesAdapter extends RecyclerView.Adapter<VisitantesAdapter.AR
             public void onError(Exception e) {
 
             }
-        });
+        });*/
+
+        String url = "http://190.129.90.115:8083/ingresoVisitantes/visitante/mostrarFoto?foto=" + visitante.getVteImagen();
+        GlideUrl glideUrl = new GlideUrl(url,
+                new LazyHeaders.Builder()
+                        .addHeader("Authorization", authorization)
+                        .build());
+        Glide.with(context)
+                .load(glideUrl)
+                .centerCrop()
+                .apply(new RequestOptions().override(96, 96))
+                .listener(new RequestListener<Drawable>() {
+                    @Override
+                    public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                        holder.imgVisitante.setVisibility(View.VISIBLE);
+                        holder.progressBar.setVisibility(View.GONE);
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                        holder.imgVisitante.setVisibility(View.VISIBLE);
+                        holder.progressBar.setVisibility(View.GONE);
+                        return false;
+                    }
+                })
+                .into(holder.imgVisitante);
 
         holder.visitante = eventosList.get(position);
     }
@@ -127,7 +164,8 @@ public class VisitantesAdapter extends RecyclerView.Adapter<VisitantesAdapter.AR
         private TextView empresaNombre;
         private Button btnVQR;
         private Button btnEE;
-        Visitante visitante;
+        private Visitante visitante;
+        private ProgressBar progressBar;
 
         public ARV(@NonNull View itemView) {
             super(itemView);
@@ -139,6 +177,11 @@ public class VisitantesAdapter extends RecyclerView.Adapter<VisitantesAdapter.AR
             empresaNombre = itemView.findViewById(R.id.empresaNombre);
             btnVQR = itemView.findViewById(R.id.btnVQR);
             btnEE = itemView.findViewById(R.id.btnEE);
+            progressBar = itemView.findViewById(R.id.progressBar);
+
+            imgVisitante.setVisibility(View.GONE);
+            progressBar.setVisibility(View.VISIBLE);
+
             itemView.setOnClickListener(this);
 
             btnVQR.setOnClickListener(new View.OnClickListener() {

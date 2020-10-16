@@ -1,11 +1,13 @@
 package com.stbnlycan.controldeingreso;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -19,10 +21,15 @@ import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.load.model.GlideUrl;
+import com.bumptech.glide.load.model.LazyHeaders;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 import com.mobsandgeeks.saripaar.annotation.NotEmpty;
 import com.mobsandgeeks.saripaar.annotation.Select;
-import com.squareup.picasso.OkHttp3Downloader;
-import com.squareup.picasso.Picasso;
 import com.stbnlycan.interfaces.LogoutAPIs;
 import com.stbnlycan.models.Usuario;
 
@@ -99,7 +106,7 @@ public class DetallesUsuario extends AppCompatActivity {
 
         progressBar.setVisibility(View.VISIBLE);
 
-        OkHttpClient client = new OkHttpClient.Builder()
+        /*OkHttpClient client = new OkHttpClient.Builder()
                 .addInterceptor(new Interceptor() {
                     @Override
                     public okhttp3.Response intercept(Chain chain) throws IOException {
@@ -123,7 +130,31 @@ public class DetallesUsuario extends AppCompatActivity {
             public void onError(Exception e) {
 
             }
-        } );
+        } );*/
+
+        String url = "http://190.129.90.115:8083/ingresoVisitantes/usuarios/mostrarFoto?foto=" + usuarioRecibido.getPic();
+        GlideUrl glideUrl = new GlideUrl(url,
+                new LazyHeaders.Builder()
+                        .addHeader("Authorization", authorization)
+                        .build());
+        Glide.with(this)
+                .load(glideUrl)
+                .centerCrop()
+                .listener(new RequestListener<Drawable>() {
+                    @Override
+                    public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                        progressBar.setVisibility(View.GONE);
+                        return false;
+                    }
+                })
+                .into(visitanteIV);
+
+
 
 
         usernameET.setText(usuarioRecibido.getUsername());

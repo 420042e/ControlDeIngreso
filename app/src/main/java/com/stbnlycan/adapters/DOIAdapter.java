@@ -1,6 +1,7 @@
 package com.stbnlycan.adapters;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.media.Image;
@@ -21,10 +22,11 @@ import androidx.appcompat.view.menu.MenuPopupHelper;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
-import com.squareup.picasso.Picasso;
 import com.stbnlycan.controldeingreso.R;
 import com.stbnlycan.models.DocumentoIngreso;
 
@@ -37,6 +39,16 @@ public class DOIAdapter extends RecyclerView.Adapter<DOIAdapter.ARV>{
     private List<DocumentoIngreso> doiList;
     private OnDOIClickListener doiListener;
     private OnDOIEClickListener doiEListener;
+
+    public Context getContext() {
+        return context;
+    }
+
+    public void setContext(Context context) {
+        this.context = context;
+    }
+
+    private Context context;
 
     public DOIAdapter(List<DocumentoIngreso> doiList) {
         this.doiList = doiList;
@@ -59,7 +71,12 @@ public class DOIAdapter extends RecyclerView.Adapter<DOIAdapter.ARV>{
             holder.divider.setVisibility(View.VISIBLE);
 
             File f = new File(doi.getDoiImagen());
-            Picasso.get().load(f).resize(300, 300).into(holder.doiImagen);
+            //Picasso.get().load(f).resize(300, 300).into(holder.doiImagen);
+            Glide.with(context)
+                    .load(f)
+                    .centerCrop()
+                    .apply(new RequestOptions().override(300, 300))
+                    .into(holder.doiImagen);
 
             holder.textoQR.setText(doi.getDoiDocumento());
             try {
@@ -90,8 +107,15 @@ public class DOIAdapter extends RecyclerView.Adapter<DOIAdapter.ARV>{
             holder.seccionFoto.setVisibility(View.VISIBLE);
             holder.divider.setVisibility(View.GONE);
 
+            Log.d("msg234",""+doi.getDoiImagen());
+
             File f = new File(doi.getDoiImagen());
-            Picasso.get().load(f).resize(300, 300).into(holder.doiImagen);
+            //Picasso.get().load(f).resize(300, 300).into(holder.doiImagen);
+            Glide.with(context)
+                    .load(f)
+                    .centerCrop()
+                    .apply(new RequestOptions().override(300, 300))
+                    .into(holder.doiImagen);
         }
         else if(doi.getDoiImagen() == null && doi.getDoiDocumento() != null)
         {
@@ -159,8 +183,9 @@ public class DOIAdapter extends RecyclerView.Adapter<DOIAdapter.ARV>{
 
             itemView.setOnClickListener(this);
 
-            final View itemView2 = itemView;
 
+
+            final View itemView2 = itemView;
             btnMore.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

@@ -21,8 +21,6 @@ import android.widget.Toast;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.gson.Gson;
 import com.mobsandgeeks.saripaar.annotation.NotEmpty;
-import com.squareup.picasso.OkHttp3Downloader;
-import com.squareup.picasso.Picasso;
 import com.stbnlycan.interfaces.LogoutAPIs;
 import com.stbnlycan.models.Visita;
 

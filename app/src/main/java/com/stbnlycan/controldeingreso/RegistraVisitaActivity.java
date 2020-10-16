@@ -20,6 +20,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Matrix;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -44,6 +45,13 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.load.model.GlideUrl;
+import com.bumptech.glide.load.model.LazyHeaders;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.zxing.integration.android.IntentIntegrator;
@@ -52,8 +60,6 @@ import com.mobsandgeeks.saripaar.ValidationError;
 import com.mobsandgeeks.saripaar.Validator;
 import com.mobsandgeeks.saripaar.annotation.NotEmpty;
 import com.mobsandgeeks.saripaar.annotation.Select;
-import com.squareup.picasso.OkHttp3Downloader;
-import com.squareup.picasso.Picasso;
 import com.stbnlycan.adapters.DOIAdapter;
 import com.stbnlycan.custom.CenterZoomLayoutManager;
 import com.stbnlycan.fragments.DFError;
@@ -192,6 +198,7 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
         doiAdapter = new DOIAdapter(dois);
         doiAdapter.setOnDOIClickListener(RegistraVisitaActivity.this);
         doiAdapter.setOnDOIEClickListener(RegistraVisitaActivity.this);
+        doiAdapter.setContext(this);
         recyclerView.setHasFixedSize(true);
         //recyclerView.setLayoutManager(new GridLayoutManager(this, 2, GridLayoutManager.HORIZONTAL, false));
         centerZoomLayoutManager = new CenterZoomLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
@@ -231,7 +238,7 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
         int height = displayMetrics.heightPixels;
         int width = displayMetrics.widthPixels;
 
-        OkHttpClient client = new OkHttpClient.Builder()
+        /*OkHttpClient client = new OkHttpClient.Builder()
                 .addInterceptor(new Interceptor() {
                     @Override
                     public Response intercept(Chain chain) throws IOException {
@@ -255,7 +262,30 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
             public void onError(Exception e) {
 
             }
-        });
+        });*/
+
+        String url = "http://190.129.90.115:8083/ingresoVisitantes/visitante/mostrarFoto?foto=" + visitanteRecibido.getVteImagen();
+        GlideUrl glideUrl = new GlideUrl(url,
+                new LazyHeaders.Builder()
+                        .addHeader("Authorization", authorization)
+                        .build());
+        Glide.with(this)
+                .load(glideUrl)
+                .centerCrop()
+                .listener(new RequestListener<Drawable>() {
+                    @Override
+                    public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                        Log.d("msg9122 ","fallo");
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                        progressBar.setVisibility(View.GONE);
+                        return false;
+                    }
+                })
+                .into(visitanteIV);
 
         ciET.setText(visitanteRecibido.getVteCi());
         nombreET.setText(visitanteRecibido.getVteNombre());

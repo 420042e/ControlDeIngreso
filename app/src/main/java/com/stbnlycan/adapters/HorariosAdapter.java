@@ -39,14 +39,14 @@ public class HorariosAdapter extends RecyclerView.Adapter<HorariosAdapter.ARV> i
         Horario horario = eventosList.get(position);
         holder.artNaam.setText(horario.getHorNombre());
         holder.lugar.setText(horario.getHorDescripcion());
-        if(horario.getHorEstado().equals("1"))
+        /*if(horario.getHorEstado().equals("1"))
         {
             holder.estado.setText("Activo");
         }
         else
         {
             holder.estado.setText("Inactivo");
-        }
+        }*/
 
         holder.horario = eventosList.get(position);
     }
@@ -100,7 +100,7 @@ public class HorariosAdapter extends RecyclerView.Adapter<HorariosAdapter.ARV> i
         //private ImageView artimg;
         private TextView artNaam;
         private TextView lugar;
-        private TextView estado;
+        //private TextView estado;
         Horario horario;
 
         public ARV(@NonNull View itemView) {
@@ -109,7 +109,7 @@ public class HorariosAdapter extends RecyclerView.Adapter<HorariosAdapter.ARV> i
             //artimg = itemView.findViewById(R.id.artthumb);
             artNaam = itemView.findViewById(R.id.artname);
             lugar = itemView.findViewById(R.id.lugar);
-            estado = itemView.findViewById(R.id.fecha);
+            //estado = itemView.findViewById(R.id.fecha);
             itemView.setOnClickListener(this);
         }
 

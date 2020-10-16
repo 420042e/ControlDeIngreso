@@ -40,13 +40,13 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.google.gson.Gson;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 import com.mobsandgeeks.saripaar.ValidationError;
 import com.mobsandgeeks.saripaar.Validator;
 import com.mobsandgeeks.saripaar.annotation.Select;
-import com.squareup.picasso.Picasso;
 import com.stbnlycan.adapters.DOIAdapter;
 import com.stbnlycan.adapters.RecintoAdapter;
 import com.stbnlycan.fragments.NuevoDocIngFragment;
@@ -131,6 +131,7 @@ public class DocumentosIngreso extends AppCompatActivity implements DOIAdapter.O
 
         doiAdapter = new DOIAdapter(dois);
         doiAdapter.setOnDOIClickListener(DocumentosIngreso.this);
+        doiAdapter.setContext(this);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
         recyclerView.setAdapter(doiAdapter);
@@ -231,7 +232,11 @@ public class DocumentosIngreso extends AppCompatActivity implements DOIAdapter.O
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
             //Log.d("msg6545 ", "" + imagenObtenida);
             File f = new File(imagenObtenida);
-            Picasso.get().load(f).resize(300, 300).into(doiImagenIV);
+            //Picasso.get().load(f).resize(300, 300).into(doiImagenIV);
+            Glide.with(this)
+                    .load(f)
+                    .centerCrop()
+                    .into(doiImagenIV);
             doiImagenIV.setTag("Img");
 
             /*Bitmap bmImg = BitmapFactory.decodeFile(f.getAbsolutePath());

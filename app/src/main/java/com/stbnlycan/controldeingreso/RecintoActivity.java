@@ -377,7 +377,7 @@ public class RecintoActivity extends AppCompatActivity implements RecintoAdapter
                     showDFSalida(visitaRecibida);
                 } else {
                     Error error = new Gson().fromJson(jsonString, Error.class);
-                    Toast.makeText(getApplicationContext(), ""+error.getMessage(), Toast.LENGTH_LONG).show();
+                    //Toast.makeText(getApplicationContext(), ""+error.getMessage(), Toast.LENGTH_LONG).show();
                     buscarXQR(llave);
                     loadingFragment.dismiss();
                 }
@@ -406,7 +406,7 @@ public class RecintoActivity extends AppCompatActivity implements RecintoAdapter
                     showDFSalida(visitaRecibida);
                 } else {
                     Error error = new Gson().fromJson(jsonString, Error.class);
-                    Toast.makeText(getApplicationContext(), ""+error.getMessage(), Toast.LENGTH_LONG).show();
+                    //Toast.makeText(getApplicationContext(), ""+error.getMessage(), Toast.LENGTH_LONG).show();
                     iniciarRVActivity(visitante);
                     dialogFragment.dismiss();
                     loadingFragment.dismiss();

@@ -54,7 +54,6 @@ import com.mobsandgeeks.saripaar.Validator;
 import com.mobsandgeeks.saripaar.annotation.Email;
 import com.mobsandgeeks.saripaar.annotation.NotEmpty;
 import com.mobsandgeeks.saripaar.annotation.Select;
-import com.squareup.picasso.Picasso;
 import com.stbnlycan.fragments.LoadingFragment;
 import com.stbnlycan.interfaces.EmpresaAPIs;
 import com.stbnlycan.interfaces.EnviarCorreoIAPIs;

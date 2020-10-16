@@ -91,6 +91,7 @@ public class VerDocumentosIngreso extends AppCompatActivity implements DOI2Adapt
         doiAdapter = new DOI2Adapter(dois);
         doiAdapter.setContext(this);
         doiAdapter.setClient(client);
+        doiAdapter.setAuthorization(authorization);
         doiAdapter.setOnDOIClickListener(VerDocumentosIngreso.this);
         doiAdapter.setOnDOIQRClickListener(VerDocumentosIngreso.this);
         recyclerView.setHasFixedSize(true);

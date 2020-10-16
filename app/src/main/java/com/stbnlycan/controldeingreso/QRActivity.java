@@ -16,8 +16,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.squareup.picasso.OkHttp3Downloader;
-import com.squareup.picasso.Picasso;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.model.GlideUrl;
+import com.bumptech.glide.load.model.LazyHeaders;
 import com.stbnlycan.interfaces.LogoutAPIs;
 import com.stbnlycan.models.Visitante;
 
@@ -69,7 +70,7 @@ public class QRActivity extends AppCompatActivity {
         int height = displayMetrics.heightPixels;
         int width = displayMetrics.widthPixels;
 
-        OkHttpClient client = new OkHttpClient.Builder()
+        /*OkHttpClient client = new OkHttpClient.Builder()
                 .addInterceptor(new Interceptor() {
                     @Override
                     public Response intercept(Chain chain) throws IOException {
@@ -84,6 +85,16 @@ public class QRActivity extends AppCompatActivity {
                 .downloader(new OkHttp3Downloader(client))
                 .build();
         picasso.load("http://190.129.90.115:8083/ingresoVisitantes/visitante/mostrarQR?ci=" + visitanteRecibido.getVteCi()).centerCrop().resize(width, width).into(imgVisitante);
+        tvNombre.setText(visitanteRecibido.getVteNombre()+ " "+visitanteRecibido.getVteApellidos());*/
+
+        String url = "http://190.129.90.115:8083/ingresoVisitantes/visitante/mostrarQR?ci=" + visitanteRecibido.getVteCi();
+        GlideUrl glideUrl = new GlideUrl(url,
+                new LazyHeaders.Builder()
+                        .addHeader("Authorization", authorization)
+                        .build());
+        Glide.with(this)
+                .load(glideUrl)
+                .into(imgVisitante);
         tvNombre.setText(visitanteRecibido.getVteNombre()+ " "+visitanteRecibido.getVteApellidos());
     }
 

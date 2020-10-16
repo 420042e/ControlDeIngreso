@@ -21,8 +21,6 @@ import android.widget.Toast;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
-import com.squareup.picasso.OkHttp3Downloader;
-import com.squareup.picasso.Picasso;
 import com.stbnlycan.interfaces.LogoutAPIs;
 import com.stbnlycan.models.DocumentoIngreso;
 import com.stbnlycan.models.Visitante;

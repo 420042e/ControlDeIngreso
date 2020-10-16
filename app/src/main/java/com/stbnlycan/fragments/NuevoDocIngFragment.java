@@ -43,8 +43,6 @@ import com.google.zxing.qrcode.QRCodeWriter;
 import com.mobsandgeeks.saripaar.ValidationError;
 import com.mobsandgeeks.saripaar.Validator;
 import com.mobsandgeeks.saripaar.annotation.Select;
-import com.squareup.picasso.Picasso;
-import com.stbnlycan.controldeingreso.DocumentosIngreso;
 import com.stbnlycan.controldeingreso.NetworkClient;
 import com.stbnlycan.controldeingreso.R;
 import com.stbnlycan.interfaces.TipoDocAPIs;
@@ -333,25 +331,15 @@ public class NuevoDocIngFragment extends DialogFragment implements Validator.Val
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-
-        Log.d("msg6543 ", "hola "+requestCode+" "+resultCode+" "+getActivity().RESULT_OK);
-
         IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
         if(result != null) {
             if(result.getContents() == null) {
                 Toast.makeText(getActivity(), "Cancelaste el escaneo de ingreso", Toast.LENGTH_LONG).show();
             } else {
-                //Toast.makeText(getActivity(), "Scanned: " + result.getContents(), Toast.LENGTH_LONG).show();
                 qrObtenido = result.getContents();
-                //doiDocumentoET.setText(qrObtenido);
-
                 int imgResource = R.drawable.ic_check_black_24dp;
                 btnAddQR.setCompoundDrawablesWithIntrinsicBounds(0, 0, imgResource, 0);
                 btnAddQR.setCompoundDrawablePadding(8);
-
-
-
-
                 try {
                     com.google.zxing.Writer writer = new QRCodeWriter();
                     // String finaldata = Uri.encode(data, "utf-8");
@@ -380,7 +368,6 @@ public class NuevoDocIngFragment extends DialogFragment implements Validator.Val
         }
 
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == getActivity().RESULT_OK) {
-            Log.d("msg6545 ", "" + imagenObtenida);
             File f = new File(imagenObtenida);
             //Picasso.get().load(f).resize(300, 300).into(doiImagenIV);
 
@@ -496,26 +483,30 @@ public class NuevoDocIngFragment extends DialogFragment implements Validator.Val
 
     @Override
     public void onValidationSucceeded() {
+        if(imagenObtenida == null && qrObtenido == null)
+        {
+            //Log.d("msg984","Debe existir una imagen por lo menos");
+            Toast.makeText(getActivity(), "Debe existir una imagen o QR", Toast.LENGTH_LONG).show();
+        }
+        else
+        {
+            DocumentoIngreso doi = new DocumentoIngreso();
+            doi.setDoiImagen(imagenObtenida);
+            doi.setDoiDocumento(qrObtenido);
+            TipoDocumento tipoDocumento = (TipoDocumento) tipoDocS.getSelectedItem();
+            doi.setTipoDocumento(tipoDocumento);
+            onInputListener.sendInput(doi);
+            dismiss();
+        }
 
-        /*File f = new File(imagenObtenida);
-        DocumentoIngreso doi = new DocumentoIngreso();
-        doi.setDoiImagen(imagenObtenida);
-        doi.setDoiDocumento(qrObtenido);
-        TipoDocumento tipoDocumento = (TipoDocumento) tipoDocS.getSelectedItem();
-        doi.setTipoDocumento(tipoDocumento);
 
-
-        //Reiniciar componentes
-        tipoDocS.setSelection(0, true);*/
-
-
-        DocumentoIngreso doi = new DocumentoIngreso();
+        /*DocumentoIngreso doi = new DocumentoIngreso();
         doi.setDoiImagen(imagenObtenida);
         doi.setDoiDocumento(qrObtenido);
         TipoDocumento tipoDocumento = (TipoDocumento) tipoDocS.getSelectedItem();
         doi.setTipoDocumento(tipoDocumento);
         onInputListener.sendInput(doi);
-        dismiss();
+        dismiss();*/
 
     }
 

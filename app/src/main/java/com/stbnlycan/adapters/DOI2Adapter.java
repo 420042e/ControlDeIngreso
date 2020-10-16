@@ -3,6 +3,7 @@ package com.stbnlycan.adapters;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,15 +12,23 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.load.model.GlideUrl;
+import com.bumptech.glide.load.model.LazyHeaders;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.request.target.Target;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
-import com.squareup.picasso.OkHttp3Downloader;
-import com.squareup.picasso.Picasso;
 import com.stbnlycan.controldeingreso.R;
 import com.stbnlycan.models.DocumentoIngreso;
 
@@ -38,6 +47,16 @@ public class DOI2Adapter extends RecyclerView.Adapter<DOI2Adapter.ARV>{
     private OnDOIQRClickListener doiQRListener;
     private Context context;
     private OkHttpClient client;
+
+    public String getAuthorization() {
+        return authorization;
+    }
+
+    public void setAuthorization(String authorization) {
+        this.authorization = authorization;
+    }
+
+    private String authorization;
 
     public Context getContext() {
         return context;
@@ -69,13 +88,17 @@ public class DOI2Adapter extends RecyclerView.Adapter<DOI2Adapter.ARV>{
     public void onBindViewHolder(@NonNull final DOI2Adapter.ARV holder, int position) {
         DocumentoIngreso doi = doiList.get(position);
 
+        //Eliminar estas 2 lineas
+        /*holder.doiImagen.setVisibility(View.VISIBLE);
+        holder.progressBar.setVisibility(View.INVISIBLE);*/
+
         if(!doi.getDoiImagen().equals("") && doi.getDoiDocumento() != null)
         {
             holder.seccionQR.setVisibility(View.VISIBLE);
             holder.seccionFoto.setVisibility(View.VISIBLE);
             holder.divider.setVisibility(View.VISIBLE);
 
-            Picasso picasso = new Picasso.Builder(context)
+            /*Picasso picasso = new Picasso.Builder(context)
                     .downloader(new OkHttp3Downloader(client))
                     .build();
             picasso.load("http://190.129.90.115:8083/ingresoVisitantes/documentoIngreso/mostrarFoto?foto=" + doi.getDoiImagen()).resize(300, 300).into(holder.doiImagen, new com.squareup.picasso.Callback() {
@@ -90,7 +113,32 @@ public class DOI2Adapter extends RecyclerView.Adapter<DOI2Adapter.ARV>{
                 public void onError(Exception e) {
                     Log.d("msg516","error "+e);
                 }
-            });
+            });*/
+
+
+            String url = "http://190.129.90.115:8083/ingresoVisitantes/documentoIngreso/mostrarFoto?foto=" + doi.getDoiImagen();
+            GlideUrl glideUrl = new GlideUrl(url,
+                    new LazyHeaders.Builder()
+                            .addHeader("Authorization", authorization)
+                            .build());
+            Glide.with(context)
+                    .load(glideUrl)
+                    .centerCrop()
+                    .apply(new RequestOptions().override(300, 300))
+                    .listener(new RequestListener<Drawable>() {
+                        @Override
+                        public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                            return false;
+                        }
+
+                        @Override
+                        public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                            holder.doiImagen.setVisibility(View.VISIBLE);
+                            holder.progressBar.setVisibility(View.GONE);
+                            return false;
+                        }
+                    })
+                    .into(holder.doiImagen);
 
             holder.textoQR.setText(doi.getDoiDocumento());
             try {
@@ -121,21 +169,29 @@ public class DOI2Adapter extends RecyclerView.Adapter<DOI2Adapter.ARV>{
             holder.seccionFoto.setVisibility(View.VISIBLE);
             holder.divider.setVisibility(View.GONE);
 
-            Picasso picasso = new Picasso.Builder(context)
-                    .downloader(new OkHttp3Downloader(client))
-                    .build();
-            picasso.load("http://190.129.90.115:8083/ingresoVisitantes/documentoIngreso/mostrarFoto?foto=" + doi.getDoiImagen()).resize(300, 300).into(holder.doiImagen, new com.squareup.picasso.Callback() {
-                @Override
-                public void onSuccess() {
-                    holder.doiImagen.setVisibility(View.VISIBLE);
-                    holder.progressBar.setVisibility(View.GONE);
-                }
+            String url = "http://190.129.90.115:8083/ingresoVisitantes/documentoIngreso/mostrarFoto?foto=" + doi.getDoiImagen();
+            GlideUrl glideUrl = new GlideUrl(url,
+                    new LazyHeaders.Builder()
+                            .addHeader("Authorization", authorization)
+                            .build());
+            Glide.with(context)
+                    .load(glideUrl)
+                    .centerCrop()
+                    .apply(new RequestOptions().override(300, 300))
+                    .listener(new RequestListener<Drawable>() {
+                        @Override
+                        public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                            return false;
+                        }
 
-                @Override
-                public void onError(Exception e) {
-
-                }
-            });
+                        @Override
+                        public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                            holder.doiImagen.setVisibility(View.VISIBLE);
+                            holder.progressBar.setVisibility(View.GONE);
+                            return false;
+                        }
+                    })
+                    .into(holder.doiImagen);
         }
         else if(doi.getDoiImagen().equals("") && doi.getDoiDocumento() != null)
         {
