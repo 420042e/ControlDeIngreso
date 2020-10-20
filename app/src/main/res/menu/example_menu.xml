@@ -9,6 +9,13 @@
         app:actionViewClass="androidx.appcompat.widget.SearchView" />
 
     <item
+        android:id="@+id/action_reporte"
+        android:icon="@drawable/ic_file_download_black_24dp"
+        android:title="Generar reporte PDF"
+        app:showAsAction="never"
+        app:actionViewClass="androidx.appcompat.widget.SearchView" />
+
+    <item
         android:id="@+id/action_salir"
         android:orderInCategory="100"
         android:title="Cerrar sesión"

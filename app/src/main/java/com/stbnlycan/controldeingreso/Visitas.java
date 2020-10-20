@@ -5,24 +5,39 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.TaskStackBuilder;
 import androidx.core.util.Pair;
 import androidx.cursoradapter.widget.CursorAdapter;
 import androidx.cursoradapter.widget.SimpleCursorAdapter;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.database.MatrixCursor;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.pdf.PdfDocument;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.os.SystemClock;
 import android.provider.BaseColumns;
 import android.util.Log;
 import android.view.Menu;
@@ -45,7 +60,17 @@ import com.google.android.material.datepicker.CalendarConstraints;
 import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.android.material.datepicker.MaterialPickerOnPositiveButtonClickListener;
 import com.google.gson.Gson;
+import com.itextpdf.text.BaseColor;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Element;
+import com.itextpdf.text.Font;
+import com.itextpdf.text.Phrase;
+import com.itextpdf.text.pdf.PdfPCell;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfWriter;
 import com.stbnlycan.adapters.VisitasAdapter;
+import com.stbnlycan.fragments.LoadingFragment;
 import com.stbnlycan.interfaces.AreaRecintoAPIs;
 import com.stbnlycan.interfaces.ListaVCSalidaAPIs;
 import com.stbnlycan.interfaces.ListaVSSalidaAPIs;
@@ -60,6 +85,10 @@ import com.stbnlycan.models.Recinto;
 import com.stbnlycan.models.Visita;
 import com.stbnlycan.models.Visitante;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -116,6 +145,7 @@ public class Visitas extends AppCompatActivity implements VisitasAdapter.OnVisit
     private SharedPreferences.Editor editor;
 
     private boolean sugerenciaPress;
+    private LoadingFragment loadingFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -459,6 +489,9 @@ public class Visitas extends AppCompatActivity implements VisitasAdapter.OnVisit
             case android.R.id.home:
                 finish();
                 return false;
+            case R.id.action_reporte:
+                generarReporte();
+                return false;
             case R.id.action_salir:
                 cerrarSesion();
                 return false;
@@ -591,6 +624,258 @@ public class Visitas extends AppCompatActivity implements VisitasAdapter.OnVisit
                 Log.d("msg4125","hola "+t.toString());
             }
         });
+    }
+
+    private void doFakeWork() {
+        try {
+            SystemClock.sleep(5000);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    public void showLoadingwDialog() {
+
+        loadingFragment = new LoadingFragment();
+        FragmentTransaction ft;
+        Bundle bundle = new Bundle();
+        bundle.putInt("tiempo", 0);
+        loadingFragment.setArguments(bundle);
+        //dialogFragment.setTargetFragment(this, 1);
+        ft = getSupportFragmentManager().beginTransaction();
+        Fragment prev = getSupportFragmentManager().findFragmentByTag("dialogLoading");
+        if (prev != null) {
+            ft.remove(prev);
+        }
+        ft.addToBackStack(null);
+        loadingFragment.show(ft, "dialogLoading");
+    }
+
+    public void generarReporte() {
+
+        //showLoadingwDialog();
+
+
+        /*Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                for (int i = 0; i <= 10; i++) {
+                    final int value = i;
+                    doFakeWork();
+                    progress.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            text.setText("Updating");
+                            progress.setProgress(value);
+                        }
+                    });
+                }
+            }
+        };
+        new Thread(runnable).start();*/
+
+
+
+
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        //String myFilePath = Environment.getExternalStorageDirectory().getPath() + "/reporte_"+tipoVisitaS.getSelectedItem().toString().toLowerCase().replace(" ","_")+timeStamp+".pdf";
+        String myFilePath = getApplicationContext().getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS) + "/reporte_"+tipoVisitaS.getSelectedItem().toString().toLowerCase().replace(" ","_")+timeStamp+".pdf";
+
+
+
+        File file = new File (myFilePath);
+        Uri path = Uri.fromFile(file);
+        Intent resultIntent = new Intent(Intent.ACTION_VIEW);
+        resultIntent.setDataAndType(path, "application/pdf");
+        resultIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        //startActivity(intent);
+
+
+        //Intent resultIntent = new Intent(this, Visitas.class);
+        NotificationManager notificationManager = (NotificationManager) getApplication().getSystemService(Context.NOTIFICATION_SERVICE);
+        int notificationId = 1;
+        String channelId = "channel-01";
+        String channelName = "Channel Name";
+        int importance = NotificationManager.IMPORTANCE_HIGH;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            NotificationChannel mChannel = new NotificationChannel(
+                    channelId, channelName, importance);
+            notificationManager.createNotificationChannel(mChannel);
+        }
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(getApplication(), channelId)
+                .setSmallIcon(R.drawable.ic_file_download_white_24dp)
+                .setContentTitle("Reporte de "+tipoVisitaS.getSelectedItem().toString().toLowerCase())
+                .setContentText("Click para visualizar");
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(getApplication());
+        stackBuilder.addNextIntent(resultIntent);
+        PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(
+                0,
+                PendingIntent.FLAG_UPDATE_CURRENT
+        );
+        mBuilder.setContentIntent(resultPendingIntent);
+        notificationManager.notify(notificationId, mBuilder.build());
+
+
+        Document doc = new Document();
+        try {
+            PdfWriter.getInstance(doc, new FileOutputStream(myFilePath));
+            doc.open();
+            PdfPTable headerTable = new PdfPTable(1);
+            headerTable.setSpacingBefore(40f);
+            headerTable.setSpacingAfter(20f);
+            headerTable.setWidthPercentage(100);
+
+            PdfPTable assigneeTable = new PdfPTable(4);
+            assigneeTable.setSpacingAfter(20f);
+            assigneeTable.setWidthPercentage(100);
+            PdfPTable table = new PdfPTable(4);
+            table.setWidthPercentage(100);
+
+            //String [] val0 = {"Reporte de visitas "};
+            String [] val1 = {"Reporte de "+tipoVisitaS.getSelectedItem().toString().toLowerCase()};
+            String [] val2 = {"Area Recinto: "+areaRecintoS.getSelectedItem().toString().toLowerCase()};
+            String [] val3 = {"Mostrando resultados desde: "+fechaIni+" - "+fechaFin};
+            String [] val4 = {"Total de visitas: "+visitas.size()};
+            //addTitulo(headerTable, 1, val0, Element.ALIGN_CENTER);
+            addTitulo(headerTable, 1, val1, Element.ALIGN_LEFT);
+            addTitulo(headerTable, 1, val2, Element.ALIGN_LEFT);
+            addTitulo(headerTable, 1, val3, Element.ALIGN_LEFT);
+            addTitulo(headerTable, 1, val4, Element.ALIGN_LEFT);
+            //addRow(assigneeTable,1);
+            addAssigneeRow(assigneeTable);
+
+            String [] val5 = {"Visitante","Ingreso", "Salida", "Empresa"};
+            addRow(table,4, val5, new BaseColor(79, 129, 189), new BaseColor(255, 255, 255));
+            for(int i = 0 ; i < visitas.size() ; i++)
+            {
+                String [] val = {visitas.get(i).getVisitante().getVteNombre()+" "+visitas.get(i).getVisitante().getVteApellidos(), visitas.get(i).getVisIngreso(), visitas.get(i).getVisSalida(), visitas.get(i).getVisitante().getEmpresa().getEmpNombre()};
+                //addRow(table,4, val);
+
+                if(i % 2 == 0)
+                {
+                    addRow(table,4, val, new BaseColor(211, 223, 238), new BaseColor(0, 0, 0));
+                }
+                else
+                {
+                    addRow(table,4, val, new BaseColor(255, 255, 255), new BaseColor(0, 0, 0));
+                }
+            }
+            // Adds table to the doc
+            doc.add(headerTable);
+            doc.add(assigneeTable);
+            doc.add(table);
+
+            //openAdobeReader(myFilePath);
+        } catch (DocumentException | FileNotFoundException e) {
+            e.printStackTrace();
+        } finally {
+            doc.close();
+        }
+
+        openAdobeReader(myFilePath);
+    }
+
+    public static void addTitulo(PdfPTable table, int columns, String[] value, int hAlign) {
+        BaseColor color = new BaseColor(240, 240, 240); // or red, green, blue, alpha
+        Font boldFont = new Font(Font.FontFamily.HELVETICA , 10, Font.BOLD);
+        Font normalFont = new Font(Font.FontFamily.HELVETICA , 11, Font.NORMAL);
+        if(columns>0) {
+            for(int i=0;i<value.length;i++)
+            {
+                PdfPCell cell = new PdfPCell(new Phrase(value[i],normalFont));
+                cell.setColspan(1);
+                cell.setPadding(5);
+                /*cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+                cell.setHorizontalAlignment(Element.ALIGN_CENTER);*/
+                cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+                cell.setHorizontalAlignment(hAlign);
+                cell.setUseVariableBorders(true);
+                cell.setBorderColorTop(BaseColor.WHITE);
+                cell.setBorderColorLeft(BaseColor.WHITE);
+                cell.setBorderColorBottom(BaseColor.WHITE);
+                cell.setBorderColorRight(BaseColor.WHITE);
+
+                table.addCell(cell);
+            }
+        }
+        table.completeRow();
+    }
+
+    public static void addRow(PdfPTable table, int columns, String[] value, BaseColor baseColor, BaseColor baseColorT) {
+        BaseColor color = new BaseColor(240, 240, 240); // or red, green, blue, alpha
+        Font boldFont = new Font(Font.FontFamily.HELVETICA , 10, Font.BOLD);
+        Font normalFont = new Font(Font.FontFamily.HELVETICA , 11, Font.NORMAL);
+        normalFont.setColor(baseColorT);
+        if(columns>0) {
+            for(int i=0;i<value.length;i++)
+            {
+                String dtIngreso = value[1];
+                String dtSalida = value[2];
+                SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
+                SimpleDateFormat dd_MM_yyyy = new SimpleDateFormat("dd/MM/yyyy");
+                SimpleDateFormat hh_mm = new SimpleDateFormat("HH:mm");
+                String hora_fecha="";
+                Date date = null;
+                Date date2 = null;
+                try {
+                    date = format.parse(dtIngreso);
+                    if(dtSalida == null)
+                    {
+                        hora_fecha = dd_MM_yyyy.format(date)+" "+hh_mm.format(date);
+                        value[1] = dd_MM_yyyy.format(date)+" "+hh_mm.format(date);
+                        value[2] = "";
+                    }
+                    else
+                    {
+                        date2 = format.parse(dtSalida);
+                        hora_fecha = dd_MM_yyyy.format(date)+" "+hh_mm.format(date)+" SAL: "+dd_MM_yyyy.format(date2)+" "+hh_mm.format(date2);
+                        value[1] = dd_MM_yyyy.format(date)+" "+hh_mm.format(date);
+                        value[2] = dd_MM_yyyy.format(date2)+" "+hh_mm.format(date2);
+                    }
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+
+
+                PdfPCell cell = new PdfPCell(new Phrase(value[i],normalFont));
+                cell.setColspan(1);
+                cell.setPadding(5);
+                cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+
+
+                cell.setBackgroundColor(baseColor);
+
+                cell.setUseVariableBorders(true);
+                cell.setBorderColorTop(baseColor);
+                cell.setBorderColorLeft(baseColor);
+                cell.setBorderColorBottom(baseColor);
+                cell.setBorderColorRight(baseColor);
+
+                table.addCell(cell);
+            }
+        }
+        table.completeRow();
+    }
+
+    public static void addAssigneeRow(PdfPTable table) {
+        // Creates another row that only have to columns.
+        // The cell 5 and cell 6 width will span two columns
+        // in width.
+        BaseColor color = new BaseColor(240, 240, 240); // or red, green, blue, alpha
+        Font boldFont = new Font(Font.FontFamily.HELVETICA , 10, Font.BOLD);
+        Font normalFont = new Font(Font.FontFamily.HELVETICA , 11, Font.NORMAL);
+
+    }
+
+    public void openAdobeReader(String myFilePath) {
+        File file = new File (myFilePath);
+        Uri path = Uri.fromFile(file);
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setDataAndType(path, "application/pdf");
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
     }
 
     private void buscarVisitanteXNombre() {
