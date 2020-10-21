@@ -7,6 +7,7 @@ import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.TaskStackBuilder;
+import androidx.core.content.FileProvider;
 import androidx.core.util.Pair;
 import androidx.cursoradapter.widget.CursorAdapter;
 import androidx.cursoradapter.widget.SimpleCursorAdapter;
@@ -21,6 +22,7 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.SearchManager;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -686,11 +688,12 @@ public class Visitas extends AppCompatActivity implements VisitasAdapter.OnVisit
 
 
         File file = new File (myFilePath);
-        Uri path = Uri.fromFile(file);
+        //Uri path = Uri.fromFile(file);
+        Uri path = FileProvider.getUriForFile(getApplication(), getApplication().getPackageName() + ".fileprovider", file);
         Intent resultIntent = new Intent(Intent.ACTION_VIEW);
         resultIntent.setDataAndType(path, "application/pdf");
         resultIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        //startActivity(intent);
+        resultIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
 
         //Intent resultIntent = new Intent(this, Visitas.class);
@@ -767,14 +770,13 @@ public class Visitas extends AppCompatActivity implements VisitasAdapter.OnVisit
             doc.add(assigneeTable);
             doc.add(table);
 
-            //openAdobeReader(myFilePath);
         } catch (DocumentException | FileNotFoundException e) {
             e.printStackTrace();
         } finally {
             doc.close();
         }
 
-        openAdobeReader(myFilePath);
+        //openAdobeReader(myFilePath);
     }
 
     public static void addTitulo(PdfPTable table, int columns, String[] value, int hAlign) {
@@ -873,8 +875,10 @@ public class Visitas extends AppCompatActivity implements VisitasAdapter.OnVisit
         File file = new File (myFilePath);
         Uri path = Uri.fromFile(file);
         Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setDataAndType(path, "application/pdf");
+        //intent.setDataAndType(path, "application/pdf");
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
         startActivity(intent);
     }
 
