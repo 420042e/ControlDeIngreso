@@ -73,6 +73,7 @@ import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.stbnlycan.adapters.VisitasAdapter;
 import com.stbnlycan.fragments.LoadingFragment;
+import com.stbnlycan.fragments.PReporteFragment;
 import com.stbnlycan.interfaces.AreaRecintoAPIs;
 import com.stbnlycan.interfaces.ListaVCSalidaAPIs;
 import com.stbnlycan.interfaces.ListaVSSalidaAPIs;
@@ -148,6 +149,9 @@ public class Visitas extends AppCompatActivity implements VisitasAdapter.OnVisit
 
     private boolean sugerenciaPress;
     private LoadingFragment loadingFragment;
+    private PReporteFragment pReporteFragment;
+    private int visitasTotales;
+    private ArrayList<Visita> visitasReporte;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -190,6 +194,8 @@ public class Visitas extends AppCompatActivity implements VisitasAdapter.OnVisit
         recyclerView.setAdapter(visitasAdapter);
         //recyclerView.setLayoutManager(new GridLayoutManager(this, 1));
         recyclerView.setLayoutManager(manager);
+
+        visitasReporte = new ArrayList<>();
 
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
@@ -492,7 +498,9 @@ public class Visitas extends AppCompatActivity implements VisitasAdapter.OnVisit
                 finish();
                 return false;
             case R.id.action_reporte:
-                generarReporte();
+                //showLoadingwDialog();
+                //showPReporteDialog();
+                procesarVisitas();
                 return false;
             case R.id.action_salir:
                 cerrarSesion();
@@ -655,128 +663,41 @@ public class Visitas extends AppCompatActivity implements VisitasAdapter.OnVisit
         loadingFragment.show(ft, "dialogLoading");
     }
 
-    public void generarReporte() {
+    public void showPReporteDialog() {
 
-        //showLoadingwDialog();
+        pReporteFragment = new PReporteFragment();
+        FragmentTransaction ft;
+        Bundle bundle = new Bundle();
+        bundle.putInt("tipoVisitaSel", tipoVisitaSel);
+        bundle.putString("tipoVisitaS", tipoVisitaS.getSelectedItem().toString());
+        bundle.putString("fechaIni", fechaIni);
+        bundle.putString("fechaFin", fechaFin);
+        bundle.putString("recintoSel", recintoSel);
+        bundle.putSerializable("areaRecintoSel", areaRecintoSel);
+        bundle.putString("areaRecintoS", areaRecintoS.getSelectedItem().toString());
+        bundle.putInt("visitasTotales", visitasTotales);
+        bundle.putString("authorization", authorization);
 
-
-        /*Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-                for (int i = 0; i <= 10; i++) {
-                    final int value = i;
-                    doFakeWork();
-                    progress.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            text.setText("Updating");
-                            progress.setProgress(value);
-                        }
-                    });
-                }
-            }
-        };
-        new Thread(runnable).start();*/
-
-
-
-
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        //String myFilePath = Environment.getExternalStorageDirectory().getPath() + "/reporte_"+tipoVisitaS.getSelectedItem().toString().toLowerCase().replace(" ","_")+timeStamp+".pdf";
-        String myFilePath = getApplicationContext().getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS) + "/reporte_"+tipoVisitaS.getSelectedItem().toString().toLowerCase().replace(" ","_")+timeStamp+".pdf";
-
-
-
-        File file = new File (myFilePath);
-        //Uri path = Uri.fromFile(file);
-        Uri path = FileProvider.getUriForFile(getApplication(), getApplication().getPackageName() + ".fileprovider", file);
-        Intent resultIntent = new Intent(Intent.ACTION_VIEW);
-        resultIntent.setDataAndType(path, "application/pdf");
-        resultIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        resultIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-
-
-        //Intent resultIntent = new Intent(this, Visitas.class);
-        NotificationManager notificationManager = (NotificationManager) getApplication().getSystemService(Context.NOTIFICATION_SERVICE);
-        int notificationId = 1;
-        String channelId = "channel-01";
-        String channelName = "Channel Name";
-        int importance = NotificationManager.IMPORTANCE_HIGH;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            NotificationChannel mChannel = new NotificationChannel(
-                    channelId, channelName, importance);
-            notificationManager.createNotificationChannel(mChannel);
+        pReporteFragment.setArguments(bundle);
+        //dialogFragment.setTargetFragment(this, 1);
+        ft = getSupportFragmentManager().beginTransaction();
+        Fragment prev = getSupportFragmentManager().findFragmentByTag("dialogPreporte");
+        if (prev != null) {
+            ft.remove(prev);
         }
-        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(getApplication(), channelId)
-                .setSmallIcon(R.drawable.ic_file_download_white_24dp)
-                .setContentTitle("Reporte de "+tipoVisitaS.getSelectedItem().toString().toLowerCase())
-                .setContentText("Click para visualizar");
-        TaskStackBuilder stackBuilder = TaskStackBuilder.create(getApplication());
-        stackBuilder.addNextIntent(resultIntent);
-        PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(
-                0,
-                PendingIntent.FLAG_UPDATE_CURRENT
-        );
-        mBuilder.setContentIntent(resultPendingIntent);
-        notificationManager.notify(notificationId, mBuilder.build());
+        ft.addToBackStack(null);
+        pReporteFragment.show(ft, "dialogPreporte");
+    }
 
-
-        Document doc = new Document();
-        try {
-            PdfWriter.getInstance(doc, new FileOutputStream(myFilePath));
-            doc.open();
-            PdfPTable headerTable = new PdfPTable(1);
-            headerTable.setSpacingBefore(40f);
-            headerTable.setSpacingAfter(20f);
-            headerTable.setWidthPercentage(100);
-
-            PdfPTable assigneeTable = new PdfPTable(4);
-            assigneeTable.setSpacingAfter(20f);
-            assigneeTable.setWidthPercentage(100);
-            PdfPTable table = new PdfPTable(4);
-            table.setWidthPercentage(100);
-
-            //String [] val0 = {"Reporte de visitas "};
-            String [] val1 = {"Reporte de "+tipoVisitaS.getSelectedItem().toString().toLowerCase()};
-            String [] val2 = {"Area Recinto: "+areaRecintoS.getSelectedItem().toString().toLowerCase()};
-            String [] val3 = {"Mostrando resultados desde: "+fechaIni+" - "+fechaFin};
-            String [] val4 = {"Total de visitas: "+visitas.size()};
-            //addTitulo(headerTable, 1, val0, Element.ALIGN_CENTER);
-            addTitulo(headerTable, 1, val1, Element.ALIGN_LEFT);
-            addTitulo(headerTable, 1, val2, Element.ALIGN_LEFT);
-            addTitulo(headerTable, 1, val3, Element.ALIGN_LEFT);
-            addTitulo(headerTable, 1, val4, Element.ALIGN_LEFT);
-            //addRow(assigneeTable,1);
-            addAssigneeRow(assigneeTable);
-
-            String [] val5 = {"Visitante","Ingreso", "Salida", "Empresa"};
-            addRow(table,4, val5, new BaseColor(79, 129, 189), new BaseColor(255, 255, 255));
-            for(int i = 0 ; i < visitas.size() ; i++)
-            {
-                String [] val = {visitas.get(i).getVisitante().getVteNombre()+" "+visitas.get(i).getVisitante().getVteApellidos(), visitas.get(i).getVisIngreso(), visitas.get(i).getVisSalida(), visitas.get(i).getVisitante().getEmpresa().getEmpNombre()};
-                //addRow(table,4, val);
-
-                if(i % 2 == 0)
-                {
-                    addRow(table,4, val, new BaseColor(211, 223, 238), new BaseColor(0, 0, 0));
-                }
-                else
-                {
-                    addRow(table,4, val, new BaseColor(255, 255, 255), new BaseColor(0, 0, 0));
-                }
-            }
-            // Adds table to the doc
-            doc.add(headerTable);
-            doc.add(assigneeTable);
-            doc.add(table);
-
-        } catch (DocumentException | FileNotFoundException e) {
-            e.printStackTrace();
-        } finally {
-            doc.close();
+    public void procesarVisitas() {
+        if(tipoVisitaSel == 1)
+        {
+            reporteVCS();
         }
-
-        //openAdobeReader(myFilePath);
+        else if(tipoVisitaSel == 2)
+        {
+            reporteVSS();
+        }
     }
 
     public static void addTitulo(PdfPTable table, int columns, String[] value, int hAlign) {
@@ -990,6 +911,7 @@ public class Visitas extends AppCompatActivity implements VisitasAdapter.OnVisit
                 }
                 else {
                     tvNoData.setVisibility(View.GONE);
+                    visitasTotales = listaVisitas.getTotalElements();
                     tvTotalVisitantes.setText("Total de visitas: " + listaVisitas.getTotalElements());
                     for(int i = 0 ; i < listaVisitas.getlVisita().size() ; i++)
                     {
@@ -1050,6 +972,7 @@ public class Visitas extends AppCompatActivity implements VisitasAdapter.OnVisit
                 }
                 else {
                     tvNoData.setVisibility(View.GONE);
+                    visitasTotales = listaVisitas.getTotalElements();
                     tvTotalVisitantes.setText("Total de visitas: " + listaVisitas.getTotalElements());
                     for(int i = 0 ; i < listaVisitas.getlVisita().size() ; i++)
                     {
@@ -1090,5 +1013,168 @@ public class Visitas extends AppCompatActivity implements VisitasAdapter.OnVisit
                 tvFallo.setVisibility(View.VISIBLE);
             }
         });
+    }
+
+    private void reporteVCS() {
+        Retrofit retrofit = NetworkClient.getRetrofitClient(this);
+        ListaVSSalidaAPIs listaVSSalidaAPIs = retrofit.create(ListaVSSalidaAPIs.class);
+        Call<ListaVisitas> call = listaVSSalidaAPIs.listaVSSalida(fechaIni, fechaFin, recintoSel, areaRecintoSel.getAreaCod(),"0", Integer.toString(visitasTotales), authorization);
+        call.enqueue(new Callback<ListaVisitas>() {
+            @Override
+            public void onResponse(Call <ListaVisitas> call, retrofit2.Response<ListaVisitas> response) {
+                //bar.setVisibility(View.GONE);
+                //recyclerView.setVisibility(View.VISIBLE);
+                visitasReporte.clear();
+                ListaVisitas listaVisitas = response.body();
+                if(listaVisitas.getlVisita().size() == 0)
+                {
+                    //tvNoData.setVisibility(View.VISIBLE);
+                    //tvTotalVisitantes.setText("Total de visitas: 0");
+                }
+                else {
+                    //tvNoData.setVisibility(View.GONE);
+                    //visitasTotales = listaVisitas.getTotalElements();
+                    //tvTotalVisitantes.setText("Total de visitas: " + listaVisitas.getTotalElements());
+                    for(int i = 0 ; i < listaVisitas.getlVisita().size() ; i++)
+                    {
+                        visitasReporte.add(listaVisitas.getlVisita().get(i));
+                    }
+                    //visitasAdapter.notifyDataSetChanged();
+                    generarReporte();
+                }
+                //swipeRefreshLayout.setRefreshing(false);
+                //nPag = 0;
+            }
+            @Override
+            public void onFailure(Call <ListaVisitas> call, Throwable t) {
+                bar.setVisibility(View.GONE);
+                tvFallo.setVisibility(View.VISIBLE);
+            }
+        });
+    }
+
+    private void reporteVSS() {
+        Retrofit retrofit = NetworkClient.getRetrofitClient(this);
+        ListaVCSalidaAPIs listaVSSalidaAPIs = retrofit.create(ListaVCSalidaAPIs.class);
+        Call<ListaVisitas> call = listaVSSalidaAPIs.listaVCSalida(fechaIni, fechaFin, recintoSel, areaRecintoSel.getAreaCod(),"0",Integer.toString(visitasTotales), authorization);
+        call.enqueue(new Callback<ListaVisitas>() {
+            @Override
+            public void onResponse(Call <ListaVisitas> call, retrofit2.Response<ListaVisitas> response) {
+                //bar.setVisibility(View.GONE);
+                //recyclerView.setVisibility(View.VISIBLE);
+                visitasReporte.clear();
+                ListaVisitas listaVisitas = response.body();
+                if(listaVisitas.getlVisita().size() == 0)
+                {
+                    //tvNoData.setVisibility(View.VISIBLE);
+                    //tvTotalVisitantes.setText("Total de visitas: 0");
+                }
+                else {
+                    //tvNoData.setVisibility(View.GONE);
+                    //visitasTotales = listaVisitas.getTotalElements();
+                    //tvTotalVisitantes.setText("Total de visitas: " + listaVisitas.getTotalElements());
+                    for(int i = 0 ; i < listaVisitas.getlVisita().size() ; i++)
+                    {
+                        visitasReporte.add(listaVisitas.getlVisita().get(i));
+                    }
+                    //visitasAdapter.notifyDataSetChanged();
+                    generarReporte();
+                }
+                //swipeRefreshLayout.setRefreshing(false);
+                //nPag = 0;
+            }
+            @Override
+            public void onFailure(Call <ListaVisitas> call, Throwable t) {
+                bar.setVisibility(View.GONE);
+                tvFallo.setVisibility(View.VISIBLE);
+            }
+        });
+    }
+
+    public void generarReporte()
+    {
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String myFilePath = getApplicationContext().getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS) + "/reporte_"+tipoVisitaS.getSelectedItem().toString().toLowerCase().replace(" ","_")+timeStamp+".pdf";
+
+        File file = new File (myFilePath);
+        Uri path = FileProvider.getUriForFile(getApplication(), getApplication().getPackageName() + ".fileprovider", file);
+        Intent resultIntent = new Intent(Intent.ACTION_VIEW);
+        resultIntent.setDataAndType(path, "application/pdf");
+        resultIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        resultIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+        NotificationManager notificationManager = (NotificationManager) getApplication().getSystemService(Context.NOTIFICATION_SERVICE);
+        int notificationId = 1;
+        String channelId = "channel-01";
+        String channelName = "Channel Name";
+        int importance = NotificationManager.IMPORTANCE_HIGH;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            NotificationChannel mChannel = new NotificationChannel(
+                    channelId, channelName, importance);
+            notificationManager.createNotificationChannel(mChannel);
+        }
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(getApplication(), channelId)
+                .setSmallIcon(R.drawable.ic_file_download_white_24dp)
+                .setContentTitle("Reporte de "+tipoVisitaS.getSelectedItem().toString().toLowerCase())
+                .setContentText("Click para visualizar");
+        mBuilder.setTicker("Reporte de "+tipoVisitaS.getSelectedItem().toString().toLowerCase());
+        TaskStackBuilder stackBuilder = TaskStackBuilder.create(getApplication());
+        stackBuilder.addNextIntent(resultIntent);
+        PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(
+                0,
+                PendingIntent.FLAG_UPDATE_CURRENT
+        );
+        mBuilder.setContentIntent(resultPendingIntent);
+        notificationManager.notify(notificationId, mBuilder.build());
+
+        Document doc = new Document();
+        try {
+            PdfWriter.getInstance(doc, new FileOutputStream(myFilePath));
+            doc.open();
+            PdfPTable headerTable = new PdfPTable(1);
+            headerTable.setSpacingBefore(40f);
+            headerTable.setSpacingAfter(20f);
+            headerTable.setWidthPercentage(100);
+
+            PdfPTable assigneeTable = new PdfPTable(4);
+            assigneeTable.setSpacingAfter(20f);
+            assigneeTable.setWidthPercentage(100);
+            PdfPTable table = new PdfPTable(4);
+            table.setWidthPercentage(100);
+
+            String [] val1 = {"Reporte de "+tipoVisitaS.getSelectedItem().toString().toLowerCase()};
+            String [] val2 = {"Area Recinto: "+areaRecintoS.getSelectedItem().toString().toLowerCase()};
+            String [] val3 = {"Mostrando resultados desde: "+fechaIni+" - "+fechaFin};
+            String [] val4 = {"Total de visitas: "+visitasTotales};
+            addTitulo(headerTable, 1, val1, Element.ALIGN_CENTER);
+            addTitulo(headerTable, 1, val2, Element.ALIGN_LEFT);
+            addTitulo(headerTable, 1, val3, Element.ALIGN_LEFT);
+            addTitulo(headerTable, 1, val4, Element.ALIGN_LEFT);
+            addAssigneeRow(assigneeTable);
+
+            String [] val5 = {"Visitante","Ingreso", "Salida", "Empresa"};
+            addRow(table,4, val5, new BaseColor(79, 129, 189), new BaseColor(255, 255, 255));
+            for(int i = 0 ; i < visitasReporte.size() ; i++)
+            {
+                String [] val = {visitasReporte.get(i).getVisitante().getVteNombre()+" "+visitasReporte.get(i).getVisitante().getVteApellidos(), visitasReporte.get(i).getVisIngreso(), visitasReporte.get(i).getVisSalida(), visitasReporte.get(i).getVisitante().getEmpresa().getEmpNombre()};
+                if(i % 2 == 0)
+                {
+                    addRow(table,4, val, new BaseColor(211, 223, 238), new BaseColor(0, 0, 0));
+                }
+                else
+                {
+                    addRow(table,4, val, new BaseColor(255, 255, 255), new BaseColor(0, 0, 0));
+                }
+            }
+            doc.add(headerTable);
+            doc.add(assigneeTable);
+            doc.add(table);
+            //loadingFragment.dismiss();
+
+        } catch (DocumentException | FileNotFoundException e) {
+            e.printStackTrace();
+        } finally {
+            doc.close();
+        }
     }
 }
