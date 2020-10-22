@@ -368,43 +368,12 @@ public class NuevoDocIngFragment extends DialogFragment implements Validator.Val
         }
 
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == getActivity().RESULT_OK) {
-            File f = new File(imagenObtenida);
-            //Picasso.get().load(f).resize(300, 300).into(doiImagenIV);
-
-            /*Bitmap bmImg = BitmapFactory.decodeFile(f.getAbsolutePath());
-            doiImagenIV.setImageBitmap(bmImg);*/
-
             redimensionarImg();
             DisplayMetrics displayMetrics = new DisplayMetrics();
             getActivity().getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-            int height = displayMetrics.heightPixels;
-            int width = displayMetrics.widthPixels;
-
             int imgResource = R.drawable.ic_check_black_24dp;
             btnAdd.setCompoundDrawablesWithIntrinsicBounds(0, 0, imgResource, 0);
             btnAdd.setCompoundDrawablePadding(8);
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                if (data != null) {
-                    Bundle extras = data.getExtras();
-                    Bitmap imageBitmap = (Bitmap) extras.get("data");
-                    //doiImagenIV.setImageBitmap(imageBitmap);
-                    /*doiImagenIV.getLayoutParams().width = width;
-                    doiImagenIV.getLayoutParams().height = width;
-                    doiImagenIV.setScaleType(ImageView.ScaleType.CENTER_CROP);*/
-                } else {
-                    //doiImagenIV.setImageURI(uri);
-                    /*doiImagenIV.getLayoutParams().width = width;
-                    doiImagenIV.getLayoutParams().height = width;
-                    doiImagenIV.setScaleType(ImageView.ScaleType.CENTER_CROP);*/
-                }
-            } else {
-                Log.d("msg554", "hola 2");
-                //doiImagenIV.setImageURI(uri);
-                /*doiImagenIV.getLayoutParams().width = width;
-                doiImagenIV.getLayoutParams().height = width;
-                doiImagenIV.setScaleType(ImageView.ScaleType.CENTER_CROP);*/
-            }
         }
     }
 

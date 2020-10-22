@@ -721,7 +721,6 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
     public void sendInput(DocumentoIngreso doi) {
         dois.add(dois.size(), doi);
         doiAdapter.notifyItemInserted(dois.size());
-        //doiAdapter.notifyDataSetChanged();
         doiTexto.setText("Documentos de ingreso: "+dois.size());
 
         scrollView.postDelayed(new Runnable() {

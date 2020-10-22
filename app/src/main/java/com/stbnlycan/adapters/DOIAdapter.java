@@ -71,7 +71,6 @@ public class DOIAdapter extends RecyclerView.Adapter<DOIAdapter.ARV>{
             holder.divider.setVisibility(View.VISIBLE);
 
             File f = new File(doi.getDoiImagen());
-            //Picasso.get().load(f).resize(300, 300).into(holder.doiImagen);
             Glide.with(context)
                     .load(f)
                     .centerCrop()

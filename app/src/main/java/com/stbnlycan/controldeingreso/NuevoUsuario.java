@@ -47,6 +47,8 @@ import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.gson.Gson;
 import com.mobsandgeeks.saripaar.ValidationError;
@@ -295,7 +297,7 @@ public class NuevoUsuario extends AppCompatActivity implements Validator.Validat
             getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
             int height = displayMetrics.heightPixels;
             int width = displayMetrics.widthPixels;
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+            /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
             {
                 //if(data.getExtras() != null)
                 if(data != null)
@@ -322,7 +324,13 @@ public class NuevoUsuario extends AppCompatActivity implements Validator.Validat
                 visitanteIV.getLayoutParams().width = width;
                 visitanteIV.getLayoutParams().height = width;
                 visitanteIV.setScaleType(ImageView.ScaleType.CENTER_CROP);
-            }
+            }*/
+            File f = new File(imagenObtenida);
+            Glide.with(getApplication())
+                    .load(f)
+                    .centerCrop()
+                    .apply(new RequestOptions().override(width, width))
+                    .into(visitanteIV);
         }
     }
 
