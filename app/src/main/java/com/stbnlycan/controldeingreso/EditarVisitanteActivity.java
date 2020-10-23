@@ -37,6 +37,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
@@ -47,6 +48,7 @@ import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.load.model.GlideUrl;
 import com.bumptech.glide.load.model.LazyHeaders;
 import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.Target;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.gson.Gson;
@@ -161,8 +163,6 @@ public class EditarVisitanteActivity extends AppCompatActivity implements Valida
         authorization = pref.getString("token_type", null) + " " + pref.getString("access_token", null);
         rol = pref.getString("rol", null);
 
-        /*ActionBar actionBar = getSupportActionBar();
-        actionBar.setDisplayHomeAsUpEnabled(true);*/
         cambioFoto = false;
 
         toolbar = findViewById(R.id.toolbar);
@@ -176,44 +176,14 @@ public class EditarVisitanteActivity extends AppCompatActivity implements Valida
 
         visitanteRecibido = (Visitante) getIntent().getSerializableExtra("visitante");
         position = getIntent().getIntExtra("position", -1);
-        //Log.d("msg2", ""+position);
-
 
         fetchDataEmpresa();
         fetchDataTipoVisitante();
-        //getDataEmpresa();
-        //getDataTipoVisitante();
 
         DisplayMetrics displayMetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         int height = displayMetrics.heightPixels;
         int width = displayMetrics.widthPixels;
-
-        /*OkHttpClient client = new OkHttpClient.Builder()
-                .addInterceptor(new Interceptor() {
-                    @Override
-                    public okhttp3.Response intercept(Chain chain) throws IOException {
-                        Request newRequest = chain.request().newBuilder()
-                                .addHeader("Authorization", authorization)
-                                .build();
-                        return chain.proceed(newRequest);
-                    }
-                })
-                .build();
-        Picasso picasso = new Picasso.Builder(this)
-                .downloader(new OkHttp3Downloader(client))
-                .build();
-        picasso.load("http://190.129.90.115:8083/ingresoVisitantes/visitante/mostrarFoto?foto=" + visitanteRecibido.getVteImagen()).resize(width, width).into(visitanteIV, new com.squareup.picasso.Callback() {
-            @Override
-            public void onSuccess() {
-                progressBar.setVisibility(View.GONE);
-            }
-
-            @Override
-            public void onError(Exception e) {
-
-            }
-        });*/
 
         String url = "http://190.129.90.115:8083/ingresoVisitantes/visitante/mostrarFoto?foto=" + visitanteRecibido.getVteImagen();
         GlideUrl glideUrl = new GlideUrl(url,
@@ -242,9 +212,6 @@ public class EditarVisitanteActivity extends AppCompatActivity implements Valida
         apellidosET.setText(visitanteRecibido.getVteApellidos());
         telcelET.setText(visitanteRecibido.getVteTelefono());
         emailET.setText(visitanteRecibido.getVteCorreo());
-
-        /*empresaS.setSelection(0);
-        tipoVisitanteS.setSelection(0);*/
 
         fabNF.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -404,84 +371,16 @@ public class EditarVisitanteActivity extends AppCompatActivity implements Valida
         //Toast.makeText(this, userData, Toast.LENGTH_LONG).show();
     }
 
-    /*public void takePicture(View view)
-    {
-        Intent imageTakeIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        if(imageTakeIntent.resolveActivity(getPackageManager())!=null)
-        {
-            startActivityForResult(imageTakeIntent, REQUEST_IMAGE_CAPTURE);
-        }
-        //Picasso.get().load("http://dineroclub.net/wp-content/uploads/2019/11/DEVELOPER3-696x465.jpg").centerCrop().resize(150, 150).into(visitanteIV);
-    }*/
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        /*if(requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK)
-        {
-            Bundle extras = data.getExtras();
-            Bitmap imageBitmap = (Bitmap)extras.get("data");
-            //visitanteIV.setImageBitmap(imageBitmap);
-
-            // CALL THIS METHOD TO GET THE URI FROM THE BITMAP
-            Uri tempUri = getImageUri(getApplicationContext(), imageBitmap);
-
-            // CALL THIS METHOD TO GET THE ACTUAL PATH
-            File finalFile = new File(getRealPathFromURI(tempUri));
-
-            //showLoadingwDialog();
-            Gson gson = new Gson();
-            String descripcion = gson.toJson(visitanteRecibido);
-
-            imagenObtenida = finalFile.toString();
-
-            DisplayMetrics displayMetrics = new DisplayMetrics();
-            getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-            int height = displayMetrics.heightPixels;
-            int width = displayMetrics.widthPixels;
-
-            Picasso.get().load(finalFile).resize(width, width).into(visitanteIV);
-            //imagenObtenida = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/prueba.jpg";
-
-            subirImagen(descripcion);
-        }*/
         if(requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK)
         {
             redimensionarImg();
-            DisplayMetrics displayMetrics = new DisplayMetrics();
-            getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-            int height = displayMetrics.heightPixels;
-            int width = displayMetrics.widthPixels;
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-            {
-                //if(data.getExtras() != null)
-                if(data != null)
-                {
-                    Bundle extras = data.getExtras();
-                    Bitmap imageBitmap = (Bitmap) extras.get("data");
-                    visitanteIV.setImageBitmap(imageBitmap);
-                    visitanteIV.getLayoutParams().width = width;
-                    visitanteIV.getLayoutParams().height = width;
-                    visitanteIV.setScaleType(ImageView.ScaleType.CENTER_CROP);
-                }
-                else
-                {
-                    visitanteIV.setImageURI(uri);
-                    visitanteIV.getLayoutParams().width = width;
-                    visitanteIV.getLayoutParams().height = width;
-                    visitanteIV.setScaleType(ImageView.ScaleType.CENTER_CROP);
-                }
-            }
-            else
-            {
-                Log.d("msg554","hola 2");
-                visitanteIV.setImageURI(uri);
-                visitanteIV.getLayoutParams().width = width;
-                visitanteIV.getLayoutParams().height = width;
-                visitanteIV.setScaleType(ImageView.ScaleType.CENTER_CROP);
-            }
             Gson gson = new Gson();
             String descripcion = gson.toJson(visitanteRecibido);
+            visitanteIV.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_person_gray_96dp));
+            progressBar.setVisibility(View.VISIBLE);
             subirImagen(descripcion);
         }
         if (resultCode == Activity.RESULT_OK) {
@@ -589,7 +488,6 @@ public class EditarVisitanteActivity extends AppCompatActivity implements Valida
                 {
                     finish();
                 }
-                //finish();
                 return false;
             case R.id.action_editar_visitante:
                 validator.validate();
@@ -626,21 +524,6 @@ public class EditarVisitanteActivity extends AppCompatActivity implements Valida
             btnNE.setEnabled(false);
             tipoVisitanteS.setEnabled(false);
         }
-        /*MenuItem searchItem = menu.findItem(R.id.action_search);
-        SearchView searchView = (SearchView) searchItem.getActionView();
-        searchView.setMaxWidth(Integer.MAX_VALUE);
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                return false;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                visitantesAdapter.getFilter().filter(newText);
-                return false;
-            }
-        });*/
         return true;
     }
 
@@ -721,10 +604,6 @@ public class EditarVisitanteActivity extends AppCompatActivity implements Valida
         });
     }
 
-    /*public void guardarVisitante(View view) {
-        validator.validate();
-    }*/
-
     private void editarVisitante() {
         Retrofit retrofit = NetworkClient.getRetrofitClient(this);
         VisitanteAPIs visitanteAPIs = retrofit.create(VisitanteAPIs.class);
@@ -751,25 +630,20 @@ public class EditarVisitanteActivity extends AppCompatActivity implements Valida
 
     @Override
     public void onValidationSucceeded() {
-        //Toast.makeText(this, "We got it right!", Toast.LENGTH_LONG).show();
         if(hasNullOrEmptyDrawable(visitanteIV))
         {
             Toast.makeText(this, "Debes añadir una fotografía", Toast.LENGTH_LONG).show();
         }
         else
         {
-            //Visitante visitante = new Visitante();
             visitante = new Visitante();
             visitante.setVteCi(ciET.getText().toString());
             visitante.setVteCorreo(emailET.getText().toString());
-
             visitante.setVteImagen(visitanteRecibido.getVteImagen());
-
             visitante.setVteNombre(nombreET.getText().toString().toUpperCase());
             visitante.setVteApellidos(apellidosET.getText().toString().toUpperCase());
             visitante.setVteTelefono(telcelET.getText().toString());
             visitante.setVteDireccion("");
-
             visitante.setVteEstado(visitanteRecibido.getVteEstado());
             visitante.setVteLlave(visitanteRecibido.getVteLlave());
             visitante.setVteFecha(visitanteRecibido.getVteFecha());
@@ -784,13 +658,6 @@ public class EditarVisitanteActivity extends AppCompatActivity implements Valida
             String descripcion = gson.toJson(visitante);
 
             editarVisitante();
-
-            /*visitante.setVteEstado("0");
-            Intent intent = new Intent();
-            intent.putExtra("visitanteResult", visitante);
-            intent.putExtra("position", position);
-            setResult(RESULT_OK, intent);
-            finish();*/
         }
     }
 
@@ -839,8 +706,6 @@ public class EditarVisitanteActivity extends AppCompatActivity implements Valida
     }
 
     private void subirImagen(String descripcion) {
-        Log.d("msgCB1", descripcion);
-
         Retrofit retrofit = NetworkClient.getRetrofitClient(this);
         SubirImagenAPIs subirImagenAPIs = retrofit.create(SubirImagenAPIs.class);
         File file = new File(imagenObtenida);
@@ -858,7 +723,35 @@ public class EditarVisitanteActivity extends AppCompatActivity implements Valida
                 visitanteRecibido.setVteImagen(response.body().getVteImagen());
                 cambioFoto = true;
 
+                DisplayMetrics displayMetrics = new DisplayMetrics();
+                getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+                int height = displayMetrics.heightPixels;
+                int width = displayMetrics.widthPixels;
 
+                String url = "http://190.129.90.115:8083/ingresoVisitantes/visitante/mostrarFoto?foto=" + response.body().getVteImagen();
+                GlideUrl glideUrl = new GlideUrl(url,
+                        new LazyHeaders.Builder()
+                                .addHeader("Authorization", authorization)
+                                .build());
+                Glide.with(getApplication())
+                        .load(glideUrl)
+                        .centerCrop()
+                        .apply(new RequestOptions().override(width, width))
+                        .listener(new RequestListener<Drawable>() {
+                            @Override
+                            public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                                return false;
+                            }
+
+                            @Override
+                            public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                                //holder.doiImagen.setVisibility(View.VISIBLE);
+                                //holder.progressBar.setVisibility(View.GONE);
+                                progressBar.setVisibility(View.GONE);
+                                return false;
+                            }
+                        })
+                        .into(visitanteIV);
                 /*Gson gson2 = new Gson();
                 String descripcion2 = gson2.toJson(visitanteCB);
                 Log.d("msgCB2", descripcion2);*/

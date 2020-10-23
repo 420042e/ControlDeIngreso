@@ -99,7 +99,7 @@ public class NuevoUsuario extends AppCompatActivity implements Validator.Validat
     private ImageView visitanteIV;
     private static final int REQUEST_IMAGE_CAPTURE = 101;
     private List<Recinto> areas;
-    private ArrayList<Rol> empresas;
+    private ArrayList<Rol> roles;
     private ArrayList<TipoVisitante> tiposVisitante;
 
     private ArrayAdapter<Rol> adapterRol;
@@ -174,7 +174,7 @@ public class NuevoUsuario extends AppCompatActivity implements Validator.Validat
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
 
-        iniciarSpinnerEmpresa();
+        iniciarSpinnerRol();
 
 
 
@@ -229,8 +229,8 @@ public class NuevoUsuario extends AppCompatActivity implements Validator.Validat
         return image;
     }
 
-    public void iniciarSpinnerEmpresa() {
-        empresas = new ArrayList<>();
+    public void iniciarSpinnerRol() {
+        roles = new ArrayList<>();
         Rol rol = new Rol();
         rol.setNombre("SELECCIONE UN ROL");
         rol.setDescripcion("SELECCIONE UN ROL");
@@ -240,10 +240,10 @@ public class NuevoUsuario extends AppCompatActivity implements Validator.Validat
         Rol rol2 = new Rol();
         rol2.setNombre("USER");
         rol2.setDescripcion("USUARIO");
-        empresas.add(rol);
-        empresas.add(rol1);
-        empresas.add(rol2);
-        adapterRol = new ArrayAdapter<Rol>(this, R.layout.style_spinner, empresas){
+        roles.add(rol);
+        roles.add(rol1);
+        roles.add(rol2);
+        adapterRol = new ArrayAdapter<Rol>(this, R.layout.style_spinner, roles){
             @Override
             public boolean isEnabled(int position) {
                 if (position == 0) {

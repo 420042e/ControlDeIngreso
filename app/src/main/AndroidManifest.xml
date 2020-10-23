@@ -45,6 +45,9 @@
             android:name=".DetallesUsuario"
             android:screenOrientation="portrait" />
         <activity
+            android:name=".EditarUsuario"
+            android:screenOrientation="portrait" />
+        <activity
             android:name=".EditarEmpresa"
             android:screenOrientation="portrait" />
         <activity

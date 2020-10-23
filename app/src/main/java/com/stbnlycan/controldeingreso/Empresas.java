@@ -295,10 +295,7 @@ public class Empresas extends AppCompatActivity implements EmpresasAdapter.OnVis
         call.enqueue(new Callback<ListaEmpresas>() {
             @Override
             public void onResponse(Call <ListaEmpresas> call, retrofit2.Response<ListaEmpresas> response) {
-                Log.d("msg990",""+" nPag: "+nPag+" authorization: "+authorization);
-                Gson gson = new Gson();
-                String descripcion = gson.toJson(response.body());
-                Log.d("msg991",""+descripcion+" nPag: "+nPag+" authorization: "+authorization);
+
                 bar.setVisibility(View.GONE);
                 recyclerView.setVisibility(View.VISIBLE);
                 ListaEmpresas listaEmpresas = response.body();
@@ -332,7 +329,7 @@ public class Empresas extends AppCompatActivity implements EmpresasAdapter.OnVis
     {
         Retrofit retrofit = NetworkClient.getRetrofitClient(this);
         ListaEmpresasAPIs listaEmpresasAPIs = retrofit.create(ListaEmpresasAPIs.class);
-        Call<ListaEmpresas> call = listaEmpresasAPIs.listaEmpresas(Integer.toString(nPag),"10", authorization);
+        Call<ListaEmpresas> call = listaEmpresasAPIs.listaEmpresas("0","10", authorization);
         call.enqueue(new Callback<ListaEmpresas>() {
             @Override
             public void onResponse(Call <ListaEmpresas> call, retrofit2.Response<ListaEmpresas> response) {

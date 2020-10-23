@@ -87,6 +87,7 @@ public class Usuarios extends AppCompatActivity implements UsuariosAdapter.OnUsu
     private String totalElements;
 
     private final static int REQUEST_CODE_NU = 1;
+    private final static int REQUEST_CODE_EU = 2;
 
     private boolean sugerenciaPress;
 
@@ -183,11 +184,10 @@ public class Usuarios extends AppCompatActivity implements UsuariosAdapter.OnUsu
 
     @Override
     public void onEventoClick(Usuario usuario, int position) {
-        Intent intent = new Intent(Usuarios.this, DetallesUsuario.class);
+        Intent intent = new Intent(Usuarios.this, EditarUsuario.class);
         intent.putExtra("usuario", usuario);
         intent.putExtra("position", position);
-        startActivity(intent);
-        //startActivityForResult(intent, REQUEST_CODE_EV);
+        startActivityForResult(intent, REQUEST_CODE_EU);
     }
 
     @Override
@@ -441,6 +441,16 @@ public class Usuarios extends AppCompatActivity implements UsuariosAdapter.OnUsu
                     usuarios.add(0, usuarioResult);
                     usuariosAdapter.notifyItemInserted(0);
                     recyclerView.scrollToPosition(0);
+                }
+            }
+            else if (requestCode == REQUEST_CODE_EU) {
+                Bundle b = data.getExtras();
+                if (data != null) {
+                    Usuario usuarioResult = (Usuario) b.getSerializable("usuarioResult");
+                    int position = b.getInt("position", -1);
+                    usuarios.set(position, usuarioResult);
+                    usuariosAdapter.notifyItemChanged(position);
+                    recyclerView.scrollToPosition(position);
                 }
             }
         }

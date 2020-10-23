@@ -68,7 +68,9 @@
                 android:id="@+id/diasTV"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Días" />
+                android:layout_marginLeft="5dp"
+                android:text="Días"
+                android:textSize="12sp" />
 
             <CheckBox
                 android:id="@+id/dia1"
@@ -104,6 +106,7 @@
                 android:id="@+id/textView3"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
                 android:text="Horario Entrada"
                 android:textSize="12sp" />
 
@@ -117,6 +120,7 @@
                 android:id="@+id/textView4"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
                 android:text="Horario Salida"
                 android:textSize="12sp" />
 
