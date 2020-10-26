@@ -33,6 +33,7 @@ import com.stbnlycan.fragments.BusquedaCiDialogFragment;
 import com.stbnlycan.fragments.DFError;
 import com.stbnlycan.fragments.DFIngreso;
 import com.stbnlycan.fragments.DFSalida;
+import com.stbnlycan.fragments.DFVNE;
 import com.stbnlycan.fragments.LoadingFragment;
 import com.stbnlycan.interfaces.BuscarXQRAPIs;
 import com.stbnlycan.interfaces.LogoutAPIs;
@@ -331,6 +332,23 @@ public class RecintoActivity extends AppCompatActivity implements RecintoAdapter
         dfSalida.show(ft, "dialogAdvertencia");
     }
 
+    public void showDFVNE() {
+        DFVNE dfVNE = new DFVNE();
+        FragmentTransaction ft;
+        Bundle bundle = new Bundle();
+        bundle.putBoolean("notAlertDialog", true);
+        //bundle.putSerializable("visita", visita);
+        dfVNE.setArguments(bundle);
+        //dialogFragment.setOnEventoClickListener(RecintoActivity.this);
+        ft = getSupportFragmentManager().beginTransaction();
+        Fragment prev = getSupportFragmentManager().findFragmentByTag("dialogVNE");
+        if (prev != null) {
+            ft.remove(prev);
+        }
+        ft.addToBackStack(null);
+        dfVNE.show(ft, "dialogVNE");
+    }
+
     public void showLoadingwDialog() {
 
         loadingFragment = new LoadingFragment();
@@ -370,6 +388,7 @@ public class RecintoActivity extends AppCompatActivity implements RecintoAdapter
             @Override
             public void onResponse(Call <JsonObject> call, retrofit2.Response<JsonObject> response) {
                 String jsonString = response.body().toString();
+                //loadingFragment.dismiss();
                 if (jsonString.contains("visCod")) {
                     Visita visitaRecibida = new Gson().fromJson(jsonString, Visita.class);
                     //Toast.makeText(getApplicationContext(), visitaRecibida.getVisitante().getVteNombre()+ " " + visitaRecibida.getVisitante().getVteApellidos() + " ha salido de " + visitaRecibida.getAreaRecinto().getAreaNombre(), Toast.LENGTH_LONG).show();
@@ -378,8 +397,9 @@ public class RecintoActivity extends AppCompatActivity implements RecintoAdapter
                 } else {
                     Error error = new Gson().fromJson(jsonString, Error.class);
                     //Toast.makeText(getApplicationContext(), ""+error.getMessage(), Toast.LENGTH_LONG).show();
+                    //showLoadingwDialog();
                     buscarXQR(llave);
-                    loadingFragment.dismiss();
+                    //loadingFragment.dismiss();
                 }
             }
             @Override
@@ -427,14 +447,16 @@ public class RecintoActivity extends AppCompatActivity implements RecintoAdapter
             @Override
             public void onResponse(Call <Visitante> call, retrofit2.Response<Visitante> response) {
                 Visitante visitanteRecibido = response.body();
+                loadingFragment.dismiss();
                 if(visitanteRecibido.getVteCi() != null)
                 {
-                    Toast.makeText(getApplicationContext(), "Se encontró el visitante", Toast.LENGTH_LONG).show();
+                    //Toast.makeText(getApplicationContext(), "Se encontró el visitante", Toast.LENGTH_LONG).show();
                     iniciarRVActivity(visitanteRecibido);
                 }
                 else
                 {
-                    Toast.makeText(getApplicationContext(), "No se encontró el visitante en la base de datos", Toast.LENGTH_LONG).show();
+                    //Toast.makeText(getApplicationContext(), "No se encontró el visitante en la base de datos", Toast.LENGTH_LONG).show();
+                    showDFVNE();
                 }
             }
             @Override

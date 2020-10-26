@@ -416,7 +416,6 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
             @Override
             public boolean onQueryTextSubmit(String query) {
                 nombre = query;
-                //buscarVisitanteXNombre();
                 return false;
             }
 

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.coordinatorlayout.widget.CoordinatorLayout
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:android="http://schemas.android.com/apk/res/android"
@@ -23,114 +23,141 @@
             app:popupTheme="@style/Theme.AppCompat.Light"/>
 
     </com.google.android.material.appbar.AppBarLayout>
-    <ScrollView
-        xmlns:tools="http://schemas.android.com/tools"
+
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        tools:context=".NuevoVisitanteActivity"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+        android:paddingTop="?actionBarSize">
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            tools:context=".NuevoVisitanteActivity"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <LinearLayout
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" >
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <EditText
+                        android:id="@+id/horNombre"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:ems="10"
+                        android:hint="Nombre *"
+                        android:inputType="textPersonName" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <EditText
+                        android:id="@+id/horDescripcion"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:ems="10"
+                        android:hint="Descripción *"
+                        android:inputType="textPersonName" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <TextView
+                    android:id="@+id/diasTV"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
+                    android:text="Días *"
+                    android:textSize="12sp" />
+
+                <CheckBox
+                    android:id="@+id/dia1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Lunes" />
+
+                <CheckBox
+                    android:id="@+id/dia2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Martes" />
+
+                <CheckBox
+                    android:id="@+id/dia3"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Miércoles" />
+
+                <CheckBox
+                    android:id="@+id/dia4"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Jueves" />
+
+                <CheckBox
+                    android:id="@+id/dia5"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Viernes" />
+
+                <TextView
+                    android:id="@+id/textView3"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
+                    android:text="Horario Entrada *"
+                    android:textSize="12sp" />
+
+                <TimePicker
+                    android:id="@+id/entrada"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:timePickerMode="spinner" />
+
+                <TextView
+                    android:id="@+id/textView4"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
+                    android:text="Horario Salida *"
+                    android:textSize="12sp" />
+
+                <TimePicker
+                    android:id="@+id/salida"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:timePickerMode="spinner" />
+
+                <TextView
+                    android:id="@+id/textView6"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dp"
+                    android:text="@string/campo_requerido"
+                    android:textSize="12sp" />
+
+            </LinearLayout>
+
+        </ScrollView>
+
+        <TextView
+            android:id="@+id/creditos"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical" >
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:background="#000000"
+            android:gravity="center"
+            android:text="@string/creditos"
+            android:textColor="@color/zxing_status_text"
+            android:textSize="12sp" />
 
-            <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+    </RelativeLayout>
 
-                <EditText
-                    android:id="@+id/horNombre"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:ems="10"
-                    android:hint="Nombre"
-                    android:inputType="textPersonName" />
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <EditText
-                    android:id="@+id/horDescripcion"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:ems="10"
-                    android:hint="Descripción"
-                    android:inputType="textPersonName" />
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <TextView
-                android:id="@+id/diasTV"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="5dp"
-                android:text="Días"
-                android:textSize="12sp" />
-
-            <CheckBox
-                android:id="@+id/dia1"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Lunes" />
-
-            <CheckBox
-                android:id="@+id/dia2"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Martes" />
-
-            <CheckBox
-                android:id="@+id/dia3"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Miércoles" />
-
-            <CheckBox
-                android:id="@+id/dia4"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Jueves" />
-
-            <CheckBox
-                android:id="@+id/dia5"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Viernes" />
-
-            <TextView
-                android:id="@+id/textView3"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="5dp"
-                android:text="Horario Entrada"
-                android:textSize="12sp" />
-
-            <TimePicker
-                android:id="@+id/entrada"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:timePickerMode="spinner" />
-
-            <TextView
-                android:id="@+id/textView4"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="5dp"
-                android:text="Horario Salida"
-                android:textSize="12sp" />
-
-            <TimePicker
-                android:id="@+id/salida"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:timePickerMode="spinner" />
-
-        </LinearLayout>
-
-    </ScrollView>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

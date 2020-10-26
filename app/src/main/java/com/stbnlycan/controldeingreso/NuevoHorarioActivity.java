@@ -25,6 +25,7 @@ import android.widget.Toast;
 
 import com.mobsandgeeks.saripaar.ValidationError;
 import com.mobsandgeeks.saripaar.Validator;
+import com.mobsandgeeks.saripaar.annotation.Checked;
 import com.mobsandgeeks.saripaar.annotation.NotEmpty;
 import com.stbnlycan.fragments.LoadingFragment;
 import com.stbnlycan.interfaces.LogoutAPIs;

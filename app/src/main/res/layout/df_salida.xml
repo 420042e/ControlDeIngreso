@@ -29,7 +29,7 @@
             android:text="Aceptar"
             android:textAllCaps="true"
             android:textColor="@color/white"
-            app:backgroundTint="@color/signupColor"
+            app:backgroundTint="#3f51b5"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />

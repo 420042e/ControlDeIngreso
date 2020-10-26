@@ -216,7 +216,6 @@ public class NuevoVisitanteActivity extends AppCompatActivity implements Validat
         if (b != null)
         {
             ciET.setText(getIntent().getStringExtra("ci"));
-
         }
 
         ciET.setHintTextColor(Color.BLUE);

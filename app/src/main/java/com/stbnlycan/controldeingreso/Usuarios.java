@@ -248,7 +248,6 @@ public class Usuarios extends AppCompatActivity implements UsuariosAdapter.OnUsu
             @Override
             public boolean onQueryTextSubmit(String query) {
                 nombre = query;
-                //buscarUsuarioXUsrName();
                 return false;
             }
 
