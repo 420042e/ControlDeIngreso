@@ -76,7 +76,7 @@ public class BusquedaCiDialogFragment extends DialogFragment {
         editor = pref.edit();
         authorization = pref.getString("token_type", null) + " " + pref.getString("access_token", null);
 
-        actv.setThreshold(1);
+        actv.setThreshold(0);
 
         actv.addTextChangedListener(new TextWatcher() {
             @Override

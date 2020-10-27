@@ -21,7 +21,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="5dp"
-                android:completionThreshold="1"
+                android:completionThreshold="0"
                 android:hint="Ingresar CI"
                 android:inputType="numberDecimal" />
         </com.google.android.material.textfield.TextInputLayout>

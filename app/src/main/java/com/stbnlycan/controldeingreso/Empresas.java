@@ -405,6 +405,9 @@ public class Empresas extends AppCompatActivity implements EmpresasAdapter.OnVis
                 if(listaEmpresas.getlEmpresa().size() == 0)
                 {
                     //tvNoData.setVisibility(View.VISIBLE);
+                    String[] columns = { BaseColumns._ID, SearchManager.SUGGEST_COLUMN_TEXT_1, SearchManager.SUGGEST_COLUMN_INTENT_DATA};
+                    MatrixCursor cursor = new MatrixCursor(columns);
+                    suggestionAdapter.swapCursor(cursor);
                 }
                 else
                 {

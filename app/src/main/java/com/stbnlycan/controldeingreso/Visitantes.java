@@ -133,6 +133,8 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
         visitantesAdapter.setOnVQRClickListener(Visitantes.this);
         visitantesAdapter.setOnEEClickListener(Visitantes.this);
 
+        suggestions = new ArrayList<>();
+
         recyclerView.setAdapter(visitantesAdapter);
 
         recyclerView.setHasFixedSize(true);
@@ -329,6 +331,9 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
                 if(listaVisitantes.getlVisitante().size() == 0)
                 {
                     //tvNoData.setVisibility(View.VISIBLE);
+                    String[] columns = { BaseColumns._ID, SearchManager.SUGGEST_COLUMN_TEXT_1, SearchManager.SUGGEST_COLUMN_INTENT_DATA};
+                    MatrixCursor cursor = new MatrixCursor(columns);
+                    suggestionAdapter.swapCursor(cursor);
                 }
                 else
                 {
@@ -372,7 +377,7 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
 
-        suggestions = new ArrayList<>();
+        //suggestions = new ArrayList<>();
 
         suggestionAdapter = new SimpleCursorAdapter(this,
                 android.R.layout.simple_list_item_1,
