@@ -73,6 +73,8 @@ public class RecintoActivity extends AppCompatActivity implements RecintoAdapter
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recinto);
 
+        //int a = 10/0;
+
         recintoRecibido = (Recinto) getIntent().getSerializableExtra("recinto");
 
         setTitle(recintoRecibido.getRecNombre());

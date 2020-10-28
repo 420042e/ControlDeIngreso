@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "311082949136",
+    "firebase_url": "https://control-de-ingreso-584c0.firebaseio.com",
+    "project_id": "control-de-ingreso-584c0",
+    "storage_bucket": "control-de-ingreso-584c0.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:311082949136:android:2a7c8b56517c688e958895",
+        "android_client_info": {
+          "package_name": "com.stbnlycan.controldeingreso"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "311082949136-0ql063u2je3r550glgq65l6tpos5rmpr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDsiyJ9SCqfYEtilDYuRfRxbOSsQI3xdbM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "311082949136-0ql063u2je3r550glgq65l6tpos5rmpr.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

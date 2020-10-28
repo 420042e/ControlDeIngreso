@@ -60,6 +60,8 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+        //int a = 10/0;
+
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_DENIED)
         {
             ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.CAMERA}, 0);
@@ -90,6 +92,8 @@ public class LoginActivity extends AppCompatActivity {
                 /*Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                 startActivity(intent);
                 finish();*/
+                //int a = 10/0;
+                //throw new RuntimeException("Prueba error de login Xperia");
                 iniciarSesion();
             }
         });
