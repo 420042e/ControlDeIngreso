@@ -3,6 +3,8 @@ package com.stbnlycan.controldeingreso;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -20,6 +22,7 @@ import android.widget.Toast;
 
 import com.stbnlycan.adapters.DOI2Adapter;
 import com.stbnlycan.adapters.DOIAdapter;
+import com.stbnlycan.fragments.DFTknExpired;
 import com.stbnlycan.interfaces.DocIngsAPIs;
 import com.stbnlycan.interfaces.ListaVisitantesAPIs;
 import com.stbnlycan.interfaces.LogoutAPIs;
@@ -157,24 +160,30 @@ public class VerDocumentosIngreso extends AppCompatActivity implements DOI2Adapt
         call.enqueue(new Callback<List<DocumentoIngreso>>() {
             @Override
             public void onResponse(Call <List<DocumentoIngreso>> call, retrofit2.Response<List<DocumentoIngreso>> response) {
-                dois.clear();
-                List<DocumentoIngreso> docIngs = response.body();
-                if(docIngs.size() == 0)
-                {
-                    bar.setVisibility(View.GONE);
-                    tvNoData.setVisibility(View.VISIBLE);
+                if (response.code() == 401) {
+                    showTknExpDialog();
                 }
                 else
                 {
-                    bar.setVisibility(View.GONE);
-                    recyclerView.setVisibility(View.VISIBLE);
-                    tvNoData.setVisibility(View.GONE);
-                    for(int i = 0 ; i < docIngs.size() ; i++)
+                    dois.clear();
+                    List<DocumentoIngreso> docIngs = response.body();
+                    if(docIngs.size() == 0)
                     {
-                        dois.add(docIngs.get(i));
+                        bar.setVisibility(View.GONE);
+                        tvNoData.setVisibility(View.VISIBLE);
                     }
-                    doiAdapter.notifyDataSetChanged();
-                    //swipeRefreshLayout.setRefreshing(false);
+                    else
+                    {
+                        bar.setVisibility(View.GONE);
+                        recyclerView.setVisibility(View.VISIBLE);
+                        tvNoData.setVisibility(View.GONE);
+                        for(int i = 0 ; i < docIngs.size() ; i++)
+                        {
+                            dois.add(docIngs.get(i));
+                        }
+                        doiAdapter.notifyDataSetChanged();
+                        //swipeRefreshLayout.setRefreshing(false);
+                    }
                 }
             }
             @Override
@@ -198,5 +207,21 @@ public class VerDocumentosIngreso extends AppCompatActivity implements DOI2Adapt
         Intent intent = new Intent(VerDocumentosIngreso.this, DoiQR.class);
         intent.putExtra("doi", doi);
         startActivity(intent);
+    }
+
+    public void showTknExpDialog() {
+        DFTknExpired dfTknExpired = new DFTknExpired();
+        FragmentTransaction ft;
+        Bundle bundle = new Bundle();
+        bundle.putInt("tiempo", 0);
+        dfTknExpired.setArguments(bundle);
+        //dialogFragment.setTargetFragment(this, 1);
+        ft = getSupportFragmentManager().beginTransaction();
+        Fragment prev = getSupportFragmentManager().findFragmentByTag("dialogTknExpLoading");
+        if (prev != null) {
+            ft.remove(prev);
+        }
+        ft.addToBackStack(null);
+        dfTknExpired.show(ft, "dialogTknExpLoading");
     }
 }

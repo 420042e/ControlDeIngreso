@@ -72,6 +72,7 @@ import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.stbnlycan.adapters.VisitasAdapter;
+import com.stbnlycan.fragments.DFTknExpired;
 import com.stbnlycan.fragments.LoadingFragment;
 import com.stbnlycan.fragments.PReporteFragment;
 import com.stbnlycan.interfaces.AreaRecintoAPIs;
@@ -472,16 +473,22 @@ public class Visitas extends AppCompatActivity implements VisitasAdapter.OnVisit
         call.enqueue(new Callback<List<AreaRecinto>>() {
             @Override
             public void onResponse(Call <List<AreaRecinto>> call, retrofit2.Response<List<AreaRecinto>> response) {
-                for(int i = 0 ; i < response.body().size() ; i++)
-                {
-                    areaRecinto.add(response.body().get(i));
+                if (response.code() == 401) {
+                    showTknExpDialog();
                 }
-                areaRecinto.get(0).setAreaNombre("SELECCIONE ÁREA DEL RECINTO");
-                adapterAreaR.notifyDataSetChanged();
-                if(response.body().size() > 0)
+                else
                 {
-                    //areaRecintoS.setSelection(1);
-                    tipoVisitaSel = 1;
+                    for(int i = 0 ; i < response.body().size() ; i++)
+                    {
+                        areaRecinto.add(response.body().get(i));
+                    }
+                    areaRecinto.get(0).setAreaNombre("SELECCIONE ÁREA DEL RECINTO");
+                    adapterAreaR.notifyDataSetChanged();
+                    if(response.body().size() > 0)
+                    {
+                        //areaRecintoS.setSelection(1);
+                        tipoVisitaSel = 1;
+                    }
                 }
             }
             @Override
@@ -810,28 +817,34 @@ public class Visitas extends AppCompatActivity implements VisitasAdapter.OnVisit
         call.enqueue(new Callback<ListaVisitantes>() {
             @Override
             public void onResponse(Call <ListaVisitantes> call, retrofit2.Response<ListaVisitantes> response) {
-                suggestions.clear();
-                ListaVisitantes listaVisitantes = response.body();
-                if(listaVisitantes.getlVisitante().size() == 0)
-                {
-                    //tvNoData.setVisibility(View.VISIBLE);
-                    String[] columns = { BaseColumns._ID, SearchManager.SUGGEST_COLUMN_TEXT_1, SearchManager.SUGGEST_COLUMN_INTENT_DATA};
-                    MatrixCursor cursor = new MatrixCursor(columns);
-                    suggestionAdapter.swapCursor(cursor);
+                if (response.code() == 401) {
+                    showTknExpDialog();
                 }
                 else
                 {
-                    //tvNoData.setVisibility(View.GONE);
-                    for(int i = 0 ; i < listaVisitantes.getlVisitante().size() ; i++)
+                    suggestions.clear();
+                    ListaVisitantes listaVisitantes = response.body();
+                    if(listaVisitantes.getlVisitante().size() == 0)
                     {
-                        suggestions.add(listaVisitantes.getlVisitante().get(i));
+                        //tvNoData.setVisibility(View.VISIBLE);
                         String[] columns = { BaseColumns._ID, SearchManager.SUGGEST_COLUMN_TEXT_1, SearchManager.SUGGEST_COLUMN_INTENT_DATA};
                         MatrixCursor cursor = new MatrixCursor(columns);
-                        for (int j = 0; j < suggestions.size(); j++) {
-                            String[] tmp = {Integer.toString(j), suggestions.get(j).getVteNombre() + " " + suggestions.get(j).getVteApellidos(), suggestions.get(j).getVteNombre()};
-                            cursor.addRow(tmp);
-                        }
                         suggestionAdapter.swapCursor(cursor);
+                    }
+                    else
+                    {
+                        //tvNoData.setVisibility(View.GONE);
+                        for(int i = 0 ; i < listaVisitantes.getlVisitante().size() ; i++)
+                        {
+                            suggestions.add(listaVisitantes.getlVisitante().get(i));
+                            String[] columns = { BaseColumns._ID, SearchManager.SUGGEST_COLUMN_TEXT_1, SearchManager.SUGGEST_COLUMN_INTENT_DATA};
+                            MatrixCursor cursor = new MatrixCursor(columns);
+                            for (int j = 0; j < suggestions.size(); j++) {
+                                String[] tmp = {Integer.toString(j), suggestions.get(j).getVteNombre() + " " + suggestions.get(j).getVteApellidos(), suggestions.get(j).getVteNombre()};
+                                cursor.addRow(tmp);
+                            }
+                            suggestionAdapter.swapCursor(cursor);
+                        }
                     }
                 }
             }
@@ -850,35 +863,41 @@ public class Visitas extends AppCompatActivity implements VisitasAdapter.OnVisit
         call.enqueue(new Callback<ListaVisitas>() {
             @Override
             public void onResponse(Call <ListaVisitas> call, retrofit2.Response<ListaVisitas> response) {
-                bar.setVisibility(View.GONE);
-                //recyclerView.setVisibility(View.VISIBLE);
-                visitas.clear();
-                ListaVisitas listaVisitas = response.body();
-
-                Gson gson = new Gson();
-                String descripcion = gson.toJson(listaVisitas);
-                Log.d("msg961",""+tipoVisitaSel);
-                Log.d("msg123", ""+descripcion);
-
-                if(listaVisitas.getlVisita().size() == 0)
+                if (response.code() == 401) {
+                    showTknExpDialog();
+                }
+                else
                 {
-                    tvNoData.setVisibility(View.VISIBLE);
-                    recyclerView.setVisibility(View.GONE);
-                    tvTotalVisitantes.setText("Total de visitas: 0");
-                }
-                else {
-                    tvNoData.setVisibility(View.GONE);
-                    recyclerView.setVisibility(View.VISIBLE);
-                    tvTotalVisitantes.setText("Total de visitas: " + listaVisitas.getTotalElements());
+                    bar.setVisibility(View.GONE);
+                    //recyclerView.setVisibility(View.VISIBLE);
+                    visitas.clear();
+                    ListaVisitas listaVisitas = response.body();
 
-                    for(int i = 0 ; i < listaVisitas.getlVisita().size() ; i++)
+                    Gson gson = new Gson();
+                    String descripcion = gson.toJson(listaVisitas);
+                    Log.d("msg961",""+tipoVisitaSel);
+                    Log.d("msg123", ""+descripcion);
+
+                    if(listaVisitas.getlVisita().size() == 0)
                     {
-                        visitas.add(listaVisitas.getlVisita().get(i));
+                        tvNoData.setVisibility(View.VISIBLE);
+                        recyclerView.setVisibility(View.GONE);
+                        tvTotalVisitantes.setText("Total de visitas: 0");
                     }
-                    visitasAdapter.notifyDataSetChanged();
+                    else {
+                        tvNoData.setVisibility(View.GONE);
+                        recyclerView.setVisibility(View.VISIBLE);
+                        tvTotalVisitantes.setText("Total de visitas: " + listaVisitas.getTotalElements());
+
+                        for(int i = 0 ; i < listaVisitas.getlVisita().size() ; i++)
+                        {
+                            visitas.add(listaVisitas.getlVisita().get(i));
+                        }
+                        visitasAdapter.notifyDataSetChanged();
+                    }
+                    swipeRefreshLayout.setRefreshing(false);
+                    nPag = 0;
                 }
-                swipeRefreshLayout.setRefreshing(false);
-                nPag = 0;
             }
             @Override
             public void onFailure(Call <ListaVisitas> call, Throwable t) {
@@ -903,27 +922,33 @@ public class Visitas extends AppCompatActivity implements VisitasAdapter.OnVisit
         call.enqueue(new Callback<ListaVisitas>() {
             @Override
             public void onResponse(Call <ListaVisitas> call, retrofit2.Response<ListaVisitas> response) {
-                bar.setVisibility(View.GONE);
-                recyclerView.setVisibility(View.VISIBLE);
-                visitas.clear();
-                ListaVisitas listaVisitas = response.body();
-                if(listaVisitas.getlVisita().size() == 0)
+                if (response.code() == 401) {
+                    showTknExpDialog();
+                }
+                else
                 {
-                    tvNoData.setVisibility(View.VISIBLE);
-                    tvTotalVisitantes.setText("Total de visitas: 0");
-                }
-                else {
-                    tvNoData.setVisibility(View.GONE);
-                    visitasTotales = listaVisitas.getTotalElements();
-                    tvTotalVisitantes.setText("Total de visitas: " + listaVisitas.getTotalElements());
-                    for(int i = 0 ; i < listaVisitas.getlVisita().size() ; i++)
+                    bar.setVisibility(View.GONE);
+                    recyclerView.setVisibility(View.VISIBLE);
+                    visitas.clear();
+                    ListaVisitas listaVisitas = response.body();
+                    if(listaVisitas.getlVisita().size() == 0)
                     {
-                        visitas.add(listaVisitas.getlVisita().get(i));
+                        tvNoData.setVisibility(View.VISIBLE);
+                        tvTotalVisitantes.setText("Total de visitas: 0");
                     }
-                    visitasAdapter.notifyDataSetChanged();
+                    else {
+                        tvNoData.setVisibility(View.GONE);
+                        visitasTotales = listaVisitas.getTotalElements();
+                        tvTotalVisitantes.setText("Total de visitas: " + listaVisitas.getTotalElements());
+                        for(int i = 0 ; i < listaVisitas.getlVisita().size() ; i++)
+                        {
+                            visitas.add(listaVisitas.getlVisita().get(i));
+                        }
+                        visitasAdapter.notifyDataSetChanged();
+                    }
+                    swipeRefreshLayout.setRefreshing(false);
+                    nPag = 0;
                 }
-                swipeRefreshLayout.setRefreshing(false);
-                nPag = 0;
             }
             @Override
             public void onFailure(Call <ListaVisitas> call, Throwable t) {
@@ -940,14 +965,20 @@ public class Visitas extends AppCompatActivity implements VisitasAdapter.OnVisit
         call.enqueue(new Callback<ListaVisitas>() {
             @Override
             public void onResponse(Call <ListaVisitas> call, retrofit2.Response<ListaVisitas> response) {
-                bar.setVisibility(View.GONE);
-                recyclerView.setVisibility(View.VISIBLE);
-                ListaVisitas listaVisitas = response.body();
-                for(int i = 0 ; i < listaVisitas.getlVisita().size() ; i++)
-                {
-                    visitas.add(listaVisitas.getlVisita().get(i));
+                if (response.code() == 401) {
+                    showTknExpDialog();
                 }
-                visitasAdapter.notifyDataSetChanged();
+                else
+                {
+                    bar.setVisibility(View.GONE);
+                    recyclerView.setVisibility(View.VISIBLE);
+                    ListaVisitas listaVisitas = response.body();
+                    for(int i = 0 ; i < listaVisitas.getlVisita().size() ; i++)
+                    {
+                        visitas.add(listaVisitas.getlVisita().get(i));
+                    }
+                    visitasAdapter.notifyDataSetChanged();
+                }
             }
             @Override
             public void onFailure(Call <ListaVisitas> call, Throwable t) {
@@ -964,27 +995,33 @@ public class Visitas extends AppCompatActivity implements VisitasAdapter.OnVisit
         call.enqueue(new Callback<ListaVisitas>() {
             @Override
             public void onResponse(Call <ListaVisitas> call, retrofit2.Response<ListaVisitas> response) {
-                bar.setVisibility(View.GONE);
-                recyclerView.setVisibility(View.VISIBLE);
-                visitas.clear();
-                ListaVisitas listaVisitas = response.body();
-                if(listaVisitas.getlVisita().size() == 0)
+                if (response.code() == 401) {
+                    showTknExpDialog();
+                }
+                else
                 {
-                    tvNoData.setVisibility(View.VISIBLE);
-                    tvTotalVisitantes.setText("Total de visitas: 0");
-                }
-                else {
-                    tvNoData.setVisibility(View.GONE);
-                    visitasTotales = listaVisitas.getTotalElements();
-                    tvTotalVisitantes.setText("Total de visitas: " + listaVisitas.getTotalElements());
-                    for(int i = 0 ; i < listaVisitas.getlVisita().size() ; i++)
+                    bar.setVisibility(View.GONE);
+                    recyclerView.setVisibility(View.VISIBLE);
+                    visitas.clear();
+                    ListaVisitas listaVisitas = response.body();
+                    if(listaVisitas.getlVisita().size() == 0)
                     {
-                        visitas.add(listaVisitas.getlVisita().get(i));
+                        tvNoData.setVisibility(View.VISIBLE);
+                        tvTotalVisitantes.setText("Total de visitas: 0");
                     }
-                    visitasAdapter.notifyDataSetChanged();
+                    else {
+                        tvNoData.setVisibility(View.GONE);
+                        visitasTotales = listaVisitas.getTotalElements();
+                        tvTotalVisitantes.setText("Total de visitas: " + listaVisitas.getTotalElements());
+                        for(int i = 0 ; i < listaVisitas.getlVisita().size() ; i++)
+                        {
+                            visitas.add(listaVisitas.getlVisita().get(i));
+                        }
+                        visitasAdapter.notifyDataSetChanged();
+                    }
+                    swipeRefreshLayout.setRefreshing(false);
+                    nPag = 0;
                 }
-                swipeRefreshLayout.setRefreshing(false);
-                nPag = 0;
             }
             @Override
             public void onFailure(Call <ListaVisitas> call, Throwable t) {
@@ -1001,14 +1038,20 @@ public class Visitas extends AppCompatActivity implements VisitasAdapter.OnVisit
         call.enqueue(new Callback<ListaVisitas>() {
             @Override
             public void onResponse(Call <ListaVisitas> call, retrofit2.Response<ListaVisitas> response) {
-                bar.setVisibility(View.GONE);
-                recyclerView.setVisibility(View.VISIBLE);
-                ListaVisitas listaVisitas = response.body();
-                for(int i = 0 ; i < listaVisitas.getlVisita().size() ; i++)
-                {
-                    visitas.add(listaVisitas.getlVisita().get(i));
+                if (response.code() == 401) {
+                    showTknExpDialog();
                 }
-                visitasAdapter.notifyDataSetChanged();
+                else
+                {
+                    bar.setVisibility(View.GONE);
+                    recyclerView.setVisibility(View.VISIBLE);
+                    ListaVisitas listaVisitas = response.body();
+                    for(int i = 0 ; i < listaVisitas.getlVisita().size() ; i++)
+                    {
+                        visitas.add(listaVisitas.getlVisita().get(i));
+                    }
+                    visitasAdapter.notifyDataSetChanged();
+                }
             }
             @Override
             public void onFailure(Call <ListaVisitas> call, Throwable t) {
@@ -1025,28 +1068,34 @@ public class Visitas extends AppCompatActivity implements VisitasAdapter.OnVisit
         call.enqueue(new Callback<ListaVisitas>() {
             @Override
             public void onResponse(Call <ListaVisitas> call, retrofit2.Response<ListaVisitas> response) {
-                //bar.setVisibility(View.GONE);
-                //recyclerView.setVisibility(View.VISIBLE);
-                visitasReporte.clear();
-                ListaVisitas listaVisitas = response.body();
-                if(listaVisitas.getlVisita().size() == 0)
+                if (response.code() == 401) {
+                    showTknExpDialog();
+                }
+                else
                 {
-                    //tvNoData.setVisibility(View.VISIBLE);
-                    //tvTotalVisitantes.setText("Total de visitas: 0");
-                }
-                else {
-                    //tvNoData.setVisibility(View.GONE);
-                    //visitasTotales = listaVisitas.getTotalElements();
-                    //tvTotalVisitantes.setText("Total de visitas: " + listaVisitas.getTotalElements());
-                    for(int i = 0 ; i < listaVisitas.getlVisita().size() ; i++)
+                    //bar.setVisibility(View.GONE);
+                    //recyclerView.setVisibility(View.VISIBLE);
+                    visitasReporte.clear();
+                    ListaVisitas listaVisitas = response.body();
+                    if(listaVisitas.getlVisita().size() == 0)
                     {
-                        visitasReporte.add(listaVisitas.getlVisita().get(i));
+                        //tvNoData.setVisibility(View.VISIBLE);
+                        //tvTotalVisitantes.setText("Total de visitas: 0");
                     }
-                    //visitasAdapter.notifyDataSetChanged();
-                    generarReporte();
+                    else {
+                        //tvNoData.setVisibility(View.GONE);
+                        //visitasTotales = listaVisitas.getTotalElements();
+                        //tvTotalVisitantes.setText("Total de visitas: " + listaVisitas.getTotalElements());
+                        for(int i = 0 ; i < listaVisitas.getlVisita().size() ; i++)
+                        {
+                            visitasReporte.add(listaVisitas.getlVisita().get(i));
+                        }
+                        //visitasAdapter.notifyDataSetChanged();
+                        generarReporte();
+                    }
+                    //swipeRefreshLayout.setRefreshing(false);
+                    //nPag = 0;
                 }
-                //swipeRefreshLayout.setRefreshing(false);
-                //nPag = 0;
             }
             @Override
             public void onFailure(Call <ListaVisitas> call, Throwable t) {
@@ -1063,28 +1112,34 @@ public class Visitas extends AppCompatActivity implements VisitasAdapter.OnVisit
         call.enqueue(new Callback<ListaVisitas>() {
             @Override
             public void onResponse(Call <ListaVisitas> call, retrofit2.Response<ListaVisitas> response) {
-                //bar.setVisibility(View.GONE);
-                //recyclerView.setVisibility(View.VISIBLE);
-                visitasReporte.clear();
-                ListaVisitas listaVisitas = response.body();
-                if(listaVisitas.getlVisita().size() == 0)
+                if (response.code() == 401) {
+                    showTknExpDialog();
+                }
+                else
                 {
-                    //tvNoData.setVisibility(View.VISIBLE);
-                    //tvTotalVisitantes.setText("Total de visitas: 0");
-                }
-                else {
-                    //tvNoData.setVisibility(View.GONE);
-                    //visitasTotales = listaVisitas.getTotalElements();
-                    //tvTotalVisitantes.setText("Total de visitas: " + listaVisitas.getTotalElements());
-                    for(int i = 0 ; i < listaVisitas.getlVisita().size() ; i++)
+                    //bar.setVisibility(View.GONE);
+                    //recyclerView.setVisibility(View.VISIBLE);
+                    visitasReporte.clear();
+                    ListaVisitas listaVisitas = response.body();
+                    if(listaVisitas.getlVisita().size() == 0)
                     {
-                        visitasReporte.add(listaVisitas.getlVisita().get(i));
+                        //tvNoData.setVisibility(View.VISIBLE);
+                        //tvTotalVisitantes.setText("Total de visitas: 0");
                     }
-                    //visitasAdapter.notifyDataSetChanged();
-                    generarReporte();
+                    else {
+                        //tvNoData.setVisibility(View.GONE);
+                        //visitasTotales = listaVisitas.getTotalElements();
+                        //tvTotalVisitantes.setText("Total de visitas: " + listaVisitas.getTotalElements());
+                        for(int i = 0 ; i < listaVisitas.getlVisita().size() ; i++)
+                        {
+                            visitasReporte.add(listaVisitas.getlVisita().get(i));
+                        }
+                        //visitasAdapter.notifyDataSetChanged();
+                        generarReporte();
+                    }
+                    //swipeRefreshLayout.setRefreshing(false);
+                    //nPag = 0;
                 }
-                //swipeRefreshLayout.setRefreshing(false);
-                //nPag = 0;
             }
             @Override
             public void onFailure(Call <ListaVisitas> call, Throwable t) {
@@ -1179,5 +1234,21 @@ public class Visitas extends AppCompatActivity implements VisitasAdapter.OnVisit
         } finally {
             doc.close();
         }
+    }
+
+    public void showTknExpDialog() {
+        DFTknExpired dfTknExpired = new DFTknExpired();
+        FragmentTransaction ft;
+        Bundle bundle = new Bundle();
+        bundle.putInt("tiempo", 0);
+        dfTknExpired.setArguments(bundle);
+        //dialogFragment.setTargetFragment(this, 1);
+        ft = getSupportFragmentManager().beginTransaction();
+        Fragment prev = getSupportFragmentManager().findFragmentByTag("dialogTknExpLoading");
+        if (prev != null) {
+            ft.remove(prev);
+        }
+        ft.addToBackStack(null);
+        dfTknExpired.show(ft, "dialogTknExpLoading");
     }
 }

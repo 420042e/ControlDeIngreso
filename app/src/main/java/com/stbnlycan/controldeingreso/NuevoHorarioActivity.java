@@ -27,6 +27,7 @@ import com.mobsandgeeks.saripaar.ValidationError;
 import com.mobsandgeeks.saripaar.Validator;
 import com.mobsandgeeks.saripaar.annotation.Checked;
 import com.mobsandgeeks.saripaar.annotation.NotEmpty;
+import com.stbnlycan.fragments.DFTknExpired;
 import com.stbnlycan.fragments.LoadingFragment;
 import com.stbnlycan.interfaces.LogoutAPIs;
 import com.stbnlycan.interfaces.RegistrarHorarioAPIs;
@@ -176,16 +177,22 @@ public class NuevoHorarioActivity extends AppCompatActivity implements Validator
         call.enqueue(new Callback <Horario> () {
             @Override
             public void onResponse(Call <Horario> call, Response <Horario> response) {
-                Horario horarioRecibido = response.body();
-                //Log.d("msg",""+horarioRecibido.getHorNombre());
-                Toast.makeText(getApplicationContext(), "El nuevo horario fué registrado", Toast.LENGTH_LONG).show();
-                horario.setHorEstado("0");
-                Intent intent = new Intent();
-                //intent.putExtra("horarioResult", horario);
-                intent.putExtra("horarioResult", horarioRecibido);
-                setResult(RESULT_OK, intent);
-                finish();
-                //finish();
+                if (response.code() == 401) {
+                    showTknExpDialog();
+                }
+                else
+                {
+                    Horario horarioRecibido = response.body();
+                    //Log.d("msg",""+horarioRecibido.getHorNombre());
+                    Toast.makeText(getApplicationContext(), "El nuevo horario fué registrado", Toast.LENGTH_LONG).show();
+                    horario.setHorEstado("0");
+                    Intent intent = new Intent();
+                    //intent.putExtra("horarioResult", horario);
+                    intent.putExtra("horarioResult", horarioRecibido);
+                    setResult(RESULT_OK, intent);
+                    finish();
+                    //finish();
+                }
             }
             @Override
             public void onFailure(Call <Horario> call, Throwable t) {
@@ -279,5 +286,21 @@ public class NuevoHorarioActivity extends AppCompatActivity implements Validator
         }
         ft.addToBackStack(null);
         dialogFragment.show(ft, "dialog");
+    }
+
+    public void showTknExpDialog() {
+        DFTknExpired dfTknExpired = new DFTknExpired();
+        FragmentTransaction ft;
+        Bundle bundle = new Bundle();
+        bundle.putInt("tiempo", 0);
+        dfTknExpired.setArguments(bundle);
+        //dialogFragment.setTargetFragment(this, 1);
+        ft = getSupportFragmentManager().beginTransaction();
+        Fragment prev = getSupportFragmentManager().findFragmentByTag("dialogTknExpLoading");
+        if (prev != null) {
+            ft.remove(prev);
+        }
+        ft.addToBackStack(null);
+        dfTknExpired.show(ft, "dialogTknExpLoading");
     }
 }

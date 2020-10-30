@@ -42,6 +42,7 @@ import com.mobsandgeeks.saripaar.ValidationError;
 import com.mobsandgeeks.saripaar.Validator;
 import com.mobsandgeeks.saripaar.annotation.NotEmpty;
 import com.mobsandgeeks.saripaar.annotation.Select;
+import com.stbnlycan.fragments.DFTknExpired;
 import com.stbnlycan.fragments.LoadingFragment;
 import com.stbnlycan.interfaces.EditarUsuarioAPIs;
 import com.stbnlycan.interfaces.LogoutAPIs;
@@ -364,15 +365,21 @@ public class EditarUsuario extends AppCompatActivity implements Validator.Valida
         call.enqueue(new Callback <Usuario> () {
             @Override
             public void onResponse(Call <Usuario> call, Response<Usuario> response) {
-                Usuario usuarioRecibido = response.body();
-                Toast.makeText(getApplicationContext(), "El usuario fué actualizado", Toast.LENGTH_LONG).show();
-                //visitante.setVteEstado("ACT");
+                if (response.code() == 401) {
+                    showTknExpDialog();
+                }
+                else
+                {
+                    Usuario usuarioRecibido = response.body();
+                    Toast.makeText(getApplicationContext(), "El usuario fué actualizado", Toast.LENGTH_LONG).show();
+                    //visitante.setVteEstado("ACT");
 
-                Intent intent = new Intent();
-                intent.putExtra("usuarioResult", usuarioRecibido);
-                intent.putExtra("position", position);
-                setResult(RESULT_OK, intent);
-                finish();
+                    Intent intent = new Intent();
+                    intent.putExtra("usuarioResult", usuarioRecibido);
+                    intent.putExtra("position", position);
+                    setResult(RESULT_OK, intent);
+                    finish();
+                }
             }
             @Override
             public void onFailure(Call <Usuario> call, Throwable t) {
@@ -464,5 +471,21 @@ public class EditarUsuario extends AppCompatActivity implements Validator.Valida
         {
             super.onBackPressed();
         }
+    }
+
+    public void showTknExpDialog() {
+        DFTknExpired dfTknExpired = new DFTknExpired();
+        FragmentTransaction ft;
+        Bundle bundle = new Bundle();
+        bundle.putInt("tiempo", 0);
+        dfTknExpired.setArguments(bundle);
+        //dialogFragment.setTargetFragment(this, 1);
+        ft = getSupportFragmentManager().beginTransaction();
+        Fragment prev = getSupportFragmentManager().findFragmentByTag("dialogTknExpLoading");
+        if (prev != null) {
+            ft.remove(prev);
+        }
+        ft.addToBackStack(null);
+        dfTknExpired.show(ft, "dialogTknExpLoading");
     }
 }

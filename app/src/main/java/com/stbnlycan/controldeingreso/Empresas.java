@@ -7,6 +7,8 @@ import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.cursoradapter.widget.CursorAdapter;
 import androidx.cursoradapter.widget.SimpleCursorAdapter;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -33,6 +35,7 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 import com.stbnlycan.adapters.EmpresasAdapter;
 import com.stbnlycan.adapters.VisitantesAdapter;
+import com.stbnlycan.fragments.DFTknExpired;
 import com.stbnlycan.interfaces.ListaEmpresasAPIs;
 import com.stbnlycan.interfaces.ListaEmpresasXNombreAPIs;
 import com.stbnlycan.interfaces.ListaVisitantesAPIs;
@@ -295,26 +298,31 @@ public class Empresas extends AppCompatActivity implements EmpresasAdapter.OnVis
         call.enqueue(new Callback<ListaEmpresas>() {
             @Override
             public void onResponse(Call <ListaEmpresas> call, retrofit2.Response<ListaEmpresas> response) {
-
-                bar.setVisibility(View.GONE);
-                recyclerView.setVisibility(View.VISIBLE);
-                ListaEmpresas listaEmpresas = response.body();
-                if(listaEmpresas.getlEmpresa().size() == 0)
-                {
-                    //tvNoData.setVisibility(View.VISIBLE);
+                if (response.code() == 401) {
+                    showTknExpDialog();
                 }
                 else
                 {
-                    //tvNoData.setVisibility(View.GONE);
-                    for(int i = 0 ; i < listaEmpresas.getlEmpresa().size() ; i++)
+                    bar.setVisibility(View.GONE);
+                    recyclerView.setVisibility(View.VISIBLE);
+                    ListaEmpresas listaEmpresas = response.body();
+                    if(listaEmpresas.getlEmpresa().size() == 0)
                     {
-                        empresas.add(listaEmpresas.getlEmpresa().get(i));
-                        //Log.d("msg1233",""+listaVisitantes.getlVisitante().get(i).getVteNombre());
+                        //tvNoData.setVisibility(View.VISIBLE);
                     }
-                    empresasAdapter = new EmpresasAdapter(empresas);
-                    empresasAdapter.setOnVisitanteClickListener(Empresas.this);
+                    else
+                    {
+                        //tvNoData.setVisibility(View.GONE);
+                        for(int i = 0 ; i < listaEmpresas.getlEmpresa().size() ; i++)
+                        {
+                            empresas.add(listaEmpresas.getlEmpresa().get(i));
+                            //Log.d("msg1233",""+listaVisitantes.getlVisitante().get(i).getVteNombre());
+                        }
+                        empresasAdapter = new EmpresasAdapter(empresas);
+                        empresasAdapter.setOnVisitanteClickListener(Empresas.this);
 
-                    recyclerView.setAdapter(empresasAdapter);
+                        recyclerView.setAdapter(empresasAdapter);
+                    }
                 }
             }
             @Override
@@ -333,24 +341,30 @@ public class Empresas extends AppCompatActivity implements EmpresasAdapter.OnVis
         call.enqueue(new Callback<ListaEmpresas>() {
             @Override
             public void onResponse(Call <ListaEmpresas> call, retrofit2.Response<ListaEmpresas> response) {
-                empresas.clear();
-                ListaEmpresas listaEmpresas = response.body();
-                if(listaEmpresas.getlEmpresa().size() == 0)
-                {
-                    //tvNoData.setVisibility(View.VISIBLE);
+                if (response.code() == 401) {
+                    showTknExpDialog();
                 }
                 else
                 {
-                    //tvNoData.setVisibility(View.GONE);
-                    for(int i = 0 ; i < listaEmpresas.getlEmpresa().size() ; i++)
+                    empresas.clear();
+                    ListaEmpresas listaEmpresas = response.body();
+                    if(listaEmpresas.getlEmpresa().size() == 0)
                     {
-                        empresas.add(listaEmpresas.getlEmpresa().get(i));
-                        //Log.d("msg1233",""+listaVisitantes.getlVisitante().get(i).getVteNombre());
+                        //tvNoData.setVisibility(View.VISIBLE);
                     }
-                    empresasAdapter.notifyDataSetChanged();
-                    swipeRefreshLayout.setRefreshing(false);
+                    else
+                    {
+                        //tvNoData.setVisibility(View.GONE);
+                        for(int i = 0 ; i < listaEmpresas.getlEmpresa().size() ; i++)
+                        {
+                            empresas.add(listaEmpresas.getlEmpresa().get(i));
+                            //Log.d("msg1233",""+listaVisitantes.getlVisitante().get(i).getVteNombre());
+                        }
+                        empresasAdapter.notifyDataSetChanged();
+                        swipeRefreshLayout.setRefreshing(false);
+                    }
+                    nPag = 0;
                 }
-                nPag = 0;
             }
             @Override
             public void onFailure(Call <ListaEmpresas> call, Throwable t) {
@@ -368,19 +382,25 @@ public class Empresas extends AppCompatActivity implements EmpresasAdapter.OnVis
         call.enqueue(new Callback<ListaEmpresas>() {
             @Override
             public void onResponse(Call <ListaEmpresas> call, retrofit2.Response<ListaEmpresas> response) {
-                ListaEmpresas listaEmpresas = response.body();
-                if(listaEmpresas.getlEmpresa().size() == 0)
-                {
-                    //tvNoData.setVisibility(View.VISIBLE);
+                if (response.code() == 401) {
+                    showTknExpDialog();
                 }
                 else
                 {
-                    //tvNoData.setVisibility(View.GONE);
-                    for(int i = 0 ; i < listaEmpresas.getlEmpresa().size() ; i++)
+                    ListaEmpresas listaEmpresas = response.body();
+                    if(listaEmpresas.getlEmpresa().size() == 0)
                     {
-                        empresas.add(listaEmpresas.getlEmpresa().get(i));
+                        //tvNoData.setVisibility(View.VISIBLE);
                     }
-                    empresasAdapter.notifyDataSetChanged();
+                    else
+                    {
+                        //tvNoData.setVisibility(View.GONE);
+                        for(int i = 0 ; i < listaEmpresas.getlEmpresa().size() ; i++)
+                        {
+                            empresas.add(listaEmpresas.getlEmpresa().get(i));
+                        }
+                        empresasAdapter.notifyDataSetChanged();
+                    }
                 }
             }
             @Override
@@ -399,37 +419,43 @@ public class Empresas extends AppCompatActivity implements EmpresasAdapter.OnVis
         call.enqueue(new Callback<ListaEmpresas>() {
             @Override
             public void onResponse(Call <ListaEmpresas> call, retrofit2.Response<ListaEmpresas> response) {
-                //empresas.clear();
-                suggestions.clear();
-                ListaEmpresas listaEmpresas = response.body();
-                if(listaEmpresas.getlEmpresa().size() == 0)
-                {
-                    //tvNoData.setVisibility(View.VISIBLE);
-                    String[] columns = { BaseColumns._ID, SearchManager.SUGGEST_COLUMN_TEXT_1, SearchManager.SUGGEST_COLUMN_INTENT_DATA};
-                    MatrixCursor cursor = new MatrixCursor(columns);
-                    suggestionAdapter.swapCursor(cursor);
+                if (response.code() == 401) {
+                    showTknExpDialog();
                 }
                 else
                 {
-                    //tvNoData.setVisibility(View.GONE);
-                    for(int i = 0 ; i < listaEmpresas.getlEmpresa().size() ; i++)
+                    //empresas.clear();
+                    suggestions.clear();
+                    ListaEmpresas listaEmpresas = response.body();
+                    if(listaEmpresas.getlEmpresa().size() == 0)
                     {
-                        suggestions.add(listaEmpresas.getlEmpresa().get(i));
-                        String[] columns = { BaseColumns._ID,
-                                SearchManager.SUGGEST_COLUMN_TEXT_1,
-                                SearchManager.SUGGEST_COLUMN_INTENT_DATA,
-                        };
+                        //tvNoData.setVisibility(View.VISIBLE);
+                        String[] columns = { BaseColumns._ID, SearchManager.SUGGEST_COLUMN_TEXT_1, SearchManager.SUGGEST_COLUMN_INTENT_DATA};
                         MatrixCursor cursor = new MatrixCursor(columns);
-                        for (int j = 0; j < suggestions.size(); j++) {
-                            String[] tmp = {Integer.toString(j), suggestions.get(j).getEmpNombre(), suggestions.get(j).getEmpNombre()};
-                            cursor.addRow(tmp);
-                        }
                         suggestionAdapter.swapCursor(cursor);
-
-                        //empresas.add(listaEmpresas.getlEmpresa().get(i));
                     }
-                    empresasAdapter.notifyDataSetChanged();
-                    swipeRefreshLayout.setRefreshing(false);
+                    else
+                    {
+                        //tvNoData.setVisibility(View.GONE);
+                        for(int i = 0 ; i < listaEmpresas.getlEmpresa().size() ; i++)
+                        {
+                            suggestions.add(listaEmpresas.getlEmpresa().get(i));
+                            String[] columns = { BaseColumns._ID,
+                                    SearchManager.SUGGEST_COLUMN_TEXT_1,
+                                    SearchManager.SUGGEST_COLUMN_INTENT_DATA,
+                            };
+                            MatrixCursor cursor = new MatrixCursor(columns);
+                            for (int j = 0; j < suggestions.size(); j++) {
+                                String[] tmp = {Integer.toString(j), suggestions.get(j).getEmpNombre(), suggestions.get(j).getEmpNombre()};
+                                cursor.addRow(tmp);
+                            }
+                            suggestionAdapter.swapCursor(cursor);
+
+                            //empresas.add(listaEmpresas.getlEmpresa().get(i));
+                        }
+                        empresasAdapter.notifyDataSetChanged();
+                        swipeRefreshLayout.setRefreshing(false);
+                    }
                 }
             }
             @Override
@@ -447,5 +473,21 @@ public class Empresas extends AppCompatActivity implements EmpresasAdapter.OnVis
         intent.putExtra("position", position);
         //startActivity(intent);
         startActivityForResult(intent, REQUEST_CODE_EE);
+    }
+
+    public void showTknExpDialog() {
+        DFTknExpired dfTknExpired = new DFTknExpired();
+        FragmentTransaction ft;
+        Bundle bundle = new Bundle();
+        bundle.putInt("tiempo", 0);
+        dfTknExpired.setArguments(bundle);
+        //dialogFragment.setTargetFragment(this, 1);
+        ft = getSupportFragmentManager().beginTransaction();
+        Fragment prev = getSupportFragmentManager().findFragmentByTag("dialogTknExpLoading");
+        if (prev != null) {
+            ft.remove(prev);
+        }
+        ft.addToBackStack(null);
+        dfTknExpired.show(ft, "dialogTknExpLoading");
     }
 }

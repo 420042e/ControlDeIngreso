@@ -18,6 +18,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.stbnlycan.adapters.ACAdapter;
 import com.stbnlycan.controldeingreso.NetworkClient;
@@ -144,31 +146,37 @@ public class BusquedaCiDialogFragment extends DialogFragment {
         call.enqueue(new Callback<List<Visitante>>() {
             @Override
             public void onResponse(Call <List<Visitante>> call, retrofit2.Response<List<Visitante>> response) {
-                List<Visitante> visitantesRecibidos = response.body();
-                visitantes.clear();
+                if (response.code() == 401) {
+                    showTknExpDialog();
+                }
+                else
+                {
+                    List<Visitante> visitantesRecibidos = response.body();
+                    visitantes.clear();
                 /*for(int i=0;i<visitantesRecibidos.size();i++)
                 {
                     visitantes.add(visitantesRecibidos.get(i));
                 }*/
-                if(visitantesRecibidos.size()==0)
-                {
-                    btnNV.setEnabled(true);
-                    //btnNV.setVisibility(View.VISIBLE);
-                    btnNV.setAlpha(1.0f);
-                }
-                else
-                {
-                    btnNV.setEnabled(false);
-                    //btnNV.setVisibility(View.INVISIBLE);
-                    btnNV.setAlpha(0.5f);
-                    for(int i=0;i<visitantesRecibidos.size();i++)
+                    if(visitantesRecibidos.size()==0)
                     {
-                        visitantes.add(visitantesRecibidos.get(i));
+                        btnNV.setEnabled(true);
+                        //btnNV.setVisibility(View.VISIBLE);
+                        btnNV.setAlpha(1.0f);
                     }
-                    actv.showDropDown();
+                    else
+                    {
+                        btnNV.setEnabled(false);
+                        //btnNV.setVisibility(View.INVISIBLE);
+                        btnNV.setAlpha(0.5f);
+                        for(int i=0;i<visitantesRecibidos.size();i++)
+                        {
+                            visitantes.add(visitantesRecibidos.get(i));
+                        }
+                        actv.showDropDown();
+                    }
+                    adapter = new ACAdapter(getActivity(), R.layout.custom_row, visitantes);
+                    actv.setAdapter(adapter);
                 }
-                adapter = new ACAdapter(getActivity(), R.layout.custom_row, visitantes);
-                actv.setAdapter(adapter);
             }
             @Override
             public void onFailure(Call <List<Visitante>> call, Throwable t) {
@@ -193,6 +201,22 @@ public class BusquedaCiDialogFragment extends DialogFragment {
     public interface OnBusquedaCiListener
     {
         void onBusquedaCiListener(Visitante visitante);
+    }
+
+    public void showTknExpDialog() {
+        DFTknExpired dfTknExpired = new DFTknExpired();
+        FragmentTransaction ft;
+        Bundle bundle = new Bundle();
+        bundle.putInt("tiempo", 0);
+        dfTknExpired.setArguments(bundle);
+        //dialogFragment.setTargetFragment(this, 1);
+        ft = getFragmentManager().beginTransaction();
+        Fragment prev = getFragmentManager().findFragmentByTag("dialogTknExpLoading");
+        if (prev != null) {
+            ft.remove(prev);
+        }
+        ft.addToBackStack(null);
+        dfTknExpired.show(ft, "dialogTknExpLoading");
     }
 
 }

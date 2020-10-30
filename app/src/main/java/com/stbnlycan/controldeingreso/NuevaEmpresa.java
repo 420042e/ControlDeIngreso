@@ -22,6 +22,7 @@ import android.widget.Toast;
 import com.mobsandgeeks.saripaar.ValidationError;
 import com.mobsandgeeks.saripaar.Validator;
 import com.mobsandgeeks.saripaar.annotation.NotEmpty;
+import com.stbnlycan.fragments.DFTknExpired;
 import com.stbnlycan.fragments.LoadingFragment;
 import com.stbnlycan.interfaces.LogoutAPIs;
 import com.stbnlycan.interfaces.RegistrarEmpresaAPIs;
@@ -111,12 +112,18 @@ public class NuevaEmpresa extends AppCompatActivity implements Validator.Validat
         call.enqueue(new Callback<Empresa>() {
             @Override
             public void onResponse(Call <Empresa> call, Response<Empresa> response) {
-                Empresa empresaRecibida = response.body();
-                Toast.makeText(getApplicationContext(), "La nueva empresa fué registrada", Toast.LENGTH_LONG).show();
-                Intent intent = new Intent();
-                intent.putExtra("empresaResult", empresaRecibida);
-                setResult(RESULT_OK, intent);
-                finish();
+                if (response.code() == 401) {
+                    showTknExpDialog();
+                }
+                else
+                {
+                    Empresa empresaRecibida = response.body();
+                    Toast.makeText(getApplicationContext(), "La nueva empresa fué registrada", Toast.LENGTH_LONG).show();
+                    Intent intent = new Intent();
+                    intent.putExtra("empresaResult", empresaRecibida);
+                    setResult(RESULT_OK, intent);
+                    finish();
+                }
             }
             @Override
             public void onFailure(Call <Empresa> call, Throwable t) {
@@ -186,5 +193,21 @@ public class NuevaEmpresa extends AppCompatActivity implements Validator.Validat
         }
         ft.addToBackStack(null);
         dialogFragment.show(ft, "dialog");
+    }
+
+    public void showTknExpDialog() {
+        DFTknExpired dfTknExpired = new DFTknExpired();
+        FragmentTransaction ft;
+        Bundle bundle = new Bundle();
+        bundle.putInt("tiempo", 0);
+        dfTknExpired.setArguments(bundle);
+        //dialogFragment.setTargetFragment(this, 1);
+        ft = getSupportFragmentManager().beginTransaction();
+        Fragment prev = getSupportFragmentManager().findFragmentByTag("dialogTknExpLoading");
+        if (prev != null) {
+            ft.remove(prev);
+        }
+        ft.addToBackStack(null);
+        dfTknExpired.show(ft, "dialogTknExpLoading");
     }
 }

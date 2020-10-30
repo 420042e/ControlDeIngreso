@@ -66,21 +66,6 @@ public class VisitantesAdapter extends RecyclerView.Adapter<VisitantesAdapter.AR
         holder.tipoVisitante.setText(visitante.getTipoVisitante().getTviNombre());
         holder.empresaNombre.setText(visitante.getEmpresa().getEmpNombre());
 
-        /*Picasso picasso = new Picasso.Builder(context)
-                .downloader(new OkHttp3Downloader(client))
-                .build();
-        picasso.load("http://190.129.90.115:8083/ingresoVisitantes/visitante/mostrarFoto?foto=" + visitante.getVteImagen()).fit().into(holder.imgVisitante, new com.squareup.picasso.Callback() {
-            @Override
-            public void onSuccess() {
-                Log.d("msg431","cargado");
-            }
-
-            @Override
-            public void onError(Exception e) {
-
-            }
-        });*/
-
         String url = "http://190.129.90.115:8083/ingresoVisitantes/visitante/mostrarFoto?foto=" + visitante.getVteImagen();
         GlideUrl glideUrl = new GlideUrl(url,
                 new LazyHeaders.Builder()
@@ -236,4 +221,5 @@ public class VisitantesAdapter extends RecyclerView.Adapter<VisitantesAdapter.AR
     {
         void OnEEClick(Visitante visitante);
     }
+
 }

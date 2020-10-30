@@ -56,6 +56,7 @@ import com.mobsandgeeks.saripaar.Validator;
 import com.mobsandgeeks.saripaar.annotation.Email;
 import com.mobsandgeeks.saripaar.annotation.NotEmpty;
 import com.mobsandgeeks.saripaar.annotation.Select;
+import com.stbnlycan.fragments.DFTknExpired;
 import com.stbnlycan.fragments.LoadingFragment;
 import com.stbnlycan.interfaces.EmpresaAPIs;
 import com.stbnlycan.interfaces.EnviarCorreoIAPIs;
@@ -508,25 +509,31 @@ public class NuevoUsuario extends AppCompatActivity implements Validator.Validat
         call.enqueue(new Callback<Usuario>() {
             @Override
             public void onResponse(Call <Usuario> call, Response<Usuario> response) {
-                Log.d("msg1",""+response);
-                try
-                {
-                    //esto funciona cuando es responsebody
-                    //Log.d("msg2",""+response.body().string());
+                if (response.code() == 401) {
+                    showTknExpDialog();
                 }
-                catch (Exception ex)
+                else
                 {
-                    Log.d("msg4",""+ex);
+                    Log.d("msg1",""+response);
+                    try
+                    {
+                        //esto funciona cuando es responsebody
+                        //Log.d("msg2",""+response.body().string());
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.d("msg4",""+ex);
+                    }
+
+                    //usuario.setPic(response.body().getPic());
+                    //usuario.setPic(imagenObtenida);
+
+                    Toast.makeText(getApplicationContext(), "Se guardó el nuevo usuario", Toast.LENGTH_LONG).show();
+                    Intent intent = new Intent();
+                    intent.putExtra("usuarioResult", response.body());
+                    setResult(RESULT_OK, intent);
+                    finish();
                 }
-
-                //usuario.setPic(response.body().getPic());
-                //usuario.setPic(imagenObtenida);
-
-                Toast.makeText(getApplicationContext(), "Se guardó el nuevo usuario", Toast.LENGTH_LONG).show();
-                Intent intent = new Intent();
-                intent.putExtra("usuarioResult", response.body());
-                setResult(RESULT_OK, intent);
-                finish();
             }
 
             @Override
@@ -543,14 +550,20 @@ public class NuevoUsuario extends AppCompatActivity implements Validator.Validat
         call.enqueue(new Callback() {
             @Override
             public void onResponse(Call call, retrofit2.Response response) {
-                if (response.body() != null) {
-                    //Aqui se debería cerrar esta actividad al recibir respuesta del server
-                    Toast.makeText(getApplicationContext(), "Se envió el correo de ingreso", Toast.LENGTH_LONG).show();
-                    visitante.setVteEstado("0");
-                    Intent intent = new Intent();
-                    intent.putExtra("visitanteResult", visitante);
-                    setResult(RESULT_OK, intent);
-                    finish();
+                if (response.code() == 401) {
+                    showTknExpDialog();
+                }
+                else
+                {
+                    if (response.body() != null) {
+                        //Aqui se debería cerrar esta actividad al recibir respuesta del server
+                        Toast.makeText(getApplicationContext(), "Se envió el correo de ingreso", Toast.LENGTH_LONG).show();
+                        visitante.setVteEstado("0");
+                        Intent intent = new Intent();
+                        intent.putExtra("visitanteResult", visitante);
+                        setResult(RESULT_OK, intent);
+                        finish();
+                    }
                 }
             }
             @Override
@@ -633,6 +646,22 @@ public class NuevoUsuario extends AppCompatActivity implements Validator.Validat
         }
         ft.addToBackStack(null);
         dialogFragment.show(ft, "dialog");
+    }
+
+    public void showTknExpDialog() {
+        DFTknExpired dfTknExpired = new DFTknExpired();
+        FragmentTransaction ft;
+        Bundle bundle = new Bundle();
+        bundle.putInt("tiempo", 0);
+        dfTknExpired.setArguments(bundle);
+        //dialogFragment.setTargetFragment(this, 1);
+        ft = getSupportFragmentManager().beginTransaction();
+        Fragment prev = getSupportFragmentManager().findFragmentByTag("dialogTknExpLoading");
+        if (prev != null) {
+            ft.remove(prev);
+        }
+        ft.addToBackStack(null);
+        dfTknExpired.show(ft, "dialogTknExpLoading");
     }
 
 }

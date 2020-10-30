@@ -36,6 +36,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.stbnlycan.adapters.VisitantesAdapter;
+import com.stbnlycan.fragments.DFTknExpired;
 import com.stbnlycan.fragments.LoadingFragment;
 import com.stbnlycan.interfaces.EnviarCorreoIAPIs;
 import com.stbnlycan.interfaces.ListaVisitantesXNombreAPIs;
@@ -215,8 +216,8 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
                 editor.putString("rol", "");
                 editor.apply();
                 Toast.makeText(getApplicationContext(), "Sesión finalizada", Toast.LENGTH_LONG).show();
-                Intent intentS = new Intent(Visitantes.this, LoginActivity.class);
-                startActivity(intentS);
+                Intent intent = new Intent(Visitantes.this, LoginActivity.class);
+                startActivity(intent);
                 finish();
             }
             @Override
@@ -259,14 +260,21 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
         call.enqueue(new Callback<ListaVisitantes>() {
             @Override
             public void onResponse(Call <ListaVisitantes> call, retrofit2.Response<ListaVisitantes> response) {
-                bar.setVisibility(View.GONE);
-                recyclerView.setVisibility(View.VISIBLE);
-                ListaVisitantes listaVisitantes = response.body();
-                for(int i = 0 ; i < listaVisitantes.getlVisitante().size() ; i++)
-                {
-                    visitantes.add(listaVisitantes.getlVisitante().get(i));
+                if (response.code() == 401) {
+                    showTknExpDialog();
                 }
-                visitantesAdapter.notifyDataSetChanged();
+                else
+                {
+                    bar.setVisibility(View.GONE);
+                    recyclerView.setVisibility(View.VISIBLE);
+                    ListaVisitantes listaVisitantes = response.body();
+                    for(int i = 0 ; i < listaVisitantes.getlVisitante().size() ; i++)
+                    {
+                        visitantes.add(listaVisitantes.getlVisitante().get(i));
+                    }
+                    visitantesAdapter.notifyDataSetChanged();
+                }
+
             }
             @Override
             public void onFailure(Call <ListaVisitantes> call, Throwable t) {
@@ -284,7 +292,34 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
         call.enqueue(new Callback<ListaVisitantes>() {
             @Override
             public void onResponse(Call <ListaVisitantes> call, retrofit2.Response<ListaVisitantes> response) {
-                visitantes.clear();
+                if (response.code() == 401) {
+                    showTknExpDialog();
+                }
+                else
+                {
+                    visitantes.clear();
+                    ListaVisitantes listaVisitantes = response.body();
+                    if(listaVisitantes.getlVisitante().size() == 0)
+                    {
+                        tvNoData.setVisibility(View.VISIBLE);
+                    }
+                    else
+                    {
+                        bar.setVisibility(View.GONE);
+                        recyclerView.setVisibility(View.VISIBLE);
+                        tvNoData.setVisibility(View.GONE);
+                        for(int i = 0 ; i < listaVisitantes.getlVisitante().size() ; i++)
+                        {
+                            visitantes.add(listaVisitantes.getlVisitante().get(i));
+                        }
+                        totalElements = listaVisitantes.getTotalElements();
+                        visitantesAdapter.notifyDataSetChanged();
+                        swipeRefreshLayout.setRefreshing(false);
+                    }
+                    nPag = 0;
+                }
+
+                /*visitantes.clear();
                 ListaVisitantes listaVisitantes = response.body();
                 if(listaVisitantes.getlVisitante().size() == 0)
                 {
@@ -303,7 +338,7 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
                     visitantesAdapter.notifyDataSetChanged();
                     swipeRefreshLayout.setRefreshing(false);
                 }
-                nPag = 0;
+                nPag = 0;*/
             }
             @Override
             public void onFailure(Call <ListaVisitantes> call, Throwable t) {
@@ -326,31 +361,37 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
         call.enqueue(new Callback<ListaVisitantes>() {
             @Override
             public void onResponse(Call <ListaVisitantes> call, retrofit2.Response<ListaVisitantes> response) {
-                suggestions.clear();
-                ListaVisitantes listaVisitantes = response.body();
-                if(listaVisitantes.getlVisitante().size() == 0)
-                {
-                    //tvNoData.setVisibility(View.VISIBLE);
-                    String[] columns = { BaseColumns._ID, SearchManager.SUGGEST_COLUMN_TEXT_1, SearchManager.SUGGEST_COLUMN_INTENT_DATA};
-                    MatrixCursor cursor = new MatrixCursor(columns);
-                    suggestionAdapter.swapCursor(cursor);
+                if (response.code() == 401) {
+                    showTknExpDialog();
                 }
                 else
                 {
-                    //tvNoData.setVisibility(View.GONE);
-                    for(int i = 0 ; i < listaVisitantes.getlVisitante().size() ; i++)
+                    suggestions.clear();
+                    ListaVisitantes listaVisitantes = response.body();
+                    if(listaVisitantes.getlVisitante().size() == 0)
                     {
-                        suggestions.add(listaVisitantes.getlVisitante().get(i));
-                        String[] columns = { BaseColumns._ID,
-                                SearchManager.SUGGEST_COLUMN_TEXT_1,
-                                SearchManager.SUGGEST_COLUMN_INTENT_DATA,
-                        };
+                        //tvNoData.setVisibility(View.VISIBLE);
+                        String[] columns = { BaseColumns._ID, SearchManager.SUGGEST_COLUMN_TEXT_1, SearchManager.SUGGEST_COLUMN_INTENT_DATA};
                         MatrixCursor cursor = new MatrixCursor(columns);
-                        for (int j = 0; j < suggestions.size(); j++) {
-                            String[] tmp = {Integer.toString(j), suggestions.get(j).getVteNombre() + " " + suggestions.get(j).getVteApellidos(), suggestions.get(j).getVteNombre()};
-                            cursor.addRow(tmp);
-                        }
                         suggestionAdapter.swapCursor(cursor);
+                    }
+                    else
+                    {
+                        //tvNoData.setVisibility(View.GONE);
+                        for(int i = 0 ; i < listaVisitantes.getlVisitante().size() ; i++)
+                        {
+                            suggestions.add(listaVisitantes.getlVisitante().get(i));
+                            String[] columns = { BaseColumns._ID,
+                                    SearchManager.SUGGEST_COLUMN_TEXT_1,
+                                    SearchManager.SUGGEST_COLUMN_INTENT_DATA,
+                            };
+                            MatrixCursor cursor = new MatrixCursor(columns);
+                            for (int j = 0; j < suggestions.size(); j++) {
+                                String[] tmp = {Integer.toString(j), suggestions.get(j).getVteNombre() + " " + suggestions.get(j).getVteApellidos(), suggestions.get(j).getVteNombre()};
+                                cursor.addRow(tmp);
+                            }
+                            suggestionAdapter.swapCursor(cursor);
+                        }
                     }
                 }
             }
@@ -487,7 +528,6 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
     }
 
     public void showLoadingwDialog() {
-
         dialogFragment = new LoadingFragment();
         FragmentTransaction ft;
         Bundle bundle = new Bundle();
@@ -510,11 +550,16 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
         call.enqueue(new Callback() {
             @Override
             public void onResponse(Call call, retrofit2.Response response) {
-                Log.d("msg44",""+response.body());
-                if (response.body() != null) {
-                    Toast.makeText(getApplicationContext(), "Se envió el correo de ingreso a "+visitante.getVteNombre() +" "+visitante.getVteApellidos(), Toast.LENGTH_LONG).show();
+                if (response.code() == 401) {
+                    showTknExpDialog();
                 }
-                dialogFragment.dismiss();
+                else
+                {
+                    if (response.body() != null) {
+                        Toast.makeText(getApplicationContext(), "Se envió el correo de ingreso a "+visitante.getVteNombre() +" "+visitante.getVteApellidos(), Toast.LENGTH_LONG).show();
+                    }
+                    dialogFragment.dismiss();
+                }
             }
             @Override
             public void onFailure(Call call, Throwable t) {
@@ -523,5 +568,21 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
                 dialogFragment.dismiss();
             }
         });
+    }
+
+    public void showTknExpDialog() {
+        DFTknExpired dfTknExpired = new DFTknExpired();
+        FragmentTransaction ft;
+        Bundle bundle = new Bundle();
+        bundle.putInt("tiempo", 0);
+        dfTknExpired.setArguments(bundle);
+        //dialogFragment.setTargetFragment(this, 1);
+        ft = getSupportFragmentManager().beginTransaction();
+        Fragment prev = getSupportFragmentManager().findFragmentByTag("dialogTknExpLoading");
+        if (prev != null) {
+            ft.remove(prev);
+        }
+        ft.addToBackStack(null);
+        dfTknExpired.show(ft, "dialogTknExpLoading");
     }
 }

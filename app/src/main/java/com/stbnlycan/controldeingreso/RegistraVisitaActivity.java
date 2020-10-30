@@ -64,6 +64,7 @@ import com.stbnlycan.adapters.DOIAdapter;
 import com.stbnlycan.custom.CenterZoomLayoutManager;
 import com.stbnlycan.fragments.DFError;
 import com.stbnlycan.fragments.DFIngreso;
+import com.stbnlycan.fragments.DFTknExpired;
 import com.stbnlycan.fragments.LoadingFragment;
 import com.stbnlycan.fragments.NuevoDocIngFragment;
 import com.stbnlycan.interfaces.AreaRecintoAPIs;
@@ -404,12 +405,18 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
         call.enqueue(new Callback<List<AreaRecinto>>() {
             @Override
             public void onResponse(Call <List<AreaRecinto>> call, retrofit2.Response<List<AreaRecinto>> response) {
-                for(int i = 0 ; i < response.body().size() ; i++)
-                {
-                    areaRecinto.add(response.body().get(i));
+                if (response.code() == 401) {
+                    showTknExpDialog();
                 }
-                areaRecinto.get(0).setAreaNombre("SELECCIONE ÁREA DEL RECINTO");
-                adapterAreaR.notifyDataSetChanged();
+                else
+                {
+                    for(int i = 0 ; i < response.body().size() ; i++)
+                    {
+                        areaRecinto.add(response.body().get(i));
+                    }
+                    areaRecinto.get(0).setAreaNombre("SELECCIONE ÁREA DEL RECINTO");
+                    adapterAreaR.notifyDataSetChanged();
+                }
             }
             @Override
             public void onFailure(Call <List<AreaRecinto>> call, Throwable t) {
@@ -474,12 +481,18 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
         call.enqueue(new Callback<List<Motivo>>() {
             @Override
             public void onResponse(Call <List<Motivo>> call, retrofit2.Response<List<Motivo>> response) {
-                for(int i = 0 ; i < response.body().size() ; i++)
-                {
-                    motivo.add(response.body().get(i));
+                if (response.code() == 401) {
+                    showTknExpDialog();
                 }
-                motivo.get(0).setMvoNombre("SELECCIONE MOTIVO");
-                adapterMotivo.notifyDataSetChanged();
+                else
+                {
+                    for(int i = 0 ; i < response.body().size() ; i++)
+                    {
+                        motivo.add(response.body().get(i));
+                    }
+                    motivo.get(0).setMvoNombre("SELECCIONE MOTIVO");
+                    adapterMotivo.notifyDataSetChanged();
+                }
             }
             @Override
             public void onFailure(Call <List<Motivo>> call, Throwable t) {
@@ -572,25 +585,31 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
         call.enqueue(new Callback<String>() {
             @Override
             public void onResponse(Call <String> call, retrofit2.Response<String> response) {
-                showLoadingwDialog();
+                if (response.code() == 401) {
+                    showTknExpDialog();
+                }
+                else
+                {
+                    showLoadingwDialog();
 
-                String jsonString = response.body();
-                if (jsonString.contains("visCod")) {
-                    Visita visitaRecibida = new Gson().fromJson(jsonString, Visita.class);
-                    loadingFragment.dismiss();
-                    Intent intent = new Intent();
-                    intent.putExtra("success", "true");
-                    intent.putExtra("visitaResult", visitaRecibida);
-                    setResult(RESULT_OK, intent);
-                    finish();
-                } else {
-                    Error error = new Gson().fromJson(jsonString, Error.class);
-                    loadingFragment.dismiss();
-                    Intent intent = new Intent();
-                    intent.putExtra("success", "false");
-                    intent.putExtra("errorResult", error);
-                    setResult(RESULT_OK, intent);
-                    finish();
+                    String jsonString = response.body();
+                    if (jsonString.contains("visCod")) {
+                        Visita visitaRecibida = new Gson().fromJson(jsonString, Visita.class);
+                        loadingFragment.dismiss();
+                        Intent intent = new Intent();
+                        intent.putExtra("success", "true");
+                        intent.putExtra("visitaResult", visitaRecibida);
+                        setResult(RESULT_OK, intent);
+                        finish();
+                    } else {
+                        Error error = new Gson().fromJson(jsonString, Error.class);
+                        loadingFragment.dismiss();
+                        Intent intent = new Intent();
+                        intent.putExtra("success", "false");
+                        intent.putExtra("errorResult", error);
+                        setResult(RESULT_OK, intent);
+                        finish();
+                    }
                 }
             }
 
@@ -738,5 +757,21 @@ public class RegistraVisitaActivity extends AppCompatActivity implements Validat
     public void OnDOIClick(int total) {
         Log.d("msg321", ""+total);
         doiTexto.setText("Documentos de ingreso: "+total);
+    }
+
+    public void showTknExpDialog() {
+        DFTknExpired dfTknExpired = new DFTknExpired();
+        FragmentTransaction ft;
+        Bundle bundle = new Bundle();
+        bundle.putInt("tiempo", 0);
+        dfTknExpired.setArguments(bundle);
+        //dialogFragment.setTargetFragment(this, 1);
+        ft = getSupportFragmentManager().beginTransaction();
+        Fragment prev = getSupportFragmentManager().findFragmentByTag("dialogTknExpLoading");
+        if (prev != null) {
+            ft.remove(prev);
+        }
+        ft.addToBackStack(null);
+        dfTknExpired.show(ft, "dialogTknExpLoading");
     }
 }

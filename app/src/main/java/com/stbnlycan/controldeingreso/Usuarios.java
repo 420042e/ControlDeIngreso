@@ -7,6 +7,8 @@ import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.cursoradapter.widget.CursorAdapter;
 import androidx.cursoradapter.widget.SimpleCursorAdapter;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -33,6 +35,7 @@ import android.widget.Toast;
 
 import com.stbnlycan.adapters.UsuariosAdapter;
 import com.stbnlycan.adapters.VisitantesAdapter;
+import com.stbnlycan.fragments.DFTknExpired;
 import com.stbnlycan.interfaces.ListaUsuariosAPIs;
 import com.stbnlycan.interfaces.ListaUsuariosXUsrNameAPIs;
 import com.stbnlycan.interfaces.ListaVisitantesAPIs;
@@ -337,26 +340,32 @@ public class Usuarios extends AppCompatActivity implements UsuariosAdapter.OnUsu
         call.enqueue(new Callback<ListaUsuarios>() {
             @Override
             public void onResponse(Call <ListaUsuarios> call, retrofit2.Response<ListaUsuarios> response) {
-                usuarios.clear();
-                ListaUsuarios listaUsuarios = response.body();
-                if(listaUsuarios.getlUsuario().size() == 0)
-                {
-                    tvNoData.setVisibility(View.VISIBLE);
+                if (response.code() == 401) {
+                    showTknExpDialog();
                 }
                 else
                 {
-                    bar.setVisibility(View.GONE);
-                    recyclerView.setVisibility(View.VISIBLE);
-                    tvNoData.setVisibility(View.GONE);
-                    for(int i = 0 ; i < listaUsuarios.getlUsuario().size() ; i++)
+                    usuarios.clear();
+                    ListaUsuarios listaUsuarios = response.body();
+                    if(listaUsuarios.getlUsuario().size() == 0)
                     {
-                        usuarios.add(listaUsuarios.getlUsuario().get(i));
+                        tvNoData.setVisibility(View.VISIBLE);
                     }
-                    totalElements = listaUsuarios.getTotalElements();
-                    usuariosAdapter.notifyDataSetChanged();
-                    swipeRefreshLayout.setRefreshing(false);
+                    else
+                    {
+                        bar.setVisibility(View.GONE);
+                        recyclerView.setVisibility(View.VISIBLE);
+                        tvNoData.setVisibility(View.GONE);
+                        for(int i = 0 ; i < listaUsuarios.getlUsuario().size() ; i++)
+                        {
+                            usuarios.add(listaUsuarios.getlUsuario().get(i));
+                        }
+                        totalElements = listaUsuarios.getTotalElements();
+                        usuariosAdapter.notifyDataSetChanged();
+                        swipeRefreshLayout.setRefreshing(false);
+                    }
+                    nPag = 0;
                 }
-                nPag = 0;
             }
             @Override
             public void onFailure(Call <ListaUsuarios> call, Throwable t) {
@@ -373,14 +382,20 @@ public class Usuarios extends AppCompatActivity implements UsuariosAdapter.OnUsu
         call.enqueue(new Callback<ListaUsuarios>() {
             @Override
             public void onResponse(Call <ListaUsuarios> call, retrofit2.Response<ListaUsuarios> response) {
-                bar.setVisibility(View.GONE);
-                recyclerView.setVisibility(View.VISIBLE);
-                ListaUsuarios listaUsuarios = response.body();
-                for(int i = 0 ; i < listaUsuarios.getlUsuario().size() ; i++)
-                {
-                    usuarios.add(listaUsuarios.getlUsuario().get(i));
+                if (response.code() == 401) {
+                    showTknExpDialog();
                 }
-                usuariosAdapter.notifyDataSetChanged();
+                else
+                {
+                    bar.setVisibility(View.GONE);
+                    recyclerView.setVisibility(View.VISIBLE);
+                    ListaUsuarios listaUsuarios = response.body();
+                    for(int i = 0 ; i < listaUsuarios.getlUsuario().size() ; i++)
+                    {
+                        usuarios.add(listaUsuarios.getlUsuario().get(i));
+                    }
+                    usuariosAdapter.notifyDataSetChanged();
+                }
             }
             @Override
             public void onFailure(Call <ListaUsuarios> call, Throwable t) {
@@ -398,31 +413,37 @@ public class Usuarios extends AppCompatActivity implements UsuariosAdapter.OnUsu
         call.enqueue(new Callback<ListaUsuarios>() {
             @Override
             public void onResponse(Call <ListaUsuarios> call, retrofit2.Response<ListaUsuarios> response) {
-                suggestions.clear();
-                ListaUsuarios listaUsuarios = response.body();
-                if(listaUsuarios.getlUsuario().size() == 0)
-                {
-                    //tvNoData.setVisibility(View.VISIBLE);
-                    String[] columns = { BaseColumns._ID, SearchManager.SUGGEST_COLUMN_TEXT_1, SearchManager.SUGGEST_COLUMN_INTENT_DATA};
-                    MatrixCursor cursor = new MatrixCursor(columns);
-                    suggestionAdapter.swapCursor(cursor);
+                if (response.code() == 401) {
+                    showTknExpDialog();
                 }
                 else
                 {
-                    //tvNoData.setVisibility(View.GONE);
-                    for(int i = 0 ; i < listaUsuarios.getlUsuario().size() ; i++)
+                    suggestions.clear();
+                    ListaUsuarios listaUsuarios = response.body();
+                    if(listaUsuarios.getlUsuario().size() == 0)
                     {
-                        suggestions.add(listaUsuarios.getlUsuario().get(i));
-                        String[] columns = { BaseColumns._ID,
-                                SearchManager.SUGGEST_COLUMN_TEXT_1,
-                                SearchManager.SUGGEST_COLUMN_INTENT_DATA,
-                        };
+                        //tvNoData.setVisibility(View.VISIBLE);
+                        String[] columns = { BaseColumns._ID, SearchManager.SUGGEST_COLUMN_TEXT_1, SearchManager.SUGGEST_COLUMN_INTENT_DATA};
                         MatrixCursor cursor = new MatrixCursor(columns);
-                        for (int j = 0; j < suggestions.size(); j++) {
-                            String[] tmp = {Integer.toString(j), suggestions.get(j).getUsername(), suggestions.get(j).getUsername()};
-                            cursor.addRow(tmp);
-                        }
                         suggestionAdapter.swapCursor(cursor);
+                    }
+                    else
+                    {
+                        //tvNoData.setVisibility(View.GONE);
+                        for(int i = 0 ; i < listaUsuarios.getlUsuario().size() ; i++)
+                        {
+                            suggestions.add(listaUsuarios.getlUsuario().get(i));
+                            String[] columns = { BaseColumns._ID,
+                                    SearchManager.SUGGEST_COLUMN_TEXT_1,
+                                    SearchManager.SUGGEST_COLUMN_INTENT_DATA,
+                            };
+                            MatrixCursor cursor = new MatrixCursor(columns);
+                            for (int j = 0; j < suggestions.size(); j++) {
+                                String[] tmp = {Integer.toString(j), suggestions.get(j).getUsername(), suggestions.get(j).getUsername()};
+                                cursor.addRow(tmp);
+                            }
+                            suggestionAdapter.swapCursor(cursor);
+                        }
                     }
                 }
             }
@@ -458,5 +479,21 @@ public class Usuarios extends AppCompatActivity implements UsuariosAdapter.OnUsu
                 }
             }
         }
+    }
+
+    public void showTknExpDialog() {
+        DFTknExpired dfTknExpired = new DFTknExpired();
+        FragmentTransaction ft;
+        Bundle bundle = new Bundle();
+        bundle.putInt("tiempo", 0);
+        dfTknExpired.setArguments(bundle);
+        //dialogFragment.setTargetFragment(this, 1);
+        ft = getSupportFragmentManager().beginTransaction();
+        Fragment prev = getSupportFragmentManager().findFragmentByTag("dialogTknExpLoading");
+        if (prev != null) {
+            ft.remove(prev);
+        }
+        ft.addToBackStack(null);
+        dfTknExpired.show(ft, "dialogTknExpLoading");
     }
 }

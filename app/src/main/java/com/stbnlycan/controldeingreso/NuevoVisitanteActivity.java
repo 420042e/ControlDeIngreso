@@ -55,6 +55,7 @@ import com.mobsandgeeks.saripaar.Validator;
 import com.mobsandgeeks.saripaar.annotation.Email;
 import com.mobsandgeeks.saripaar.annotation.NotEmpty;
 import com.mobsandgeeks.saripaar.annotation.Select;
+import com.stbnlycan.fragments.DFTknExpired;
 import com.stbnlycan.fragments.LoadingFragment;
 import com.stbnlycan.interfaces.EmpresaAPIs;
 import com.stbnlycan.interfaces.EnviarCorreoIAPIs;
@@ -530,12 +531,18 @@ public class NuevoVisitanteActivity extends AppCompatActivity implements Validat
         call.enqueue(new Callback<ListaEmpresas>() {
             @Override
             public void onResponse(Call <ListaEmpresas> call, retrofit2.Response<ListaEmpresas> response) {
-                for(int i = 0 ; i < response.body().getlEmpresa().size() ; i++)
-                {
-                    empresas.add(response.body().getlEmpresa().get(i));
+                if (response.code() == 401) {
+                    showTknExpDialog();
                 }
-                empresas.get(0).setEmpNombre("SELECCIONE UNA EMPRESA");
-                adapterEmpresa.notifyDataSetChanged();
+                else
+                {
+                    for(int i = 0 ; i < response.body().getlEmpresa().size() ; i++)
+                    {
+                        empresas.add(response.body().getlEmpresa().get(i));
+                    }
+                    empresas.get(0).setEmpNombre("SELECCIONE UNA EMPRESA");
+                    adapterEmpresa.notifyDataSetChanged();
+                }
             }
             @Override
             public void onFailure(Call <ListaEmpresas> call, Throwable t) {
@@ -551,12 +558,18 @@ public class NuevoVisitanteActivity extends AppCompatActivity implements Validat
         call.enqueue(new Callback<List<TipoVisitante>>() {
             @Override
             public void onResponse(Call <List<TipoVisitante>> call, retrofit2.Response<List<TipoVisitante>> response) {
-                for(int i = 0 ; i < response.body().size() ; i++)
-                {
-                    tiposVisitante.add(response.body().get(i));
+                if (response.code() == 401) {
+                    showTknExpDialog();
                 }
-                tiposVisitante.get(0).setTviNombre("SELECCIONE TIPO DE VISITANTE");
-                adapterTipoVisitante.notifyDataSetChanged();
+                else
+                {
+                    for(int i = 0 ; i < response.body().size() ; i++)
+                    {
+                        tiposVisitante.add(response.body().get(i));
+                    }
+                    tiposVisitante.get(0).setTviNombre("SELECCIONE TIPO DE VISITANTE");
+                    adapterTipoVisitante.notifyDataSetChanged();
+                }
             }
             @Override
             public void onFailure(Call <List<TipoVisitante>> call, Throwable t) {
@@ -576,17 +589,23 @@ public class NuevoVisitanteActivity extends AppCompatActivity implements Validat
         call.enqueue(new Callback<Visitante>() {
             @Override
         public void onResponse(Call <Visitante> call, Response<Visitante> response) {
-                /*visitante.setVteImagen(response.body().getVteImagen());
+                if (response.code() == 401) {
+                    showTknExpDialog();
+                }
+                else
+                {
+                    /*visitante.setVteImagen(response.body().getVteImagen());
                 Toast.makeText(getApplicationContext(), "Se guardó el nuevo asistente", Toast.LENGTH_LONG).show();
                 enviarCorreoIngreso(visitanteResult);*/
 
-                Visitante visitanteResult = response.body();
-                Toast.makeText(getApplicationContext(), "Se guardó el nuevo asistente", Toast.LENGTH_LONG).show();
-                //enviarCorreoIngreso(visitanteResult);
-                Intent intent = new Intent();
-                intent.putExtra("visitanteResult", visitanteResult);
-                setResult(RESULT_OK, intent);
-                finish();
+                    Visitante visitanteResult = response.body();
+                    Toast.makeText(getApplicationContext(), "Se guardó el nuevo asistente", Toast.LENGTH_LONG).show();
+                    //enviarCorreoIngreso(visitanteResult);
+                    Intent intent = new Intent();
+                    intent.putExtra("visitanteResult", visitanteResult);
+                    setResult(RESULT_OK, intent);
+                    finish();
+                }
             }
 
             @Override
@@ -603,14 +622,20 @@ public class NuevoVisitanteActivity extends AppCompatActivity implements Validat
         call.enqueue(new Callback() {
             @Override
             public void onResponse(Call call, retrofit2.Response response) {
-                if (response.body() != null) {
-                    //Aqui se debería cerrar esta actividad al recibir respuesta del server
-                    Toast.makeText(getApplicationContext(), "Se envió el correo de ingreso", Toast.LENGTH_LONG).show();
-                    //visitante.setVteEstado("0");
-                    Intent intent = new Intent();
-                    intent.putExtra("visitanteResult", visitanteResult);
-                    setResult(RESULT_OK, intent);
-                    finish();
+                if (response.code() == 401) {
+                    showTknExpDialog();
+                }
+                else
+                {
+                    if (response.body() != null) {
+                        //Aqui se debería cerrar esta actividad al recibir respuesta del server
+                        Toast.makeText(getApplicationContext(), "Se envió el correo de ingreso", Toast.LENGTH_LONG).show();
+                        //visitante.setVteEstado("0");
+                        Intent intent = new Intent();
+                        intent.putExtra("visitanteResult", visitanteResult);
+                        setResult(RESULT_OK, intent);
+                        finish();
+                    }
                 }
             }
             @Override
@@ -701,6 +726,22 @@ public class NuevoVisitanteActivity extends AppCompatActivity implements Validat
         }
         ft.addToBackStack(null);
         dialogFragment.show(ft, "dialog");
+    }
+
+    public void showTknExpDialog() {
+        DFTknExpired dfTknExpired = new DFTknExpired();
+        FragmentTransaction ft;
+        Bundle bundle = new Bundle();
+        bundle.putInt("tiempo", 0);
+        dfTknExpired.setArguments(bundle);
+        //dialogFragment.setTargetFragment(this, 1);
+        ft = getSupportFragmentManager().beginTransaction();
+        Fragment prev = getSupportFragmentManager().findFragmentByTag("dialogTknExpLoading");
+        if (prev != null) {
+            ft.remove(prev);
+        }
+        ft.addToBackStack(null);
+        dfTknExpired.show(ft, "dialogTknExpLoading");
     }
 
 }

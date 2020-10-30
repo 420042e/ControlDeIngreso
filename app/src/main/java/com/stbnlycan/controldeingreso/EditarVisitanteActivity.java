@@ -57,6 +57,7 @@ import com.mobsandgeeks.saripaar.Validator;
 import com.mobsandgeeks.saripaar.annotation.Email;
 import com.mobsandgeeks.saripaar.annotation.NotEmpty;
 import com.mobsandgeeks.saripaar.annotation.Select;
+import com.stbnlycan.fragments.DFTknExpired;
 import com.stbnlycan.fragments.LoadingFragment;
 import com.stbnlycan.interfaces.EmpresaAPIs;
 import com.stbnlycan.interfaces.ListaEmpresasAPIs;
@@ -557,18 +558,24 @@ public class EditarVisitanteActivity extends AppCompatActivity implements Valida
         call.enqueue(new Callback<ListaEmpresas>() {
             @Override
             public void onResponse(Call <ListaEmpresas> call, retrofit2.Response<ListaEmpresas> response) {
-                int pos = -1;
-                for(int i = 0 ; i < response.body().getlEmpresa().size() ; i++)
-                {
-                    empresas.add(response.body().getlEmpresa().get(i));
-                    if(response.body().getlEmpresa().get(i).getEmpCod().equals(visitanteRecibido.getEmpresa().getEmpCod()))
-                    {
-                        pos = i+1;
-                    }
+                if (response.code() == 401) {
+                    showTknExpDialog();
                 }
-                empresas.get(0).setEmpNombre("SELECCIONE UNA EMPRESA");
-                adapterEmpresa.notifyDataSetChanged();
-                empresaS.setSelection(pos, true);
+                else
+                {
+                    int pos = -1;
+                    for(int i = 0 ; i < response.body().getlEmpresa().size() ; i++)
+                    {
+                        empresas.add(response.body().getlEmpresa().get(i));
+                        if(response.body().getlEmpresa().get(i).getEmpCod().equals(visitanteRecibido.getEmpresa().getEmpCod()))
+                        {
+                            pos = i+1;
+                        }
+                    }
+                    empresas.get(0).setEmpNombre("SELECCIONE UNA EMPRESA");
+                    adapterEmpresa.notifyDataSetChanged();
+                    empresaS.setSelection(pos, true);
+                }
             }
             @Override
             public void onFailure(Call <ListaEmpresas> call, Throwable t) {
@@ -584,18 +591,24 @@ public class EditarVisitanteActivity extends AppCompatActivity implements Valida
         call.enqueue(new Callback<List<TipoVisitante>>() {
             @Override
             public void onResponse(Call <List<TipoVisitante>> call, retrofit2.Response<List<TipoVisitante>> response) {
-                int pos = -1;
-                for(int i = 0 ; i < response.body().size() ; i++)
-                {
-                    tiposVisitante.add(response.body().get(i));
-                    if(response.body().get(i).getTviCod().equals(visitanteRecibido.getTipoVisitante().getTviCod()))
-                    {
-                        pos = i+1;
-                    }
+                if (response.code() == 401) {
+                    showTknExpDialog();
                 }
-                tiposVisitante.get(0).setTviNombre("SELECCIONE TIPO DE VISITANTE");
-                adapterTipoVisitante.notifyDataSetChanged();
-                tipoVisitanteS.setSelection(pos, true);
+                else
+                {
+                    int pos = -1;
+                    for(int i = 0 ; i < response.body().size() ; i++)
+                    {
+                        tiposVisitante.add(response.body().get(i));
+                        if(response.body().get(i).getTviCod().equals(visitanteRecibido.getTipoVisitante().getTviCod()))
+                        {
+                            pos = i+1;
+                        }
+                    }
+                    tiposVisitante.get(0).setTviNombre("SELECCIONE TIPO DE VISITANTE");
+                    adapterTipoVisitante.notifyDataSetChanged();
+                    tipoVisitanteS.setSelection(pos, true);
+                }
             }
             @Override
             public void onFailure(Call <List<TipoVisitante>> call, Throwable t) {
@@ -611,15 +624,21 @@ public class EditarVisitanteActivity extends AppCompatActivity implements Valida
         call.enqueue(new Callback <Visitante> () {
             @Override
             public void onResponse(Call <Visitante> call, Response<Visitante> response) {
-                Visitante visitanteRecibido = response.body();
-                Toast.makeText(getApplicationContext(), "El visitante fué actualizado", Toast.LENGTH_LONG).show();
-                //visitante.setVteEstado("ACT");
+                if (response.code() == 401) {
+                    showTknExpDialog();
+                }
+                else
+                {
+                    Visitante visitanteRecibido = response.body();
+                    Toast.makeText(getApplicationContext(), "El visitante fué actualizado", Toast.LENGTH_LONG).show();
+                    //visitante.setVteEstado("ACT");
 
-                Intent intent = new Intent();
-                intent.putExtra("visitanteResult", visitanteRecibido);
-                intent.putExtra("position", position);
-                setResult(RESULT_OK, intent);
-                finish();
+                    Intent intent = new Intent();
+                    intent.putExtra("visitanteResult", visitanteRecibido);
+                    intent.putExtra("position", position);
+                    setResult(RESULT_OK, intent);
+                    finish();
+                }
             }
             @Override
             public void onFailure(Call <Visitante> call, Throwable t) {
@@ -716,46 +735,50 @@ public class EditarVisitanteActivity extends AppCompatActivity implements Valida
         call.enqueue(new Callback<Visitante>() {
             @Override
             public void onResponse(Call <Visitante> call, retrofit2.Response <Visitante> response) {
+                if (response.code() == 401) {
+                    showTknExpDialog();
+                }
+                else
+                {
+                    Toast.makeText(getApplicationContext(), "Se guardó la nueva imágen", Toast.LENGTH_LONG).show();
+                    visitanteResult = response.body();
 
-                Toast.makeText(getApplicationContext(), "Se guardó la nueva imágen", Toast.LENGTH_LONG).show();
-                visitanteResult = response.body();
+                    visitanteRecibido.setVteImagen(response.body().getVteImagen());
+                    cambioFoto = true;
 
-                visitanteRecibido.setVteImagen(response.body().getVteImagen());
-                cambioFoto = true;
+                    DisplayMetrics displayMetrics = new DisplayMetrics();
+                    getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+                    int height = displayMetrics.heightPixels;
+                    int width = displayMetrics.widthPixels;
 
-                DisplayMetrics displayMetrics = new DisplayMetrics();
-                getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-                int height = displayMetrics.heightPixels;
-                int width = displayMetrics.widthPixels;
+                    String url = "http://190.129.90.115:8083/ingresoVisitantes/visitante/mostrarFoto?foto=" + response.body().getVteImagen();
+                    GlideUrl glideUrl = new GlideUrl(url,
+                            new LazyHeaders.Builder()
+                                    .addHeader("Authorization", authorization)
+                                    .build());
+                    Glide.with(getApplication())
+                            .load(glideUrl)
+                            .centerCrop()
+                            .apply(new RequestOptions().override(width, width))
+                            .listener(new RequestListener<Drawable>() {
+                                @Override
+                                public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                                    return false;
+                                }
 
-                String url = "http://190.129.90.115:8083/ingresoVisitantes/visitante/mostrarFoto?foto=" + response.body().getVteImagen();
-                GlideUrl glideUrl = new GlideUrl(url,
-                        new LazyHeaders.Builder()
-                                .addHeader("Authorization", authorization)
-                                .build());
-                Glide.with(getApplication())
-                        .load(glideUrl)
-                        .centerCrop()
-                        .apply(new RequestOptions().override(width, width))
-                        .listener(new RequestListener<Drawable>() {
-                            @Override
-                            public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
-                                return false;
-                            }
-
-                            @Override
-                            public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
-                                //holder.doiImagen.setVisibility(View.VISIBLE);
-                                //holder.progressBar.setVisibility(View.GONE);
-                                progressBar.setVisibility(View.GONE);
-                                return false;
-                            }
-                        })
-                        .into(visitanteIV);
+                                @Override
+                                public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                                    //holder.doiImagen.setVisibility(View.VISIBLE);
+                                    //holder.progressBar.setVisibility(View.GONE);
+                                    progressBar.setVisibility(View.GONE);
+                                    return false;
+                                }
+                            })
+                            .into(visitanteIV);
                 /*Gson gson2 = new Gson();
                 String descripcion2 = gson2.toJson(visitanteCB);
                 Log.d("msgCB2", descripcion2);*/
-
+                }
             }
 
             @Override
@@ -781,5 +804,21 @@ public class EditarVisitanteActivity extends AppCompatActivity implements Valida
         {
             super.onBackPressed();
         }
+    }
+
+    public void showTknExpDialog() {
+        DFTknExpired dfTknExpired = new DFTknExpired();
+        FragmentTransaction ft;
+        Bundle bundle = new Bundle();
+        bundle.putInt("tiempo", 0);
+        dfTknExpired.setArguments(bundle);
+        //dialogFragment.setTargetFragment(this, 1);
+        ft = getSupportFragmentManager().beginTransaction();
+        Fragment prev = getSupportFragmentManager().findFragmentByTag("dialogTknExpLoading");
+        if (prev != null) {
+            ft.remove(prev);
+        }
+        ft.addToBackStack(null);
+        dfTknExpired.show(ft, "dialogTknExpLoading");
     }
 }

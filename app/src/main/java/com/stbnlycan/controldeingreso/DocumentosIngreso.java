@@ -49,6 +49,7 @@ import com.mobsandgeeks.saripaar.Validator;
 import com.mobsandgeeks.saripaar.annotation.Select;
 import com.stbnlycan.adapters.DOIAdapter;
 import com.stbnlycan.adapters.RecintoAdapter;
+import com.stbnlycan.fragments.DFTknExpired;
 import com.stbnlycan.fragments.NuevoDocIngFragment;
 import com.stbnlycan.interfaces.LogoutAPIs;
 import com.stbnlycan.interfaces.TipoDocAPIs;
@@ -415,8 +416,14 @@ public class DocumentosIngreso extends AppCompatActivity implements DOIAdapter.O
         call.enqueue(new Callback<List<TipoDocumento>>() {
             @Override
             public void onResponse(Call<List<TipoDocumento>> call, retrofit2.Response<List<TipoDocumento>> response) {
-                for (int i = 0; i < response.body().size(); i++) {
-                    tipoDocumento.add(response.body().get(i));
+                if (response.code() == 401) {
+                    showTknExpDialog();
+                }
+                else
+                {
+                    for (int i = 0; i < response.body().size(); i++) {
+                        tipoDocumento.add(response.body().get(i));
+                    }
                 }
             }
 
@@ -503,6 +510,22 @@ public class DocumentosIngreso extends AppCompatActivity implements DOIAdapter.O
                 Toast.makeText(this, message, Toast.LENGTH_LONG).show();
             }
         }
+    }
+
+    public void showTknExpDialog() {
+        DFTknExpired dfTknExpired = new DFTknExpired();
+        FragmentTransaction ft;
+        Bundle bundle = new Bundle();
+        bundle.putInt("tiempo", 0);
+        dfTknExpired.setArguments(bundle);
+        //dialogFragment.setTargetFragment(this, 1);
+        ft = getSupportFragmentManager().beginTransaction();
+        Fragment prev = getSupportFragmentManager().findFragmentByTag("dialogTknExpLoading");
+        if (prev != null) {
+            ft.remove(prev);
+        }
+        ft.addToBackStack(null);
+        dfTknExpired.show(ft, "dialogTknExpLoading");
     }
 
 }

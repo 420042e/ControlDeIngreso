@@ -6,6 +6,8 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -32,6 +34,7 @@ import com.mobsandgeeks.saripaar.ValidationError;
 import com.mobsandgeeks.saripaar.Validator;
 import com.mobsandgeeks.saripaar.annotation.Select;
 import com.stbnlycan.adapters.HorariosAdapter;
+import com.stbnlycan.fragments.DFTknExpired;
 import com.stbnlycan.interfaces.HorariosAPIs;
 import com.stbnlycan.interfaces.LogoutAPIs;
 import com.stbnlycan.interfaces.TipoVisitanteAPIs;
@@ -216,21 +219,27 @@ public class Horarios extends AppCompatActivity implements HorariosAdapter.OnVis
         call.enqueue(new Callback <List<Horario>> () {
             @Override
             public void onResponse(Call <List<Horario>> call, Response <List<Horario>> response) {
-                bar.setVisibility(View.GONE);
-                recyclerView.setVisibility(View.VISIBLE);
-                horarios.clear();
-                if (response.body().size() == 0) {
-                    recyclerView.setVisibility(View.GONE);
-                    tvNoData.setVisibility(View.VISIBLE);
+                if (response.code() == 401) {
+                    showTknExpDialog();
                 }
-                else {
+                else
+                {
+                    bar.setVisibility(View.GONE);
                     recyclerView.setVisibility(View.VISIBLE);
-                    tvNoData.setVisibility(View.GONE);
-                    for(int i=0;i<response.body().size();i++)
-                    {
-                        horarios.add(response.body().get(i));
+                    horarios.clear();
+                    if (response.body().size() == 0) {
+                        recyclerView.setVisibility(View.GONE);
+                        tvNoData.setVisibility(View.VISIBLE);
                     }
-                    horariosAdapter.notifyDataSetChanged();
+                    else {
+                        recyclerView.setVisibility(View.VISIBLE);
+                        tvNoData.setVisibility(View.GONE);
+                        for(int i=0;i<response.body().size();i++)
+                        {
+                            horarios.add(response.body().get(i));
+                        }
+                        horariosAdapter.notifyDataSetChanged();
+                    }
                 }
             }
             @Override
@@ -308,12 +317,18 @@ public class Horarios extends AppCompatActivity implements HorariosAdapter.OnVis
         call.enqueue(new Callback<List<TipoVisitante>>() {
             @Override
             public void onResponse(Call <List<TipoVisitante>> call, Response<List<TipoVisitante>> response) {
-                for(int i = 0 ; i < response.body().size() ; i++)
-                {
-                    tipoVisitantes.add(response.body().get(i));
+                if (response.code() == 401) {
+                    showTknExpDialog();
                 }
-                tipoVisitantes.get(0).setTviNombre("SELECCIONE TIPO DE VISITANTE");
-                adapterTipoVisitante.notifyDataSetChanged();
+                else
+                {
+                    for(int i = 0 ; i < response.body().size() ; i++)
+                    {
+                        tipoVisitantes.add(response.body().get(i));
+                    }
+                    tipoVisitantes.get(0).setTviNombre("SELECCIONE TIPO DE VISITANTE");
+                    adapterTipoVisitante.notifyDataSetChanged();
+                }
             }
             @Override
             public void onFailure(Call call, Throwable t) {
@@ -365,5 +380,21 @@ public class Horarios extends AppCompatActivity implements HorariosAdapter.OnVis
                 Toast.makeText(this, message, Toast.LENGTH_LONG).show();
             }
         }
+    }
+
+    public void showTknExpDialog() {
+        DFTknExpired dfTknExpired = new DFTknExpired();
+        FragmentTransaction ft;
+        Bundle bundle = new Bundle();
+        bundle.putInt("tiempo", 0);
+        dfTknExpired.setArguments(bundle);
+        //dialogFragment.setTargetFragment(this, 1);
+        ft = getSupportFragmentManager().beginTransaction();
+        Fragment prev = getSupportFragmentManager().findFragmentByTag("dialogTknExpLoading");
+        if (prev != null) {
+            ft.remove(prev);
+        }
+        ft.addToBackStack(null);
+        dfTknExpired.show(ft, "dialogTknExpLoading");
     }
 }
