@@ -69,7 +69,6 @@ public class VisitantesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder viewHolder, int position) {
 
         if (viewHolder instanceof ItemViewHolder) {
-
             populateItemRows((ItemViewHolder) viewHolder, position);
         } else if (viewHolder instanceof LoadingViewHolder) {
             showLoadingView((LoadingViewHolder) viewHolder, position);
@@ -211,13 +210,6 @@ public class VisitantesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
     private class ItemViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
-        /*TextView tvItem;
-
-        public ItemViewHolder(@NonNull View itemView) {
-            super(itemView);
-
-            tvItem = itemView.findViewById(R.id.tvItem);
-        }*/
         private ImageView imgVisitante;
         private TextView artNaam;
         private TextView lugar;
@@ -286,9 +278,6 @@ public class VisitantesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     }
 
     private void populateItemRows(final ItemViewHolder viewHolder, int position) {
-
-        /*String item = eventosList.get(position);
-        viewHolder.tvItem.setText(item);*/
 
         Visitante visitante = eventosList.get(position);
         viewHolder.artNaam.setText(visitante.getVteNombre() + " " + visitante.getVteApellidos());

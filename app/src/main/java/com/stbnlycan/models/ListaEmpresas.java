@@ -10,10 +10,22 @@ public class ListaEmpresas {
     @Expose
     private List<Empresa> lEmpresa;
 
+    @SerializedName("totalElements")
+    @Expose
+    private String totalElements;
+
     public List<Empresa> getlEmpresa() {
         return lEmpresa;
     }
 
     public ListaEmpresas() {
+    }
+
+    public String getTotalElements() {
+        return totalElements;
+    }
+
+    public void setTotalElements(String totalElements) {
+        this.totalElements = totalElements;
     }
 }

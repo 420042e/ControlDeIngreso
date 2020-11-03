@@ -21,6 +21,7 @@ import android.content.SharedPreferences;
 import android.database.MatrixCursor;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.provider.BaseColumns;
 import android.util.Log;
 import android.view.Menu;
@@ -93,6 +94,7 @@ public class Usuarios extends AppCompatActivity implements UsuariosAdapter.OnUsu
     private final static int REQUEST_CODE_EU = 2;
 
     private boolean sugerenciaPress;
+    boolean isLoading = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -157,7 +159,7 @@ public class Usuarios extends AppCompatActivity implements UsuariosAdapter.OnUsu
             @Override
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
-                currentItems = manager.getChildCount();
+                /*currentItems = manager.getChildCount();
                 totalItems = manager.getItemCount();
                 scrollOutItems = manager.findFirstVisibleItemPosition();
                 if(isScrolling && (currentItems + scrollOutItems == totalItems) && totalItems != Integer.parseInt(totalElements)  && !sugerenciaPress)
@@ -165,6 +167,16 @@ public class Usuarios extends AppCompatActivity implements UsuariosAdapter.OnUsu
                     isScrolling = false;
                     nPag++;
                     mostrarMasUsuarios();
+                }*/
+                totalItems = manager.getItemCount();
+                LinearLayoutManager linearLayoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
+                if (!isLoading) {
+                    if (linearLayoutManager != null && linearLayoutManager.findLastCompletelyVisibleItemPosition() == usuarios.size() - 1 && totalItems != Integer.parseInt(totalElements) && !sugerenciaPress) {
+                        //bottom of list!
+                        nPag++;
+                        mostrarMasUsuarios();
+                        isLoading = true;
+                    }
                 }
             }
         });
@@ -365,6 +377,7 @@ public class Usuarios extends AppCompatActivity implements UsuariosAdapter.OnUsu
                         swipeRefreshLayout.setRefreshing(false);
                     }
                     nPag = 0;
+                    isLoading = false;
                 }
             }
             @Override
@@ -376,33 +389,48 @@ public class Usuarios extends AppCompatActivity implements UsuariosAdapter.OnUsu
     }
 
     private void mostrarMasUsuarios() {
-        Retrofit retrofit = NetworkClient.getRetrofitClient(this);
-        ListaUsuariosAPIs listaUsuariosAPIs = retrofit.create(ListaUsuariosAPIs.class);
-        Call<ListaUsuarios> call = listaUsuariosAPIs.listaUsuarios(Integer.toString(nPag),"10", authorization);
-        call.enqueue(new Callback<ListaUsuarios>() {
+        usuarios.add(null);
+        usuariosAdapter.notifyItemInserted(usuarios.size() - 1);
+
+        Handler handler = new Handler(Looper.getMainLooper());
+        handler.postDelayed(new Runnable() {
             @Override
-            public void onResponse(Call <ListaUsuarios> call, retrofit2.Response<ListaUsuarios> response) {
-                if (response.code() == 401) {
-                    showTknExpDialog();
-                }
-                else
-                {
-                    bar.setVisibility(View.GONE);
-                    recyclerView.setVisibility(View.VISIBLE);
-                    ListaUsuarios listaUsuarios = response.body();
-                    for(int i = 0 ; i < listaUsuarios.getlUsuario().size() ; i++)
-                    {
-                        usuarios.add(listaUsuarios.getlUsuario().get(i));
+            public void run() {
+                Retrofit retrofit = NetworkClient.getRetrofitClient(getApplication());
+                ListaUsuariosAPIs listaUsuariosAPIs = retrofit.create(ListaUsuariosAPIs.class);
+                Call<ListaUsuarios> call = listaUsuariosAPIs.listaUsuarios(Integer.toString(nPag),"10", authorization);
+                call.enqueue(new Callback<ListaUsuarios>() {
+                    @Override
+                    public void onResponse(Call <ListaUsuarios> call, retrofit2.Response<ListaUsuarios> response) {
+                        if (response.code() == 401) {
+                            showTknExpDialog();
+                        }
+                        else
+                        {
+                            bar.setVisibility(View.GONE);
+                            recyclerView.setVisibility(View.VISIBLE);
+                            usuarios.remove(usuarios.size() - 1);
+                            int scrollPosition = usuarios.size();
+                            usuariosAdapter.notifyItemRemoved(scrollPosition);
+                            ListaUsuarios listaUsuarios = response.body();
+                            for(int i = 0 ; i < listaUsuarios.getlUsuario().size() ; i++)
+                            {
+                                usuarios.add(listaUsuarios.getlUsuario().get(i));
+                            }
+                            usuariosAdapter.notifyDataSetChanged();
+                            isLoading = false;
+                        }
                     }
-                    usuariosAdapter.notifyDataSetChanged();
-                }
+                    @Override
+                    public void onFailure(Call <ListaUsuarios> call, Throwable t) {
+                        bar.setVisibility(View.GONE);
+                        tvFallo.setVisibility(View.VISIBLE);
+                    }
+                });
             }
-            @Override
-            public void onFailure(Call <ListaUsuarios> call, Throwable t) {
-                bar.setVisibility(View.GONE);
-                tvFallo.setVisibility(View.VISIBLE);
-            }
-        });
+        }, 1000);
+
+
 
     }
 

@@ -20,6 +20,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.MatrixCursor;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.provider.BaseColumns;
 import android.util.Log;
 import android.view.Menu;
@@ -69,6 +71,7 @@ public class Empresas extends AppCompatActivity implements EmpresasAdapter.OnVis
     private SearchView searchView;
     private List<Empresa> suggestions;
     private CursorAdapter suggestionAdapter;
+    private String totalElements;
 
     private String authorization;
     private SharedPreferences pref;
@@ -78,6 +81,8 @@ public class Empresas extends AppCompatActivity implements EmpresasAdapter.OnVis
     private final static int REQUEST_CODE_EE = 2;
 
     private boolean sugerenciaPress;
+
+    boolean isLoading = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -114,7 +119,7 @@ public class Empresas extends AppCompatActivity implements EmpresasAdapter.OnVis
             @Override
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
-                currentItems = manager.getChildCount();
+                /*currentItems = manager.getChildCount();
                 totalItems = manager.getItemCount();
                 scrollOutItems = manager.findFirstVisibleItemPosition();
                 if(isScrolling && (currentItems + scrollOutItems == totalItems) && !sugerenciaPress)
@@ -122,6 +127,17 @@ public class Empresas extends AppCompatActivity implements EmpresasAdapter.OnVis
                     isScrolling = false;
                     nPag++;
                     mostrarMasEmpresas();
+                }*/
+
+                totalItems = manager.getItemCount();
+                LinearLayoutManager linearLayoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
+                if (!isLoading) {
+                    if (linearLayoutManager != null && linearLayoutManager.findLastCompletelyVisibleItemPosition() == empresas.size() - 1 && totalItems != Integer.parseInt(totalElements) && !sugerenciaPress) {
+                        //bottom of list!
+                        nPag++;
+                        mostrarMasEmpresas();
+                        isLoading = true;
+                    }
                 }
             }
         });
@@ -318,6 +334,7 @@ public class Empresas extends AppCompatActivity implements EmpresasAdapter.OnVis
                             empresas.add(listaEmpresas.getlEmpresa().get(i));
                             //Log.d("msg1233",""+listaVisitantes.getlVisitante().get(i).getVteNombre());
                         }
+                        totalElements = listaEmpresas.getTotalElements();
                         empresasAdapter = new EmpresasAdapter(empresas);
                         empresasAdapter.setOnVisitanteClickListener(Empresas.this);
 
@@ -360,10 +377,12 @@ public class Empresas extends AppCompatActivity implements EmpresasAdapter.OnVis
                             empresas.add(listaEmpresas.getlEmpresa().get(i));
                             //Log.d("msg1233",""+listaVisitantes.getlVisitante().get(i).getVteNombre());
                         }
+                        totalElements = listaEmpresas.getTotalElements();
                         empresasAdapter.notifyDataSetChanged();
                         swipeRefreshLayout.setRefreshing(false);
                     }
                     nPag = 0;
+                    isLoading = false;
                 }
             }
             @Override
@@ -376,39 +395,56 @@ public class Empresas extends AppCompatActivity implements EmpresasAdapter.OnVis
 
     private void mostrarMasEmpresas()
     {
-        Retrofit retrofit = NetworkClient.getRetrofitClient(this);
-        ListaEmpresasAPIs listaEmpresasAPIs = retrofit.create(ListaEmpresasAPIs.class);
-        Call<ListaEmpresas> call = listaEmpresasAPIs.listaEmpresas(Integer.toString(nPag),"10", authorization);
-        call.enqueue(new Callback<ListaEmpresas>() {
+        empresas.add(null);
+        empresasAdapter.notifyItemInserted(empresas.size() - 1);
+
+        Handler handler = new Handler(Looper.getMainLooper());
+        handler.postDelayed(new Runnable() {
             @Override
-            public void onResponse(Call <ListaEmpresas> call, retrofit2.Response<ListaEmpresas> response) {
-                if (response.code() == 401) {
-                    showTknExpDialog();
-                }
-                else
-                {
-                    ListaEmpresas listaEmpresas = response.body();
-                    if(listaEmpresas.getlEmpresa().size() == 0)
-                    {
-                        //tvNoData.setVisibility(View.VISIBLE);
-                    }
-                    else
-                    {
-                        //tvNoData.setVisibility(View.GONE);
-                        for(int i = 0 ; i < listaEmpresas.getlEmpresa().size() ; i++)
-                        {
-                            empresas.add(listaEmpresas.getlEmpresa().get(i));
+            public void run() {
+                Retrofit retrofit = NetworkClient.getRetrofitClient(getApplication());
+                ListaEmpresasAPIs listaEmpresasAPIs = retrofit.create(ListaEmpresasAPIs.class);
+                Call<ListaEmpresas> call = listaEmpresasAPIs.listaEmpresas(Integer.toString(nPag),"10", authorization);
+                call.enqueue(new Callback<ListaEmpresas>() {
+                    @Override
+                    public void onResponse(Call <ListaEmpresas> call, retrofit2.Response<ListaEmpresas> response) {
+                        if (response.code() == 401) {
+                            showTknExpDialog();
                         }
-                        empresasAdapter.notifyDataSetChanged();
+                        else
+                        {
+                            bar.setVisibility(View.GONE);
+                            recyclerView.setVisibility(View.VISIBLE);
+                            empresas.remove(empresas.size() - 1);
+                            int scrollPosition = empresas.size();
+                            empresasAdapter.notifyItemRemoved(scrollPosition);
+                            ListaEmpresas listaEmpresas = response.body();
+                            if(listaEmpresas.getlEmpresa().size() == 0)
+                            {
+                                //tvNoData.setVisibility(View.VISIBLE);
+                            }
+                            else
+                            {
+                                //tvNoData.setVisibility(View.GONE);
+                                for(int i = 0 ; i < listaEmpresas.getlEmpresa().size() ; i++)
+                                {
+                                    empresas.add(listaEmpresas.getlEmpresa().get(i));
+                                }
+                                empresasAdapter.notifyDataSetChanged();
+                                isLoading = false;
+                            }
+                        }
                     }
-                }
+                    @Override
+                    public void onFailure(Call <ListaEmpresas> call, Throwable t) {
+                        bar.setVisibility(View.GONE);
+                        tvFallo.setVisibility(View.VISIBLE);
+                    }
+                });
             }
-            @Override
-            public void onFailure(Call <ListaEmpresas> call, Throwable t) {
-                bar.setVisibility(View.GONE);
-                tvFallo.setVisibility(View.VISIBLE);
-            }
-        });
+        }, 1000);
+
+
     }
 
     private void buscarEmpresaXNombre()

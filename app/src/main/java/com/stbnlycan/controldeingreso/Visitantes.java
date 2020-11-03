@@ -22,6 +22,7 @@ import android.content.SharedPreferences;
 import android.database.MatrixCursor;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.provider.BaseColumns;
 import android.util.Log;
 import android.view.Menu;
@@ -269,47 +270,43 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
         visitantes.add(null);
         visitantesAdapter.notifyItemInserted(visitantes.size() - 1);
 
-        /*Handler handler = new Handler();
+        Handler handler = new Handler(Looper.getMainLooper());
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-
-            }
-        }, 2000);*/
-
-        Retrofit retrofit = NetworkClient.getRetrofitClient(getApplication());
-        ListaVisitantesAPIs listaVisitantesAPIs = retrofit.create(ListaVisitantesAPIs.class);
-        Call<ListaVisitantes> call = listaVisitantesAPIs.listaVisitantes(Integer.toString(nPag),"10", authorization);
-        call.enqueue(new Callback<ListaVisitantes>() {
-            @Override
-            public void onResponse(Call <ListaVisitantes> call, retrofit2.Response<ListaVisitantes> response) {
-                if (response.code() == 401) {
-                    showTknExpDialog();
-                }
-                else
-                {
-                    bar.setVisibility(View.GONE);
-                    recyclerView.setVisibility(View.VISIBLE);
-                    visitantes.remove(visitantes.size() - 1);
-                    int scrollPosition = visitantes.size();
-                    visitantesAdapter.notifyItemRemoved(scrollPosition);
-                    ListaVisitantes listaVisitantes = response.body();
-                    for(int i = 0 ; i < listaVisitantes.getlVisitante().size() ; i++)
-                    {
-                        visitantes.add(listaVisitantes.getlVisitante().get(i));
+                Retrofit retrofit = NetworkClient.getRetrofitClient(getApplication());
+                ListaVisitantesAPIs listaVisitantesAPIs = retrofit.create(ListaVisitantesAPIs.class);
+                Call<ListaVisitantes> call = listaVisitantesAPIs.listaVisitantes(Integer.toString(nPag),"10", authorization);
+                call.enqueue(new Callback<ListaVisitantes>() {
+                    @Override
+                    public void onResponse(Call <ListaVisitantes> call, retrofit2.Response<ListaVisitantes> response) {
+                        if (response.code() == 401) {
+                            showTknExpDialog();
+                        }
+                        else
+                        {
+                            bar.setVisibility(View.GONE);
+                            recyclerView.setVisibility(View.VISIBLE);
+                            visitantes.remove(visitantes.size() - 1);
+                            int scrollPosition = visitantes.size();
+                            visitantesAdapter.notifyItemRemoved(scrollPosition);
+                            ListaVisitantes listaVisitantes = response.body();
+                            for(int i = 0 ; i < listaVisitantes.getlVisitante().size() ; i++)
+                            {
+                                visitantes.add(listaVisitantes.getlVisitante().get(i));
+                            }
+                            visitantesAdapter.notifyDataSetChanged();
+                            isLoading = false;
+                        }
                     }
-                    visitantesAdapter.notifyDataSetChanged();
-                    isLoading = false;
-                }
-
+                    @Override
+                    public void onFailure(Call <ListaVisitantes> call, Throwable t) {
+                        bar.setVisibility(View.GONE);
+                        tvFallo.setVisibility(View.VISIBLE);
+                    }
+                });
             }
-            @Override
-            public void onFailure(Call <ListaVisitantes> call, Throwable t) {
-                bar.setVisibility(View.GONE);
-                tvFallo.setVisibility(View.VISIBLE);
-            }
-        });
-
+        }, 1000);
     }
 
     private void actualizarVisitantes() {

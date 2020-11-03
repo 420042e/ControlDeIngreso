@@ -33,7 +33,7 @@ import java.util.List;
 
 import okhttp3.OkHttpClient;
 
-public class UsuariosAdapter extends RecyclerView.Adapter<UsuariosAdapter.ARV> implements Filterable {
+public class UsuariosAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements Filterable {
     private List<Usuario> eventosList;
     private List<Usuario> eventosListFull;
 
@@ -43,6 +43,9 @@ public class UsuariosAdapter extends RecyclerView.Adapter<UsuariosAdapter.ARV> i
     private Context context;
     //private OkHttpClient client;
     private String authorization;
+
+    private final int VIEW_TYPE_ITEM = 0;
+    private final int VIEW_TYPE_LOADING = 1;
 
     public UsuariosAdapter(Context context, String authorization, List<Usuario> eventosList) {
         this.eventosList = eventosList;
@@ -54,45 +57,26 @@ public class UsuariosAdapter extends RecyclerView.Adapter<UsuariosAdapter.ARV> i
 
     @NonNull
     @Override
-    public ARV onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return new ARV(LayoutInflater.from(parent.getContext()).inflate(R.layout.usuarios_list, parent, false));
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        if (viewType == VIEW_TYPE_ITEM) {
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.usuarios_list, parent, false);
+            return new ItemViewHolder(view);
+        } else {
+            View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.loading_recycler, parent, false);
+            return new LoadingViewHolder(view);
+        }
+        //return new ARV(LayoutInflater.from(parent.getContext()).inflate(R.layout.usuarios_list, parent, false));
     }
 
     @Override
-    public void onBindViewHolder(@NonNull final ARV holder, int position) {
-        Usuario visitante = eventosList.get(position);
-        holder.artNaam.setText(visitante.getUsername());
-        holder.lugar.setText(visitante.getFullname());
-        holder.tipoVisitante.setText(visitante.getRol().getNombre());
-        holder.empresaNombre.setText(visitante.getAddress());
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder viewHolder, int position) {
 
-        String url = context.getResources().getString(R.string.url_foto_usuarios) + visitante.getPic();
-        GlideUrl glideUrl = new GlideUrl(url,
-                new LazyHeaders.Builder()
-                        .addHeader("Authorization", authorization)
-                        .build());
-        Glide.with(context)
-                .load(glideUrl)
-                .centerCrop()
-                .apply(new RequestOptions().override(96, 96))
-                .listener(new RequestListener<Drawable>() {
-                    @Override
-                    public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
-                        holder.imgVisitante.setVisibility(View.VISIBLE);
-                        holder.progressBar.setVisibility(View.GONE);
-                        return false;
-                    }
+        if (viewHolder instanceof ItemViewHolder) {
+            populateItemRows((ItemViewHolder) viewHolder, position);
+        } else if (viewHolder instanceof LoadingViewHolder) {
+            showLoadingView((LoadingViewHolder) viewHolder, position);
+        }
 
-                    @Override
-                    public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
-                        holder.imgVisitante.setVisibility(View.VISIBLE);
-                        holder.progressBar.setVisibility(View.GONE);
-                        return false;
-                    }
-                })
-                .into(holder.imgVisitante);
-
-        holder.visitante = eventosList.get(position);
     }
 
     @Override
@@ -137,6 +121,11 @@ public class UsuariosAdapter extends RecyclerView.Adapter<UsuariosAdapter.ARV> i
     @Override
     public int getItemCount() {
         return eventosList!=null?eventosList.size():0;
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return eventosList.get(position) == null ? VIEW_TYPE_LOADING : VIEW_TYPE_ITEM;
     }
 
     public class ARV extends RecyclerView.ViewHolder implements View.OnClickListener
@@ -202,5 +191,91 @@ public class UsuariosAdapter extends RecyclerView.Adapter<UsuariosAdapter.ARV> i
     public interface OnEEClickListener
     {
         void OnEEClick(Usuario visitante);
+    }
+
+    private class ItemViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+        private ImageView imgVisitante;
+        private TextView artNaam;
+        private TextView lugar;
+        private TextView tipoVisitante;
+        private TextView empresaNombre;
+        private Usuario visitante;
+        private ProgressBar progressBar;
+
+        public ItemViewHolder(@NonNull View itemView) {
+            super(itemView);
+
+            imgVisitante = itemView.findViewById(R.id.imgVisitante);
+            artNaam = itemView.findViewById(R.id.nombres);
+            lugar = itemView.findViewById(R.id.nroCi);
+            tipoVisitante = itemView.findViewById(R.id.tipoVisitante);
+            empresaNombre = itemView.findViewById(R.id.empresaNombre);
+            progressBar = itemView.findViewById(R.id.progressBar);
+
+            imgVisitante.setVisibility(View.GONE);
+            progressBar.setVisibility(View.VISIBLE);
+
+            itemView.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View view)
+        {
+            Log.d("Click","clickeado");
+
+            mListener.onEventoClick(visitante, getAdapterPosition());
+
+        }
+    }
+
+    private class LoadingViewHolder extends RecyclerView.ViewHolder {
+
+        ProgressBar progressBar;
+
+        public LoadingViewHolder(@NonNull View itemView) {
+            super(itemView);
+            progressBar = itemView.findViewById(R.id.progressBar);
+        }
+    }
+
+    private void showLoadingView(LoadingViewHolder viewHolder, int position) {
+        //ProgressBar would be displayed
+
+    }
+
+    private void populateItemRows(final ItemViewHolder viewHolder, int position) {
+        Usuario visitante = eventosList.get(position);
+        viewHolder.artNaam.setText(visitante.getUsername());
+        viewHolder.lugar.setText(visitante.getFullname());
+        viewHolder.tipoVisitante.setText(visitante.getRol().getNombre());
+        viewHolder.empresaNombre.setText(visitante.getAddress());
+
+        String url = context.getResources().getString(R.string.url_foto_usuarios) + visitante.getPic();
+        GlideUrl glideUrl = new GlideUrl(url,
+                new LazyHeaders.Builder()
+                        .addHeader("Authorization", authorization)
+                        .build());
+        Glide.with(context)
+                .load(glideUrl)
+                .centerCrop()
+                .apply(new RequestOptions().override(96, 96))
+                .listener(new RequestListener<Drawable>() {
+                    @Override
+                    public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                        viewHolder.imgVisitante.setVisibility(View.VISIBLE);
+                        viewHolder.progressBar.setVisibility(View.GONE);
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                        viewHolder.imgVisitante.setVisibility(View.VISIBLE);
+                        viewHolder.progressBar.setVisibility(View.GONE);
+                        return false;
+                    }
+                })
+                .into(viewHolder.imgVisitante);
+
+        viewHolder.visitante = eventosList.get(position);
     }
 }
