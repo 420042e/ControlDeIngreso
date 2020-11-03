@@ -186,7 +186,7 @@ public class EditarVisitanteActivity extends AppCompatActivity implements Valida
         int height = displayMetrics.heightPixels;
         int width = displayMetrics.widthPixels;
 
-        String url = "http://190.129.90.115:8083/ingresoVisitantes/visitante/mostrarFoto?foto=" + visitanteRecibido.getVteImagen();
+        String url = getResources().getString(R.string.url_foto_visitantes) + visitanteRecibido.getVteImagen();
         GlideUrl glideUrl = new GlideUrl(url,
                 new LazyHeaders.Builder()
                         .addHeader("Authorization", authorization)
@@ -751,7 +751,7 @@ public class EditarVisitanteActivity extends AppCompatActivity implements Valida
                     int height = displayMetrics.heightPixels;
                     int width = displayMetrics.widthPixels;
 
-                    String url = "http://190.129.90.115:8083/ingresoVisitantes/visitante/mostrarFoto?foto=" + response.body().getVteImagen();
+                    String url = getResources().getString(R.string.url_foto_visitantes) + response.body().getVteImagen();
                     GlideUrl glideUrl = new GlideUrl(url,
                             new LazyHeaders.Builder()
                                     .addHeader("Authorization", authorization)

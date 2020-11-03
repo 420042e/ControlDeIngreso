@@ -105,22 +105,6 @@ public class DetallesVisita extends AppCompatActivity {
         editor = pref.edit();
         authorization = pref.getString("token_type", null) + " " + pref.getString("access_token", null);
 
-        /*OkHttpClient client = new OkHttpClient.Builder()
-                .addInterceptor(new Interceptor() {
-                    @Override
-                    public okhttp3.Response intercept(Chain chain) throws IOException {
-                        Request newRequest = chain.request().newBuilder()
-                                .addHeader("Authorization", authorization)
-                                .build();
-                        return chain.proceed(newRequest);
-                    }
-                })
-                .build();
-        Picasso picasso = new Picasso.Builder(this)
-                .downloader(new OkHttp3Downloader(client))
-                .build();
-        picasso.load("http://190.129.90.115:8083/ingresoVisitantes/visitante/mostrarFoto?foto=" + visitaRecibida.getVisitante().getVteImagen()).into(visitanteIV);*/
-
         String dtIngreso = visitaRecibida.getVisIngreso();
         String dtSalida = visitaRecibida.getVisSalida();
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");

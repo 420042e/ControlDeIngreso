@@ -66,11 +66,7 @@ public class UsuariosAdapter extends RecyclerView.Adapter<UsuariosAdapter.ARV> i
         holder.tipoVisitante.setText(visitante.getRol().getNombre());
         holder.empresaNombre.setText(visitante.getAddress());
 
-        /*Picasso picasso = new Picasso.Builder(context)
-                .downloader(new OkHttp3Downloader(client))
-                .build();
-        picasso.load("http://190.129.90.115:8083/ingresoVisitantes/usuarios/mostrarFoto?foto=" + visitante.getPic()).fit().into(holder.imgVisitante);*/
-        String url = "http://190.129.90.115:8083/ingresoVisitantes/usuarios/mostrarFoto?foto=" + visitante.getPic();
+        String url = context.getResources().getString(R.string.url_foto_usuarios) + visitante.getPic();
         GlideUrl glideUrl = new GlideUrl(url,
                 new LazyHeaders.Builder()
                         .addHeader("Authorization", authorization)

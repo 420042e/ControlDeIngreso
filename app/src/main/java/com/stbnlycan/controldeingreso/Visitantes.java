@@ -89,6 +89,7 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
     private String totalElements;
     private boolean sugerenciaPress;
     private LoadingFragment dialogFragment;
+    boolean isLoading = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -154,7 +155,7 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
             @Override
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
-                currentItems = manager.getChildCount();
+                /*currentItems = manager.getChildCount();
                 totalItems = manager.getItemCount();
                 scrollOutItems = manager.findFirstVisibleItemPosition();
                 if(isScrolling && (currentItems + scrollOutItems == totalItems)  && totalItems != Integer.parseInt(totalElements) && !sugerenciaPress)
@@ -162,6 +163,17 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
                     isScrolling = false;
                     nPag++;
                     mostrarMasVisitantes();
+                }*/
+
+                totalItems = manager.getItemCount();
+                LinearLayoutManager linearLayoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
+                if (!isLoading) {
+                    if (linearLayoutManager != null && linearLayoutManager.findLastCompletelyVisibleItemPosition() == visitantes.size() - 1 && totalItems != Integer.parseInt(totalElements) && !sugerenciaPress) {
+                        //bottom of list!
+                        nPag++;
+                        mostrarMasVisitantes();
+                        isLoading = true;
+                    }
                 }
             }
         });
@@ -254,7 +266,18 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
     }
 
     private void mostrarMasVisitantes() {
-        Retrofit retrofit = NetworkClient.getRetrofitClient(this);
+        visitantes.add(null);
+        visitantesAdapter.notifyItemInserted(visitantes.size() - 1);
+
+        /*Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+
+            }
+        }, 2000);*/
+
+        Retrofit retrofit = NetworkClient.getRetrofitClient(getApplication());
         ListaVisitantesAPIs listaVisitantesAPIs = retrofit.create(ListaVisitantesAPIs.class);
         Call<ListaVisitantes> call = listaVisitantesAPIs.listaVisitantes(Integer.toString(nPag),"10", authorization);
         call.enqueue(new Callback<ListaVisitantes>() {
@@ -267,12 +290,16 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
                 {
                     bar.setVisibility(View.GONE);
                     recyclerView.setVisibility(View.VISIBLE);
+                    visitantes.remove(visitantes.size() - 1);
+                    int scrollPosition = visitantes.size();
+                    visitantesAdapter.notifyItemRemoved(scrollPosition);
                     ListaVisitantes listaVisitantes = response.body();
                     for(int i = 0 ; i < listaVisitantes.getlVisitante().size() ; i++)
                     {
                         visitantes.add(listaVisitantes.getlVisitante().get(i));
                     }
                     visitantesAdapter.notifyDataSetChanged();
+                    isLoading = false;
                 }
 
             }
@@ -317,28 +344,8 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
                         swipeRefreshLayout.setRefreshing(false);
                     }
                     nPag = 0;
+                    isLoading = false;
                 }
-
-                /*visitantes.clear();
-                ListaVisitantes listaVisitantes = response.body();
-                if(listaVisitantes.getlVisitante().size() == 0)
-                {
-                    tvNoData.setVisibility(View.VISIBLE);
-                }
-                else
-                {
-                    bar.setVisibility(View.GONE);
-                    recyclerView.setVisibility(View.VISIBLE);
-                    tvNoData.setVisibility(View.GONE);
-                    for(int i = 0 ; i < listaVisitantes.getlVisitante().size() ; i++)
-                    {
-                        visitantes.add(listaVisitantes.getlVisitante().get(i));
-                    }
-                    totalElements = listaVisitantes.getTotalElements();
-                    visitantesAdapter.notifyDataSetChanged();
-                    swipeRefreshLayout.setRefreshing(false);
-                }
-                nPag = 0;*/
             }
             @Override
             public void onFailure(Call <ListaVisitantes> call, Throwable t) {

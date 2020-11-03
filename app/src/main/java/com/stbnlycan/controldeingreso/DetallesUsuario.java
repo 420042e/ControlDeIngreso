@@ -106,33 +106,7 @@ public class DetallesUsuario extends AppCompatActivity {
 
         progressBar.setVisibility(View.VISIBLE);
 
-        /*OkHttpClient client = new OkHttpClient.Builder()
-                .addInterceptor(new Interceptor() {
-                    @Override
-                    public okhttp3.Response intercept(Chain chain) throws IOException {
-                        Request newRequest = chain.request().newBuilder()
-                                .addHeader("Authorization", authorization)
-                                .build();
-                        return chain.proceed(newRequest);
-                    }
-                })
-                .build();
-        Picasso picasso = new Picasso.Builder(this)
-                .downloader(new OkHttp3Downloader(client))
-                .build();
-        picasso.load("http://190.129.90.115:8083/ingresoVisitantes/usuarios/mostrarFoto?foto=" + usuarioRecibido.getPic()).resize(width, width).into(visitanteIV, new com.squareup.picasso.Callback() {
-            @Override
-            public void onSuccess() {
-                progressBar.setVisibility(View.GONE);
-            }
-
-            @Override
-            public void onError(Exception e) {
-
-            }
-        } );*/
-
-        String url = "http://190.129.90.115:8083/ingresoVisitantes/usuarios/mostrarFoto?foto=" + usuarioRecibido.getPic();
+        String url = getResources().getString(R.string.url_foto_usuarios) + usuarioRecibido.getPic();
         GlideUrl glideUrl = new GlideUrl(url,
                 new LazyHeaders.Builder()
                         .addHeader("Authorization", authorization)

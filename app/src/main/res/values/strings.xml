@@ -2,6 +2,12 @@
     <string name="app_name">Control de Ingreso</string>
     <string name="title_activity_visitantes">Visitantes</string>
 
+    <!-- TODO: Url fotos de visitantes -->
+    <string name="url_foto_visitantes">http://190.129.90.115:8083/ingresoVisitantes/visitante/mostrarFoto?foto=</string>
+
+    <!-- TODO: Url fotos de usuarios -->
+    <string name="url_foto_usuarios">http://190.129.90.115:8083/ingresoVisitantes/usuarios/mostrarFoto?foto=</string>
+
     <!-- TODO: Remove or change this placeholder text -->
     <string name="loading">Espera un momento por favor...</string>
     <string name="no_data_available">No hay datos disponibles</string>
