@@ -58,7 +58,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Retrofit;
 
-public class Visitantes extends AppCompatActivity implements VisitantesAdapter.OnVisitanteClickListener, VisitantesAdapter.OnVQRClickListener, VisitantesAdapter.OnEEClickListener{
+public class Visitantes extends AppCompatActivity implements VisitantesAdapter.OnVisitanteClickListener, VisitantesAdapter.OnVQRClickListener, VisitantesAdapter.OnEEClickListener, DFTknExpired.OnInputListener{
 
     private ArrayList<Visitante> visitantes;
     private VisitantesAdapter visitantesAdapter;
@@ -86,6 +86,7 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
     private String authorization;
     private SharedPreferences pref;
     private SharedPreferences.Editor editor;
+    private String rol;
 
     private String totalElements;
     private boolean sugerenciaPress;
@@ -184,7 +185,7 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
         tvFallo.setVisibility(View.GONE);
         tvNoData.setVisibility(View.GONE);
 
-        //recyclerView.getRecycledViewPool().setMaxRecycledViews(0, 0);
+        //cerrarSesion();
 
         actualizarVisitantes();
 
@@ -576,6 +577,7 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
 
     public void showTknExpDialog() {
         DFTknExpired dfTknExpired = new DFTknExpired();
+        dfTknExpired.setOnInputListener(this);
         FragmentTransaction ft;
         Bundle bundle = new Bundle();
         bundle.putInt("tiempo", 0);
@@ -588,5 +590,14 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
         }
         ft.addToBackStack(null);
         dfTknExpired.show(ft, "dialogTknExpLoading");
+    }
+
+    @Override
+    public void sendInput(boolean estado) {
+        /*pref = getApplicationContext().getSharedPreferences("MyPref", 0);
+        editor = pref.edit();
+        authorization = pref.getString("token_type", null) + " " + pref.getString("access_token", null);
+        rol = pref.getString("rol", null);
+        actualizarVisitantes();*/
     }
 }

@@ -53,7 +53,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Retrofit;
 
-public class Empresas extends AppCompatActivity implements EmpresasAdapter.OnVisitanteClickListener{
+public class Empresas extends AppCompatActivity implements EmpresasAdapter.OnVisitanteClickListener, DFTknExpired.OnInputListener{
 
     private ArrayList<Empresa> empresas;
     private EmpresasAdapter empresasAdapter;
@@ -76,6 +76,7 @@ public class Empresas extends AppCompatActivity implements EmpresasAdapter.OnVis
     private String authorization;
     private SharedPreferences pref;
     private SharedPreferences.Editor editor;
+    private String rol;
 
     private final static int REQUEST_CODE_NE = 1;
     private final static int REQUEST_CODE_EE = 2;
@@ -98,6 +99,11 @@ public class Empresas extends AppCompatActivity implements EmpresasAdapter.OnVis
 
         empresas = new ArrayList<>();
 
+        empresasAdapter = new EmpresasAdapter(empresas);
+        empresasAdapter.setOnVisitanteClickListener(Empresas.this);
+
+
+
         pref = getApplicationContext().getSharedPreferences("MyPref", 0);
         editor = pref.edit();
         authorization = pref.getString("token_type", null) + " " + pref.getString("access_token", null);
@@ -106,6 +112,7 @@ public class Empresas extends AppCompatActivity implements EmpresasAdapter.OnVis
         recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(manager);
+        recyclerView.setAdapter(empresasAdapter);
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
@@ -148,7 +155,9 @@ public class Empresas extends AppCompatActivity implements EmpresasAdapter.OnVis
         recyclerView.setVisibility(View.GONE);
         tvFallo.setVisibility(View.GONE);
 
-        fetchEmpresas();
+        //cerrarSesion();
+        //fetchEmpresas();
+        actualizarEmpresas();
 
         swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout);
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -363,6 +372,8 @@ public class Empresas extends AppCompatActivity implements EmpresasAdapter.OnVis
                 }
                 else
                 {
+                    bar.setVisibility(View.GONE);
+                    recyclerView.setVisibility(View.VISIBLE);
                     empresas.clear();
                     ListaEmpresas listaEmpresas = response.body();
                     if(listaEmpresas.getlEmpresa().size() == 0)
@@ -513,6 +524,7 @@ public class Empresas extends AppCompatActivity implements EmpresasAdapter.OnVis
 
     public void showTknExpDialog() {
         DFTknExpired dfTknExpired = new DFTknExpired();
+        dfTknExpired.setOnInputListener(this);
         FragmentTransaction ft;
         Bundle bundle = new Bundle();
         bundle.putInt("tiempo", 0);
@@ -525,5 +537,14 @@ public class Empresas extends AppCompatActivity implements EmpresasAdapter.OnVis
         }
         ft.addToBackStack(null);
         dfTknExpired.show(ft, "dialogTknExpLoading");
+    }
+
+    @Override
+    public void sendInput(boolean estado) {
+        /*pref = getApplicationContext().getSharedPreferences("MyPref", 0);
+        editor = pref.edit();
+        authorization = pref.getString("token_type", null) + " " + pref.getString("access_token", null);
+        rol = pref.getString("rol", null);
+        actualizarEmpresas();*/
     }
 }

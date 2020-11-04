@@ -107,14 +107,12 @@ public class LoginActivity extends AppCompatActivity {
         fields.put("grant_type", "password");
         fields.put("username", username.getText().toString());
         fields.put("password", password.getText().toString());
-
         Retrofit retrofit = NetworkClient.getRetrofitClient(this);
         LoginAPIs loginAPIs = retrofit.create(LoginAPIs.class);
         Call<JsonObject> call = loginAPIs.login(headers, fields);
         call.enqueue(new Callback<JsonObject>() {
             @Override
             public void onResponse(Call <JsonObject> call, retrofit2.Response<JsonObject> response) {
-                //progressBarHolder.setVisibility(View.GONE);
                 if (response.code() == 400) {
                     progressBarHolder.setVisibility(View.GONE);
                     Toast.makeText(getApplicationContext(), "No existe el usuario", Toast.LENGTH_LONG).show();
@@ -128,17 +126,8 @@ public class LoginActivity extends AppCompatActivity {
                         editor.putString("access_token", token.getAccess_token());
                         editor.putString("token_type", token.getToken_type());
                         editor.apply();
-                        //editor.commit();
-
                         authorization = token.getToken_type() + " " + token.getAccess_token();
-
                         JWT jwt = new JWT(token.getAccess_token());
-                        /*Map<String, Claim> allClaims = jwt.getClaims();
-                        for (Map.Entry<String, Claim> entry : allClaims.entrySet()) {
-                            Log.d("msg8645",""+entry.getKey() + "/" + entry.getValue().asString());
-                        }*/
-
-                        //iniciarMainActivity(jwt.getClaim("user_name").asString());
                         buscaRecintosXUsuario(jwt.getClaim("user_name").asString());
                     }
                 }

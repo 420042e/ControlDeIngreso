@@ -106,7 +106,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Retrofit;
 
-public class Visitas extends AppCompatActivity implements VisitasAdapter.OnVisitanteClickListener{
+public class Visitas extends AppCompatActivity implements VisitasAdapter.OnVisitanteClickListener, DFTknExpired.OnInputListener{
 
     private Toolbar toolbar;
     private Recinto recintoRecibido;
@@ -148,6 +148,7 @@ public class Visitas extends AppCompatActivity implements VisitasAdapter.OnVisit
     private String authorization;
     private SharedPreferences pref;
     private SharedPreferences.Editor editor;
+    private String rol;
 
     private boolean sugerenciaPress;
     private LoadingFragment loadingFragment;
@@ -405,6 +406,8 @@ public class Visitas extends AppCompatActivity implements VisitasAdapter.OnVisit
                 }
             }
         });
+
+        //cerrarSesion();
     }
 
     public void iniciarSpinnerArea() {
@@ -1292,6 +1295,7 @@ public class Visitas extends AppCompatActivity implements VisitasAdapter.OnVisit
 
     public void showTknExpDialog() {
         DFTknExpired dfTknExpired = new DFTknExpired();
+        dfTknExpired.setOnInputListener(this);
         FragmentTransaction ft;
         Bundle bundle = new Bundle();
         bundle.putInt("tiempo", 0);
@@ -1304,5 +1308,25 @@ public class Visitas extends AppCompatActivity implements VisitasAdapter.OnVisit
         }
         ft.addToBackStack(null);
         dfTknExpired.show(ft, "dialogTknExpLoading");
+    }
+
+    @Override
+    public void sendInput(boolean estado) {
+        /*pref = getApplicationContext().getSharedPreferences("MyPref", 0);
+        editor = pref.edit();
+        authorization = pref.getString("token_type", null) + " " + pref.getString("access_token", null);
+        rol = pref.getString("rol", null);
+        AreaRecinto areaRecinto = (AreaRecinto) areaRecintoS.getSelectedItem();
+        if(!(areaRecinto.getAreaCod().equals("cod")))
+        {
+            if(tipoVisitaSel == 1)
+            {
+                actualizarVCS();
+            }
+            else if(tipoVisitaSel == 2)
+            {
+                actualizarVSS();
+            }
+        }*/
     }
 }

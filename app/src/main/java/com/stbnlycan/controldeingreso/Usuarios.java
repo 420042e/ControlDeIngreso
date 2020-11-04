@@ -60,7 +60,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Retrofit;
 
-public class Usuarios extends AppCompatActivity implements UsuariosAdapter.OnUsuarioClickListener {
+public class Usuarios extends AppCompatActivity implements UsuariosAdapter.OnUsuarioClickListener, DFTknExpired.OnInputListener {
 
     private ArrayList<Usuario> usuarios;
     private UsuariosAdapter usuariosAdapter;
@@ -85,6 +85,7 @@ public class Usuarios extends AppCompatActivity implements UsuariosAdapter.OnUsu
     private String authorization;
     private SharedPreferences pref;
     private SharedPreferences.Editor editor;
+    private String rol;
 
     private Recinto recintoRecibido;
 
@@ -142,6 +143,8 @@ public class Usuarios extends AppCompatActivity implements UsuariosAdapter.OnUsu
         suggestions = new ArrayList<>();
 
         recyclerView.setAdapter(usuariosAdapter);
+
+        //cerrarSesion();
 
         recyclerView.setHasFixedSize(true);
         //recyclerView.setLayoutManager(new GridLayoutManager(getApplicationContext(), 1));
@@ -511,6 +514,7 @@ public class Usuarios extends AppCompatActivity implements UsuariosAdapter.OnUsu
 
     public void showTknExpDialog() {
         DFTknExpired dfTknExpired = new DFTknExpired();
+        dfTknExpired.setOnInputListener(this);
         FragmentTransaction ft;
         Bundle bundle = new Bundle();
         bundle.putInt("tiempo", 0);
@@ -523,5 +527,14 @@ public class Usuarios extends AppCompatActivity implements UsuariosAdapter.OnUsu
         }
         ft.addToBackStack(null);
         dfTknExpired.show(ft, "dialogTknExpLoading");
+    }
+
+    @Override
+    public void sendInput(boolean estado) {
+        /*pref = getApplicationContext().getSharedPreferences("MyPref", 0);
+        editor = pref.edit();
+        authorization = pref.getString("token_type", null) + " " + pref.getString("access_token", null);
+        rol = pref.getString("rol", null);
+        actualizarUsuarios();*/
     }
 }

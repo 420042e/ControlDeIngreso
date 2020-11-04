@@ -286,7 +286,7 @@ public class NuevoDocIngFragment extends DialogFragment implements Validator.Val
 
             //Toast.makeText(getApplicationContext(), "origWidth "+origWidth+" origHeight "+origHeight, Toast.LENGTH_LONG).show();
 
-            final int destWidth = 640;//or the width you need
+            final int destWidth = 1200;//or the width you need
 
             if (origWidth > destWidth) {
                 // picture is wider than we want it, we calculate its target height
@@ -336,13 +336,41 @@ public class NuevoDocIngFragment extends DialogFragment implements Validator.Val
             if(result.getContents() == null) {
                 Toast.makeText(getActivity(), "Cancelaste el escaneo de ingreso", Toast.LENGTH_LONG).show();
             } else {
-                qrObtenido = result.getContents();
+                if(result.getContents().equals(""))
+                {
+                    qrObtenido = null;
+                    Toast.makeText(getActivity(), "El QR no tiene contenido", Toast.LENGTH_LONG).show();
+                }
+                else
+                {
+                    qrObtenido = result.getContents();
+                    int imgResource = R.drawable.ic_check_black_24dp;
+                    btnAddQR.setCompoundDrawablesWithIntrinsicBounds(0, 0, imgResource, 0);
+                    btnAddQR.setCompoundDrawablePadding(8);
+                    try {
+                        com.google.zxing.Writer writer = new QRCodeWriter();
+                        int width = 250;
+                        int height = 250;
+                        BitMatrix bm = writer.encode(qrObtenido, BarcodeFormat.QR_CODE, width, height);
+                        Bitmap ImageBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+
+                        for (int i = 0; i < width; i++) {// width
+                            for (int j = 0; j < height; j++) {// height
+                                ImageBitmap.setPixel(i, j, bm.get(i, j) ? Color.BLACK : Color.WHITE);
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+
+                    }
+                }
+                /*qrObtenido = result.getContents();
                 int imgResource = R.drawable.ic_check_black_24dp;
                 btnAddQR.setCompoundDrawablesWithIntrinsicBounds(0, 0, imgResource, 0);
                 btnAddQR.setCompoundDrawablePadding(8);
                 try {
                     com.google.zxing.Writer writer = new QRCodeWriter();
-                    // String finaldata = Uri.encode(data, "utf-8");
                     int width = 250;
                     int height = 250;
                     BitMatrix bm = writer
@@ -356,12 +384,11 @@ public class NuevoDocIngFragment extends DialogFragment implements Validator.Val
                                     : Color.WHITE);
                         }
                     }
-                    //doiImagenIV2.setImageBitmap(ImageBitmap);
                 }
                 catch (Exception ex)
                 {
 
-                }
+                }*/
             }
         } else {
             super.onActivityResult(requestCode, resultCode, data);
@@ -467,15 +494,6 @@ public class NuevoDocIngFragment extends DialogFragment implements Validator.Val
             onInputListener.sendInput(doi);
             dismiss();
         }
-
-
-        /*DocumentoIngreso doi = new DocumentoIngreso();
-        doi.setDoiImagen(imagenObtenida);
-        doi.setDoiDocumento(qrObtenido);
-        TipoDocumento tipoDocumento = (TipoDocumento) tipoDocS.getSelectedItem();
-        doi.setTipoDocumento(tipoDocumento);
-        onInputListener.sendInput(doi);
-        dismiss();*/
 
     }
 
