@@ -513,7 +513,8 @@ public class NuevoVisitanteActivity extends AppCompatActivity implements Validat
                 editor.putString("rol", "");
                 editor.apply();
                 Toast.makeText(getApplicationContext(), "Sesión finalizada", Toast.LENGTH_LONG).show();
-                Intent intent = new Intent(NuevoVisitanteActivity.this, LoginActivity.class);
+                Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
                 finish();
             }
@@ -527,7 +528,7 @@ public class NuevoVisitanteActivity extends AppCompatActivity implements Validat
     private void fetchDataEmpresa() {
         Retrofit retrofit = NetworkClient.getRetrofitClient(this);
         ListaEmpresasAPIs listaEmpresasAPIs = retrofit.create(ListaEmpresasAPIs.class);
-        Call<ListaEmpresas> call = listaEmpresasAPIs.listaEmpresas("0","10", authorization);
+        Call<ListaEmpresas> call = listaEmpresasAPIs.listaEmpresas("0","50", authorization);
         call.enqueue(new Callback<ListaEmpresas>() {
             @Override
             public void onResponse(Call <ListaEmpresas> call, retrofit2.Response<ListaEmpresas> response) {

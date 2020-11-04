@@ -418,8 +418,9 @@ public class EditarUsuario extends AppCompatActivity implements Validator.Valida
                 editor.putString("rol", "");
                 editor.apply();
                 Toast.makeText(getApplicationContext(), "Sesión finalizada", Toast.LENGTH_LONG).show();
-                Intent intentS = new Intent(EditarUsuario.this, LoginActivity.class);
-                startActivity(intentS);
+                Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(intent);
                 finish();
             }
             @Override

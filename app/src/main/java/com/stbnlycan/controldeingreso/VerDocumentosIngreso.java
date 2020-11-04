@@ -141,7 +141,8 @@ public class VerDocumentosIngreso extends AppCompatActivity implements DOI2Adapt
                 editor.putString("rol", "");
                 editor.apply();
                 Toast.makeText(getApplicationContext(), "Sesión finalizada", Toast.LENGTH_LONG).show();
-                Intent intent = new Intent(VerDocumentosIngreso.this, LoginActivity.class);
+                Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
                 finish();
             }

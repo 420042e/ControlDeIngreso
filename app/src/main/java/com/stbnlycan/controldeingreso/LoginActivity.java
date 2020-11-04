@@ -159,10 +159,11 @@ public class LoginActivity extends AppCompatActivity {
 
     public void iniciarRecintoActivity(Recinto recinto)
     {
+        progressBarHolder.setVisibility(View.GONE);
         Intent intent = new Intent(LoginActivity.this, RecintoActivity.class);
         intent.putExtra("recinto", recinto);
         startActivity(intent);
-        progressBarHolder.setVisibility(View.GONE);
+
         finish();
     }
 
