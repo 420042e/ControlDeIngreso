@@ -171,7 +171,6 @@ public class Visitantes extends AppCompatActivity implements VisitantesAdapter.O
                 LinearLayoutManager linearLayoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
                 if (!isLoading) {
                     if (linearLayoutManager != null && linearLayoutManager.findLastCompletelyVisibleItemPosition() == visitantes.size() - 1 && totalItems != Integer.parseInt(totalElements) && !sugerenciaPress) {
-                        //bottom of list!
                         nPag++;
                         mostrarMasVisitantes();
                         isLoading = true;

@@ -262,6 +262,7 @@ public class Visitas extends AppCompatActivity implements VisitasAdapter.OnVisit
         builder.setTitleText("SELECCIONE UN RANGO DE FECHAS");
         builder.setCalendarConstraints(constraintsBuilder.build());
         builder.setTheme(R.style.ThemeOverlay_MaterialComponents_MaterialCalendar);
+        //builder.setTheme(R.style.CustomMDP);
 
         picker = builder.build();
         picker.addOnPositiveButtonClickListener(new MaterialPickerOnPositiveButtonClickListener<Pair<Long, Long>>() {
@@ -300,6 +301,7 @@ public class Visitas extends AppCompatActivity implements VisitasAdapter.OnVisit
                 }
             }
         });
+
         fechaRango.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
