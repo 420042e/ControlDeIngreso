@@ -318,10 +318,10 @@ public class EditarUsuario extends AppCompatActivity implements Validator.Valida
             editarUsuario();
         }*/
         usuario = new Usuario();
-        usuario.setAddress(addressET.getText().toString());
-        usuario.setEmail(emailET.getText().toString());
-        usuario.setFullname(fullnameET.getText().toString());
-        usuario.setOccupation(occupationET.getText().toString());
+        usuario.setAddress(addressET.getText().toString().toUpperCase());
+        usuario.setEmail(emailET.getText().toString().toUpperCase());
+        usuario.setFullname(fullnameET.getText().toString().toUpperCase());
+        usuario.setOccupation(occupationET.getText().toString().toUpperCase());
         usuario.setPassword(usuarioRecibido.getPassword());
         usuario.setPhone(phoneET.getText().toString());
         usuario.setPic(usuarioRecibido.getPic());
